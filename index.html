@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Auto Manager</title>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig={
+apiKey:"AIzaSy...",
+authDomain:"auto-manutenzione.firebaseapp.com",
+projectId:"auto-manutenzione"
+};
+
+
+
+
+
+
+
+const manutenzioniImport = [
+
+{
+nome:"Additivo Pulisci Iniettori",
+frequenza_km:15000,
+frequenza_mesi:12,
+tipo_frequenza: "Prima del tagliando",
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Bardahl Injector Cleaner",
+immagine:""
+},
+{
+nome:"Additivo Diesel e iniettori shock",
+frequenza_km:15000,
+frequenza_mesi:12,
+tipo_frequenza: "Dopo il tagliando",
+ultimo_km:99000,
+ultima_data:"2025-08-01",
+prodotto:"Bardahl Top Diesel+ 1lt",
+immagine:""
+},
+{
+nome:"Sostituzione olio motore",
+frequenza_km:15000,
+frequenza_mesi:12,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"Motul Specific 0720 5W-30",
+immagine:""
+},
+{
+nome:"Additivo olio pulisci motore",
+frequenza_km:15000,
+frequenza_mesi:12,
+tipo_frequenza: "Prima della sostituzione dell'olio",
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"Liqui Moly Motor Clean",
+immagine:""
+},
+{
+nome:"Additivo olio ceramico",
+frequenza_km:30000,
+frequenza_mesi:24,
+tipo_frequenza: "Dopo la sostituzione dell'olio",
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"Liqui Moly Cera Tec",
+immagine:""
+},
+{
+nome:"Sostituzione Filtro abitacolo",
+frequenza_km:15000,
+frequenza_mesi:12,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"PureFlow HEPA",
+immagine:""
+},
+{
+nome:"Sanificazione impianto A/C",
+frequenza_km:0,
+frequenza_mesi:12,
+ultimo_km:0,
+ultima_data:"2025-07-01",
+prodotto:"Ambro-sol Igienizzante Climatizzatori Spray + Igienizzante Abitacoli Monouso One-Shot",
+immagine:""
+},
+{
+nome:"Sostituzione Filtro olio",
+frequenza_km:15000,
+frequenza_mesi:12,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"Bosch P7176",
+immagine:""
+},
+{
+nome:"Lavaggio o Sostituzione Filtro aria motore",
+frequenza_km:15000,
+frequenza_mesi:12,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"BMC FB 921/01",
+immagine:""
+},
+{
+nome:"Sostituzione Filtro gasolio",
+frequenza_km:15000,
+frequenza_mesi:12,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"UFI Filters 24.095.01",
+immagine:""
+},
+{
+nome:"Convergenza degli pneumatici",
+frequenza_km:20000,
+frequenza_mesi:0,
+ultimo_km:108000,
+ultima_data:"2026-03-01",
+prodotto:0,
+immagine:""
+},
+{
+nome:"Additivo radiatore",
+frequenza_km:30000,
+frequenza_mesi:24,
+ultimo_km:108000,
+ultima_data:0,
+prodotto:"Mishimoto Liquid Chill",
+immagine:""
+},
+{
+nome:"Sostituzione tergicristalli",
+frequenza_km:0,
+frequenza_mesi:24,
+ultimo_km:0,
+ultima_data:"2024-01-01",
+prodotto:"Bosch Aerotwin AR653S + Bosch Rear H301",
+immagine:""
+},
+{
+nome:"Sostituzione liquido freni + spurgo",
+frequenza_km:30000,
+frequenza_mesi:24,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"Brembo PRIME DOT4",
+immagine:""
+},
+{
+nome:"Revisione",
+frequenza_km:0,
+frequenza_mesi:24,
+ultimo_km:0,
+ultima_data:"2024-11-01",
+prodotto:0,
+immagine:""
+},
+{
+nome:"Pulizia Sensore MAF (Mass Air Flow)",
+frequenza_km:30000,
+frequenza_mesi:0,
+ultimo_km:102000,
+ultima_data:"2025-08-01",
+prodotto:"Liqui Moly Air Flow Sensor Cleaner",
+immagine:""
+},
+{
+nome:"Sostituzione Pneumatici",
+frequenza_km:40000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Michelin CrossClimate 2 215/55 R18",
+immagine:""
+},
+{
+nome:"Sostituzione Valvole",
+frequenza_km:40000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Schrader (?)",
+immagine:""
+},
+{
+nome:"Pulizia corpo farfallato",
+frequenza_km:40000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Bardahl Pulitore Aspirazione",
+immagine:""
+},
+{
+nome:"Sostituzione batteria",
+frequenza_km:0,
+frequenza_mesi:36,
+ultimo_km:0,
+ultima_data:"2026-01-01",
+prodotto:"VARTA Dynamic AGM 570901076",
+immagine:""
+},
+{
+nome:"Sostituzione Pastiglie freni",
+frequenza_km:45000,
+frequenza_mesi:36,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"Brembo P 56 098 + Brembo P 56 100",
+immagine:""
+},
+{
+nome:"Rabbocco gas impianto di condizionamento",
+frequenza_km:0,
+frequenza_mesi:36,
+ultimo_km:0,
+ultima_data:"2024-07-01",
+prodotto:0,
+immagine:""
+},
+{
+nome:"Sostituzione olio Compressore",
+frequenza_km:0,
+frequenza_mesi:36,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Denso ND-OIL 8",
+immagine:""
+},
+{
+nome:"Sostituzione olio cambio + additivo",
+frequenza_km:45000,
+frequenza_mesi:36,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"Motul Gear 300 75W-80 GL-4",
+immagine:""
+},
+{
+nome:"Pulizia Sensore MAP (Pressione Collettore)",
+frequenza_km:50000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"WD-40 Specialist Pulitore Contatti",
+immagine:""
+},
+{
+nome:"Sostituzione liquido di raffreddamento",
+frequenza_km:60000,
+frequenza_mesi:48,
+ultimo_km:87000,
+ultima_data:"2024-06-01",
+prodotto:"AREXONS Protettivo Radiatori Verde",
+immagine:""
+},
+{
+nome:"Sostituzione dischi freni",
+frequenza_km:75000,
+frequenza_mesi:60,
+ultimo_km:78000,
+ultima_data:"2023-07-01",
+prodotto:"Brembo 08.C546.11 + ZIMMERMANN 200.2534.52",
+immagine:""
+},
+{
+nome:"Sostituzione Ammortizzatori",
+frequenza_km:75000,
+frequenza_mesi:60,
+ultimo_km:78000,
+ultima_data:"2023-07-01",
+prodotto:"Bilstein B4 22-245694 + 22-247162 + 19-245706",
+immagine:""
+},
+{
+nome:"Sostituzione Paracolpi Ammortizzatori",
+frequenza_km:75000,
+frequenza_mesi:60,
+ultimo_km:78000,
+ultima_data:"2023-07-01",
+prodotto:"Febi Bilstein 103458",
+immagine:""
+},
+{
+nome:"Sostituzione Parapolvere Ammortizzatori",
+frequenza_km:75000,
+frequenza_mesi:60,
+ultimo_km:78000,
+ultima_data:"2023-07-01",
+prodotto:"Febi Bilstein 197106",
+immagine:""
+},
+{
+nome:"Sostituzione Biellette barra stabilizzatrice",
+frequenza_km:75000,
+frequenza_mesi:60,
+ultimo_km:108000,
+ultima_data:"2026-03-01",
+prodotto:"MOOG NI-LS-10692",
+immagine:""
+},
+{
+nome:"Sostituzione Biellette barra stabilizzatrice",
+frequenza_km:75000,
+frequenza_mesi:60,
+ultimo_km:108000,
+ultima_data:"2026-03-01",
+prodotto:"MOOG NI-SB-15275",
+immagine:""
+},
+{
+nome:"Sostituzione Supporti Ammortizzatori",
+frequenza_km:75000,
+frequenza_mesi:60,
+ultimo_km:78000,
+ultima_data:"2023-07-01",
+prodotto:"Bilstein 12-263325",
+immagine:""
+},
+{
+nome:"Sostituzione candelette",
+frequenza_km:90000,
+frequenza_mesi:0,
+ultimo_km:89000,
+ultima_data:"2024-07-01",
+prodotto:"4 x Bosch 0 250 403 012",
+immagine:""
+},
+{
+nome:"Sostituzione Sensori TPMS",
+frequenza_km:0,
+frequenza_mesi:72,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Autel MX-Sensor 2-in-1 315/433 MHz",
+immagine:""
+},
+{
+nome:"Sostituzione Tubi Freni",
+frequenza_km:90000,
+frequenza_mesi:72,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:0,
+immagine:""
+},
+{
+nome:"Sostituzione supporti motore",
+frequenza_km:90000,
+frequenza_mesi:0,
+ultimo_km:99000,
+ultima_data:"2025-07-01",
+prodotto:"Blue Print ADBP800233 + Blue Print ADBP800294 + Blue Print ADBP800401",
+immagine:""
+},
+{
+nome:"Sostituzione Cinghia Servizi",
+frequenza_km:90000,
+frequenza_mesi:0,
+ultimo_km:89000,
+ultima_data:"2024-07-01",
+prodotto:"Dayco 6PK1195",
+immagine:""
+},
+{
+nome:"Sostituzione Tendicinghia Servizi",
+frequenza_km:90000,
+frequenza_mesi:0,
+ultimo_km:89000,
+ultima_data:"2024-07-01",
+prodotto:"Dayco APV3180",
+immagine:""
+},
+{
+nome:"Sostituzione Puleggia Cinghia Albero a gomiti",
+frequenza_km:90000,
+frequenza_mesi:0,
+ultimo_km:89000,
+ultima_data:"2024-07-01",
+prodotto:"GATES TVD1126A",
+immagine:""
+},
+{
+nome:"Sostituzione Dispositivo a Ruota Libera Alternatore",
+frequenza_km:90000,
+frequenza_mesi:0,
+ultimo_km:89000,
+ultima_data:"2024-07-01",
+prodotto:"SKF VKM 03608",
+immagine:""
+},
+{
+nome:"Sostituzione Cinghia di distribuzione + Pompa Acqua",
+frequenza_km:90000,
+frequenza_mesi:0,
+ultimo_km:89000,
+ultima_data:"2024-07-01",
+prodotto:"Dayco KTBWP8860",
+immagine:""
+},
+{
+nome:"Sostituzione Tendicinghia Distribuzione",
+frequenza_km:90000,
+frequenza_mesi:0,
+ultimo_km:89000,
+ultima_data:"2024-07-01",
+prodotto:"Dayco APV3180",
+immagine:""
+},
+{
+nome:"Sostituzione Sensore ECT o CTS (Temperatura Liquido di Raffreddamento)",
+frequenza_km:100000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Denso 193-1000 (?)",
+immagine:""
+},
+{
+nome:"Sostituzione Sensore O2 (Sonda Lambda)",
+frequenza_km:100000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"DENSO DOX-0590",
+immagine:""
+},
+{
+nome:"Sostituzione Testine Sterzo",
+frequenza_km:100000,
+frequenza_mesi:0,
+ultimo_km:108000,
+ultima_data:"2026-03-01",
+prodotto:"MOOG NI-ES-14847 + MOOG NI-ES-14848",
+immagine:""
+},
+{
+nome:"Sostituzione Snodo Assiale + Soffietto",
+frequenza_km:100000,
+frequenza_mesi:0,
+ultimo_km:108000,
+ultima_data:"2026-03-01",
+prodotto:"MOOG RE-AX-15537 + FEBI BILSTEIN 194783",
+immagine:""
+},
+{
+nome:"Sostituzione Bracci oscillanti",
+frequenza_km:100000,
+frequenza_mesi:0,
+ultimo_km:108000,
+ultima_data:"2026-03-01",
+prodotto:"MOOG NI-WP-15273 + MOOG NI-WP-15274",
+immagine:""
+},
+{
+nome:"Sostituzione Cuscinetti Ruota",
+frequenza_km:150000,
+frequenza_mesi:120,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"SKF VKBA 7738 + SKF VKBA 7739",
+immagine:""
+},
+{
+nome:"Sostituzione Valvola Termostatica",
+frequenza_km:150000,
+frequenza_mesi:120,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Wahler 410231.82D (?)",
+immagine:""
+},
+{
+nome:"Sostituzione Frizione",
+frequenza_km:150000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"LuK Kit Frizione 600 0197 00",
+immagine:""
+},
+{
+nome:"Sostituzione Volano Bimassa",
+frequenza_km:150000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Incluso nel kit frizione",
+immagine:""
+},
+{
+nome:"Sostituzione Alternatore / Motorino",
+frequenza_km:200000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Bosch 0 986 084 070",
+immagine:""
+},
+{
+nome:"Sostituzione Pompa alta pressione",
+frequenza_km:200000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Bosch 0445010XXX (?)",
+immagine:""
+},
+{
+nome:"Sostituzione Compressore Clima",
+frequenza_km:200000,
+frequenza_mesi:0,
+ultimo_km:0,
+ultima_data:0,
+prodotto:"Denso DCP46022",
+immagine:""
+},
+{
+nome:"Sostituzione Sensore Pressione Olio",
+frequenza_km:0,
+frequenza_mesi:0,
+tipo_frequenza: "Avvisi errati sul quadro",
+ultimo_km:0,
+ultima_data:0,
+prodotto:"OEM Nissan 1114500Q2F",
+immagine:""
+}
+
+];
+
+window.importaManutenzioni = async function(){
+
+for(const m of manutenzioniImport){
+
+await addDoc(
+collection(db,"manutenzioni"),
+m
+);
+
+}
+
+alert("Manutenzioni importate");
+
+render();
+
+}
+
+
+
+
+
+
+
+
+
+
+const app=initializeApp(firebaseConfig);
+const db=getFirestore(app);
+
+let tab="home";
+let dettaglioManut=null;
+let dettaglioId=null;
+
+
+
+function formatKm(km){
+if(km === null || km === undefined) return "-";
+return Number(km).toLocaleString("it-IT");
+}
+
+
+window.nav=function(t){
+tab=t;
+render();
+}
+
+
+
+window.toggleDark=function(){
+document.body.classList.toggle("dark");
+localStorage.setItem("darkMode",document.body.classList.contains("dark"));
+}
+
+function formatDate(d){
+
+if(!d) return "-";
+
+let date;
+
+// formato YYYY-MM-DD (firebase)
+if(d.includes("-")){
+date = new Date(d);
+}
+
+// formato italiano DD/MM/YYYY
+else if(d.includes("/")){
+let parts = d.split("/");
+date = new Date(parts[2], parts[1]-1, parts[0]);
+}
+
+else{
+date = new Date(d);
+}
+
+return date.toLocaleDateString("it-IT", {
+day:"numeric",
+month:"short",
+year:"numeric"
+});
+
+}
+
+
+function calcolaStato(m, kmAttuali){
+
+let nextKm = null;
+let kmLeft = null;
+
+if(m.frequenza_km && m.frequenza_km > 0){
+
+nextKm = (m.ultimo_km || 0) + m.frequenza_km;
+kmLeft = nextKm - kmAttuali;
+
+}
+
+let prossimaData = null;
+let mesiLeft = null;
+
+if(m.ultima_data && m.frequenza_mesi){
+
+let ultima = new Date(m.ultima_data);
+
+prossimaData = new Date(ultima);
+prossimaData.setMonth(prossimaData.getMonth() + m.frequenza_mesi);
+
+let oggi = new Date();
+
+mesiLeft =
+(prossimaData.getFullYear() - oggi.getFullYear()) * 12 +
+(prossimaData.getMonth() - oggi.getMonth());
+
+}
+
+let stato = "ok";
+
+if(
+(kmLeft !== null && kmLeft <= 0) ||
+(mesiLeft !== null && mesiLeft <= 0)
+){
+stato = "urgente";
+}
+else if(
+(kmLeft !== null && kmLeft <= 8000) ||
+(mesiLeft !== null && mesiLeft <= 6)
+){
+stato = "imminente";
+}
+
+let progress = 0;
+
+if(m.frequenza_km && m.frequenza_km > 0){
+
+progress = ((kmAttuali - (m.ultimo_km || 0)) / m.frequenza_km) * 100;
+
+}
+
+else if(m.frequenza_mesi && m.ultima_data){
+
+let ultima = new Date(m.ultima_data);
+
+let prossima = new Date(ultima);
+prossima.setMonth(prossima.getMonth() + m.frequenza_mesi);
+
+let oggi = new Date();
+
+let totale = prossima - ultima;
+let passato = oggi - ultima;
+
+progress = (passato / totale) * 100;
+
+if(progress < 0) progress = 0;
+if(progress > 100) progress = 100;
+}
+
+let colore = "#007aff";
+
+if(stato === "imminente") colore = "#ff9f0a";
+if(stato === "urgente") colore = "#ff3b30";
+
+return{
+stato: stato,
+nextKm: nextKm,
+nextDate: prossimaData ? prossimaData.toISOString().split("T")[0] : null,
+progress: progress,
+colore: colore
+};
+
+}
+
+
+
+async function render(){
+
+const appDiv=document.getElementById("app");
+appDiv.innerHTML="";
+
+let km=0;
+
+const conf=await getDocs(collection(db,"config"));
+conf.forEach(d=>km=d.data().km_attuali||0);
+
+const manut=await getDocs(collection(db,"manutenzioni"));
+
+let manutList=[];
+
+manut.forEach(docSnap=>{
+manutList.push({
+id:docSnap.id,
+data:docSnap.data()
+});
+});
+
+
+manutList.sort((a,b)=>{
+
+let kmA=(a.data.ultimo_km||0)+(a.data.frequenza_km||0);
+let kmB=(b.data.ultimo_km||0)+(b.data.frequenza_km||0);
+
+return kmA-kmB;
+
+});
+
+
+
+if(tab==="home"){
+
+let urg=0;
+let imm=0;
+
+manutList.forEach(item=>{
+
+let stato=calcolaStato(item.data,km);
+
+if(stato.stato==="urgente") urg++;
+if(stato.stato==="imminente") imm++;
+
+});
+
+
+appDiv.innerHTML+=`
+
+<div class="header">
+
+<div class="title">
+🚗 Auto Manager
+</div>
+
+<button class="darkToggle" onclick="toggleDark()">🌙</button>
+
+</div>
+
+
+<div class="widgets">
+
+<div class="widget kmWidget">
+
+<div class="wTitle">Km auto</div>
+
+<div class="kmBox">
+
+<input id="km" value="${km}">
+
+<button onclick="saveKm()">Aggiorna</button>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="widgets">
+
+<div class="widget">
+
+<div class="wTitle">Urgenti</div>
+
+<div class="wValue">${urg}</div>
+
+</div>
+
+<div class="widget">
+
+<div class="wTitle">Imminenti</div>
+
+<div class="wValue">${imm}</div>
+
+</div>
+
+</div>
+
+
+<div class="section">Interventi imminenti o urgenti</div>
+
+<div class="list" id="imminenti"></div>
+
+`;
+
+}
+
+
+
+if(tab==="manut"){
+
+appDiv.innerHTML+=`
+
+<div class="header">
+
+Manutenzioni
+
+<button class="darkToggle" onclick="toggleDark()">🌙</button>
+
+</div>
+
+<button class="addBtn" onclick="aggiungiManutenzione()">+ Aggiungi manutenzione</button>
+<button onclick="importaManutenzioni()">
+Importa manutenzioni
+</button>
+
+<div class="list" id="lista"></div>
+
+`;
+
+}
+
+
+
+if(tab==="dettaglio"){
+
+let m=dettaglioManut;
+
+let stato=calcolaStato(m,km);
+
+appDiv.innerHTML+=`
+
+<div class="header">
+
+<button onclick="nav('manut')" class="backBtn">←</button>
+
+<button class="darkToggle" onclick="toggleDark()">🌙</button>
+
+</div>
+
+
+<div class="detailTop">
+
+<img class="detailImg" src="${m.immagine||''}">
+
+<div>
+
+<div class="detailTitle">${m.nome}</div>
+
+<div class="detailFreq">
+Periodicità: ${m.frequenza_km} km / ${m.frequenza_mesi} mesi
+</div>
+
+</div>
+
+</div>
+
+
+
+<div class="group">
+
+<div class="row">
+<div>Ultimo intervento</div>
+<div>${formatDate(m.ultima_data)} | ${formatKm(m.ultimo_km)} km</div>
+</div>
+
+<div class="row">
+<div>Prossimo intervento</div>
+<div>${formatDate(stato.nextDate)} | ${formatKm(stato.nextKm)} km</div>
+</div>
+
+<div class="row productLabel">
+<div>Prodotto:</div>
+</div>
+
+<div class="row productValue">
+<div>${m.prodotto||"-"}</div>
+</div>
+
+</div>
+
+
+<div class="actions">
+
+<button class="mainBtn" onclick="segnaFatto()">
+Registra intervento
+</button>
+
+<button class="deleteBtn" onclick="eliminaManutenzione()">
+Elimina manutenzione
+</button>
+
+</div>
+
+`;
+
+}
+
+
+
+manutList.forEach(item=>{
+
+let m=item.data;
+let id=item.id;
+
+let stato = calcolaStato(m,km);
+
+let scadenzaTesto = "";
+
+let kmMancanti = null;
+
+if(stato.nextKm !== null){
+kmMancanti = stato.nextKm - km;
+}
+
+// caso: km + mesi
+if(
+m.frequenza_km > 0 &&
+m.frequenza_mesi > 0
+){
+
+scadenzaTesto =
+`${formatDate(stato.nextDate)} | ${formatKm(kmMancanti)} km rimasti`;
+
+}
+
+// caso: solo km
+else if(
+m.frequenza_km > 0
+){
+
+scadenzaTesto =
+`${formatKm(kmMancanti)} km rimasti`;
+
+}
+
+// caso: solo mesi
+else if(
+m.frequenza_mesi > 0
+){
+
+scadenzaTesto =
+formatDate(stato.nextDate);
+
+}
+
+let periodicita = "";
+
+if(m.frequenza_km > 0 && m.frequenza_mesi > 0){
+periodicita =
+`${formatKm(m.frequenza_km)} km / ${m.frequenza_mesi} mesi`;
+}
+
+else if(m.frequenza_km > 0){
+periodicita =
+`${formatKm(m.frequenza_km)} km`;
+}
+
+else if(m.frequenza_mesi > 0){
+periodicita =
+`${m.frequenza_mesi} mesi`;
+}
+
+let row=`
+
+<div class="manutRow" onclick="apriDettaglio('${id}')">
+
+<img class="manutImg" src="${m.immagine||''}">
+
+<div class="manutInfo">
+
+<div class="manutNext">
+Scadenza: ${scadenzaTesto}
+</div>
+
+<div class="manutTitle">
+${m.nome}
+</div>
+
+<div class="manutFreq">
+Periodicità: ${periodicita}
+</div>
+
+<div class="progressBar">
+<div class="progressFill" style="width:${stato.progress}%; background:${stato.colore}"></div>
+</div>
+
+</div>
+
+</div>
+
+`;
+
+if(tab==="home" && stato.stato!=="ok")
+document.getElementById("imminenti").innerHTML+=row;
+
+if(tab==="manut")
+document.getElementById("lista").innerHTML+=row;
+
+});
+
+}
+
+
+
+window.aggiungiManutenzione=function(){
+
+let nome=prompt("Nome manutenzione | Frequenza km | Frequenza mesi | Prodotto\n\nEsempio:\nOlio motore, 15000, 12, Motul");
+
+if(!nome) return;
+
+let parts=nome.split(",");
+
+let nomeMan=parts[0];
+let km=parts[1];
+let mesi=parts[2];
+let prodotto=parts[3];
+
+addDoc(collection(db,"manutenzioni"),{
+
+nome:nomeMan,
+frequenza_km:Number(km),
+frequenza_mesi:Number(mesi),
+prodotto
+
+}).then(()=>render());
+
+}
+
+
+
+window.saveKm=async function(){
+
+let km=document.getElementById("km").value;
+
+await setDoc(doc(db,"config","auto"),{
+km_attuali:Number(km)
+});
+
+render();
+
+}
+
+
+
+window.apriDettaglio=async function(id){
+
+const snap=await getDocs(collection(db,"manutenzioni"));
+
+snap.forEach(docSnap=>{
+if(docSnap.id===id){
+dettaglioManut=docSnap.data();
+dettaglioId=id;
+}
+});
+
+tab="dettaglio";
+render();
+
+}
+
+
+
+window.segnaFatto=async function(){
+
+let km=prompt("KM intervento");
+
+if(!km) return;
+
+let data=new Date().toISOString().split("T")[0];
+
+await addDoc(collection(db,"registro"),{
+manutenzione:dettaglioManut.nome,
+km:Number(km),
+data:data
+});
+
+await setDoc(doc(db,"manutenzioni",dettaglioId),{
+ultimo_km:Number(km),
+ultima_data:data
+},{merge:true});
+
+tab="home";
+render();
+
+}
+
+
+
+window.eliminaManutenzione=async function(){
+
+if(confirm("Eliminare questa manutenzione?")){
+
+await deleteDoc(doc(db,"manutenzioni",dettaglioId));
+
+tab="manut";
+render();
+
+}
+
+}
+
+
+
+window.onload=function(){
+
+if(localStorage.getItem("darkMode")==="true"){
+document.body.classList.add("dark");
+}
+
+render();
+
+}
+
+</script>
+
+
+
+<style>
+
+body{
+margin:0;
+font-family:-apple-system;
+background:#f2f2f7;
+color:#1c1c1e;
+}
+
+/* DARK MODE */
+
+.dark{
+background:#000;
+color:white;
+}
+
+.dark .widget,
+.dark .group{
+background:#1c1c1e;
+}
+
+.dark .manutRow{
+border-bottom:1px solid #2c2c2e;
+}
+
+.dark .manutFreq{
+color:#9a9a9a;
+}
+
+.dark .progressBar{
+background:#2c2c2e;
+}
+
+.dark .nav{
+background:#1c1c1e;
+}
+
+/* HEADER */
+
+.header{
+display:flex;
+justify-content:space-between;
+padding:20px;
+font-size:24px;
+}
+
+/* DARK BUTTON */
+
+.darkToggle{
+background:#007aff;
+border:none;
+color:white;
+padding:10px 16px;
+border-radius:14px;
+}
+
+/* WIDGETS */
+
+.widgets{
+display:flex;
+gap:14px;
+padding:16px;
+}
+
+.widget{
+background:white;
+padding:20px;
+border-radius:18px;
+flex:1;
+text-align:center;
+}
+
+.kmWidget{
+flex:1 1 100%;
+}
+
+/* KM BOX */
+
+.kmBox{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-top:10px;
+}
+
+/* INPUT */
+
+input{
+padding:10px;
+border-radius:10px;
+border:1px solid #d1d1d6;
+width:90px;
+text-align:center;
+background:white;
+color:#1c1c1e;
+}
+
+.dark input{
+background:#2c2c2e;
+border:1px solid #3a3a3c;
+color:white;
+}
+
+/* BUTTON */
+
+button{
+background:#007aff;
+color:white;
+border:none;
+padding:10px 14px;
+border-radius:12px;
+}
+
+/* SECTION */
+
+.section{
+padding:16px;
+color:#6e6e73;
+}
+
+/* LIST */
+
+.manutRow{
+display:flex;
+gap:14px;
+padding:16px;
+border-bottom:1px solid #e5e5ea;
+}
+
+.manutImg{
+width:50px;
+height:50px;
+border-radius:12px;
+}
+
+.manutNext{
+color:#007aff;
+font-size:14px;
+}
+
+.manutTitle{
+font-size:18px;
+color:#1c1c1e;
+}
+
+.dark .manutTitle{
+color:white;
+}
+
+.manutFreq{
+color:#6e6e73;
+}
+
+.list{
+padding-bottom:120px;
+}
+
+/* PROGRESS BAR */
+
+.progressBar{
+width:50%;
+max-width:200px;
+height:6px;
+background:#e5e5ea;
+border-radius:6px;
+margin-top:8px;
+}
+
+.manutInfo{
+flex:1;
+min-width:0;
+}
+
+.progressFill{
+height:6px;
+background:#007aff;
+border-radius:6px;
+max-width:100%;
+}
+
+/* GROUP */
+
+.group{
+margin:16px;
+background:white;
+border-radius:16px;
+overflow:hidden;
+}
+
+.row{
+display:flex;
+justify-content:space-between;
+padding:16px;
+border-bottom:1px solid #e5e5ea;
+}
+
+.row.productLabel{
+border-bottom:none !important;
+}
+
+.dark .row.productLabel{
+border-bottom:none !important;
+}
+
+.productValue{
+padding-top:6px;
+}
+
+.dark .row{
+border-bottom:1px solid #2c2c2e;
+}
+
+/* DETAIL */
+
+.detailTop{
+display:flex;
+gap:16px;
+padding:20px;
+}
+
+.detailImg{
+width:90px;
+border-radius:12px;
+}
+
+/* ACTION BUTTONS */
+
+.actions{
+display:flex;
+gap:10px;
+padding:20px;
+}
+
+.mainBtn{
+flex:1;
+background:#007aff;
+padding:14px;
+border-radius:14px;
+}
+
+.deleteBtn{
+flex:1;
+background:#ff3b30;
+padding:14px;
+border-radius:14px;
+}
+
+/* ADD BUTTON */
+
+.addBtn{
+background:#007aff;
+color:white;
+border:none;
+padding:10px 16px;
+border-radius:12px;
+margin:16px;
+margin-bottom:8px;
+}
+
+/* NAV BAR */
+
+.nav{
+position:fixed;
+bottom:0;
+width:100%;
+background:white;
+border-top:1px solid #e5e5ea;
+display:flex;
+}
+
+.nav div{
+flex:1;
+text-align:center;
+padding:16px;
+font-size:26px;
+}
+
+.dark .nav{
+background:#1c1c1e;
+border-top:1px solid #2c2c2e;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div id="app"></div>
+
+<div class="nav">
+
+<div onclick="nav('home')">🏠</div>
+<div onclick="nav('manut')">🔧</div>
+<div onclick="nav('registro')">📋</div>
+
+</div>
+
+</body>
+</html>
