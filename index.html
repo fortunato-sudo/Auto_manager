@@ -8,10 +8,12 @@
 
 <title>Auto Manager</title>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig={
 apiKey:"AIzaSy...",
@@ -20,501 +22,15 @@ projectId:"auto-manutenzione"
 };
 
 
-
-
-
-
-
-const manutenzioniImport = [
-
-{
-nome:"Additivo Pulisci Iniettori",
-frequenza_km:15000,
-frequenza_mesi:12,
-tipo_frequenza: "Prima del tagliando",
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Bardahl Injector Cleaner",
-},
-{
-nome:"Additivo Diesel e iniettori shock",
-frequenza_km:15000,
-frequenza_mesi:12,
-tipo_frequenza: "Dopo il tagliando",
-ultimo_km:99000,
-ultima_data:"2025-08-01",
-prodotto:"Bardahl Top Diesel+ 1lt",
-},
-{
-nome:"Sostituzione olio motore",
-frequenza_km:15000,
-frequenza_mesi:12,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"Motul Specific 0720 5W-30",
-},
-{
-nome:"Additivo olio pulisci motore",
-frequenza_km:15000,
-frequenza_mesi:12,
-tipo_frequenza: "Prima della sostituzione dell'olio",
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"Liqui Moly Motor Clean",
-},
-{
-nome:"Additivo olio ceramico",
-frequenza_km:30000,
-frequenza_mesi:24,
-tipo_frequenza: "Dopo la sostituzione dell'olio",
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"Liqui Moly Cera Tec",
-},
-{
-nome:"Sostituzione Filtro abitacolo",
-frequenza_km:15000,
-frequenza_mesi:12,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"PureFlow HEPA",
-},
-{
-nome:"Sanificazione impianto Aria Condizionata",
-frequenza_km:0,
-frequenza_mesi:12,
-ultimo_km:0,
-ultima_data:"2025-07-01",
-prodotto:"Ambro-sol Igienizzante Climatizzatori Spray + Igienizzante Abitacoli Monouso One-Shot",
-},
-{
-nome:"Sostituzione Filtro olio",
-frequenza_km:15000,
-frequenza_mesi:12,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"Bosch P7176",
-},
-{
-nome:"Lavaggio o Sostituzione Filtro aria motore",
-frequenza_km:15000,
-frequenza_mesi:12,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"BMC FB 921/01",
-},
-{
-nome:"Sostituzione Filtro gasolio",
-frequenza_km:15000,
-frequenza_mesi:12,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"UFI Filters 24.095.01",
-},
-{
-nome:"Convergenza degli pneumatici",
-frequenza_km:20000,
-frequenza_mesi:0,
-ultimo_km:108000,
-ultima_data:"2026-03-01",
-prodotto:0,
-},
-{
-nome:"Additivo radiatore",
-frequenza_km:30000,
-frequenza_mesi:24,
-ultimo_km:108000,
-ultima_data:0,
-prodotto:"Mishimoto Liquid Chill",
-},
-{
-nome:"Sostituzione tergicristalli",
-frequenza_km:0,
-frequenza_mesi:24,
-ultimo_km:0,
-ultima_data:"2024-01-01",
-prodotto:"Bosch Aerotwin AR653S + Bosch Rear H301",
-},
-{
-nome:"Sostituzione liquido freni + spurgo",
-frequenza_km:30000,
-frequenza_mesi:24,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"Brembo PRIME DOT4",
-},
-{
-nome:"Revisione",
-frequenza_km:0,
-frequenza_mesi:24,
-ultimo_km:0,
-ultima_data:"2024-11-01",
-prodotto:0,
-},
-{
-nome:"Pulizia Sensore MAF (Mass Air Flow)",
-frequenza_km:30000,
-frequenza_mesi:0,
-ultimo_km:102000,
-ultima_data:"2025-08-01",
-prodotto:"Liqui Moly Air Flow Sensor Cleaner",
-},
-{
-nome:"Sostituzione Pneumatici",
-frequenza_km:40000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Michelin CrossClimate 2 215/55 R18",
-},
-{
-nome:"Sostituzione Valvole",
-frequenza_km:40000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Schrader (?)",
-},
-{
-nome:"Pulizia corpo farfallato",
-frequenza_km:40000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Bardahl Pulitore Aspirazione",
-},
-{
-nome:"Sostituzione batteria",
-frequenza_km:0,
-frequenza_mesi:36,
-ultimo_km:0,
-ultima_data:"2026-01-01",
-prodotto:"VARTA Dynamic AGM 570901076",
-},
-{
-nome:"Sostituzione Pastiglie freni",
-frequenza_km:45000,
-frequenza_mesi:36,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"Brembo P 56 098 + Brembo P 56 100",
-},
-{
-nome:"Rabbocco gas impianto di condizionamento",
-frequenza_km:0,
-frequenza_mesi:36,
-ultimo_km:0,
-ultima_data:"2024-07-01",
-prodotto:0,
-},
-{
-nome:"Sostituzione olio Compressore",
-frequenza_km:0,
-frequenza_mesi:36,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Denso ND-OIL 8",
-},
-{
-nome:"Sostituzione olio cambio + additivo",
-frequenza_km:45000,
-frequenza_mesi:36,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"Motul Gear 300 75W-80 GL-4",
-},
-{
-nome:"Pulizia Sensore MAP (Pressione Collettore)",
-frequenza_km:50000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"WD-40 Specialist Pulitore Contatti",
-},
-{
-nome:"Sostituzione liquido di raffreddamento",
-frequenza_km:60000,
-frequenza_mesi:48,
-ultimo_km:87000,
-ultima_data:"2024-06-01",
-prodotto:"AREXONS Protettivo Radiatori Verde",
-},
-{
-nome:"Sostituzione dischi freni",
-frequenza_km:75000,
-frequenza_mesi:60,
-ultimo_km:78000,
-ultima_data:"2023-07-01",
-prodotto:"Brembo 08.C546.11 + ZIMMERMANN 200.2534.52",
-},
-{
-nome:"Sostituzione Ammortizzatori",
-frequenza_km:75000,
-frequenza_mesi:60,
-ultimo_km:78000,
-ultima_data:"2023-07-01",
-prodotto:"Bilstein B4 22-245694 + 22-247162 + 19-245706",
-},
-{
-nome:"Sostituzione Paracolpi Ammortizzatori",
-frequenza_km:75000,
-frequenza_mesi:60,
-ultimo_km:78000,
-ultima_data:"2023-07-01",
-prodotto:"Febi Bilstein 103458",
-},
-{
-nome:"Sostituzione Parapolvere Ammortizzatori",
-frequenza_km:75000,
-frequenza_mesi:60,
-ultimo_km:78000,
-ultima_data:"2023-07-01",
-prodotto:"Febi Bilstein 197106",
-},
-{
-nome:"Sostituzione Biellette barra stabilizzatrice",
-frequenza_km:75000,
-frequenza_mesi:60,
-ultimo_km:108000,
-ultima_data:"2026-03-01",
-prodotto:"MOOG NI-LS-10692",
-},
-{
-nome:"Sostituzione Gommino barra stabilizzatrice",
-frequenza_km:75000,
-frequenza_mesi:60,
-ultimo_km:108000,
-ultima_data:"2026-03-01",
-prodotto:"MOOG NI-SB-15275",
-},
-{
-nome:"Sostituzione Supporti Ammortizzatori",
-frequenza_km:75000,
-frequenza_mesi:60,
-ultimo_km:78000,
-ultima_data:"2023-07-01",
-prodotto:"Bilstein 12-263325",
-},
-{
-nome:"Sostituzione candelette",
-frequenza_km:90000,
-frequenza_mesi:0,
-ultimo_km:89000,
-ultima_data:"2024-07-01",
-prodotto:"4 x Bosch 0 250 403 012",
-},
-{
-nome:"Sostituzione Sensori TPMS",
-frequenza_km:0,
-frequenza_mesi:72,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Autel MX-Sensor 2-in-1 315/433 MHz",
-},
-{
-nome:"Sostituzione Tubi Freni",
-frequenza_km:90000,
-frequenza_mesi:72,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:0,
-},
-{
-nome:"Sostituzione supporti motore",
-frequenza_km:90000,
-frequenza_mesi:0,
-ultimo_km:99000,
-ultima_data:"2025-07-01",
-prodotto:"Blue Print ADBP800233 + Blue Print ADBP800294 + Blue Print ADBP800401",
-},
-{
-nome:"Sostituzione Cinghia Servizi",
-frequenza_km:90000,
-frequenza_mesi:0,
-ultimo_km:89000,
-ultima_data:"2024-07-01",
-prodotto:"Dayco 6PK1195",
-},
-{
-nome:"Sostituzione Tendicinghia Servizi",
-frequenza_km:90000,
-frequenza_mesi:0,
-ultimo_km:89000,
-ultima_data:"2024-07-01",
-prodotto:"Dayco APV3180",
-},
-{
-nome:"Sostituzione Puleggia Cinghia Albero a gomiti",
-frequenza_km:90000,
-frequenza_mesi:0,
-ultimo_km:89000,
-ultima_data:"2024-07-01",
-prodotto:"GATES TVD1126A",
-},
-{
-nome:"Sostituzione Dispositivo a Ruota Libera Alternatore",
-frequenza_km:90000,
-frequenza_mesi:0,
-ultimo_km:89000,
-ultima_data:"2024-07-01",
-prodotto:"SKF VKM 03608",
-},
-{
-nome:"Sostituzione Cinghia di distribuzione + Pompa Acqua",
-frequenza_km:90000,
-frequenza_mesi:0,
-ultimo_km:89000,
-ultima_data:"2024-07-01",
-prodotto:"Dayco KTBWP8860",
-},
-{
-nome:"Sostituzione Tendicinghia Distribuzione",
-frequenza_km:90000,
-frequenza_mesi:0,
-ultimo_km:89000,
-ultima_data:"2024-07-01",
-prodotto:"Dayco APV3180",
-},
-{
-nome:"Sostituzione Sensore ECT o CTS (Temperatura Liquido di Raffreddamento)",
-frequenza_km:100000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Denso 193-1000 (?)",
-},
-{
-nome:"Sostituzione Sensore O2 (Sonda Lambda)",
-frequenza_km:100000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"DENSO DOX-0590",
-},
-{
-nome:"Sostituzione Testine Sterzo",
-frequenza_km:100000,
-frequenza_mesi:0,
-ultimo_km:108000,
-ultima_data:"2026-03-01",
-prodotto:"MOOG NI-ES-14847 + MOOG NI-ES-14848",
-},
-{
-nome:"Sostituzione Snodo Assiale + Soffietto",
-frequenza_km:100000,
-frequenza_mesi:0,
-ultimo_km:108000,
-ultima_data:"2026-03-01",
-prodotto:"MOOG RE-AX-15537 + FEBI BILSTEIN 194783",
-},
-{
-nome:"Sostituzione Bracci oscillanti",
-frequenza_km:100000,
-frequenza_mesi:0,
-ultimo_km:108000,
-ultima_data:"2026-03-01",
-prodotto:"MOOG NI-WP-15273 + MOOG NI-WP-15274",
-},
-{
-nome:"Sostituzione Cuscinetti Ruota",
-frequenza_km:150000,
-frequenza_mesi:120,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"SKF VKBA 7738 + SKF VKBA 7739",
-},
-{
-nome:"Sostituzione Valvola Termostatica",
-frequenza_km:150000,
-frequenza_mesi:120,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Wahler 410231.82D (?)",
-},
-{
-nome:"Sostituzione Frizione",
-frequenza_km:150000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"LuK Kit Frizione 600 0197 00",
-},
-{
-nome:"Sostituzione Volano Bimassa",
-frequenza_km:150000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Incluso nel kit frizione",
-},
-{
-nome:"Sostituzione Alternatore-Motorino",
-frequenza_km:200000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Bosch 0 986 084 070",
-},
-{
-nome:"Sostituzione Pompa alta pressione",
-frequenza_km:200000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Bosch 0445010XXX (?)",
-},
-{
-nome:"Sostituzione Compressore Clima",
-frequenza_km:200000,
-frequenza_mesi:0,
-ultimo_km:0,
-ultima_data:0,
-prodotto:"Denso DCP46022",
-},
-{
-nome:"Sostituzione Sensore Pressione Olio",
-frequenza_km:0,
-frequenza_mesi:0,
-tipo_frequenza: "Avvisi errati sul quadro",
-ultimo_km:0,
-ultima_data:0,
-prodotto:"OEM Nissan 1114500Q2F",
-}
-
-];
-
-window.importaManutenzioni = async function(){
-
-for(const m of manutenzioniImport){
-
-await addDoc(
-collection(db,"manutenzioni"),
-m
-);
-
-}
-
-alert("Manutenzioni importate");
-
-render();
-
-}
-
-
-
-
-
-
-
-
-
-
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
+
 
 let tab="home";
 let dettaglioManut=null;
 let dettaglioId=null;
+let tabPrecedente = "home";
+let fuelEditId = null;
 
 
 
@@ -523,10 +39,23 @@ if(km === null || km === undefined) return "-";
 return Number(km).toLocaleString("it-IT");
 }
 
+function formatNumero(num, decimali){
+
+if(num===null || num===undefined) return "";
+
+return Number(num)
+.toFixed(decimali)
+.replace(".",",");
+
+}
+
 
 window.nav=function(t){
-tab=t;
+
+tabPrecedente = tab;
+tab = t;
 render();
+
 }
 
 
@@ -540,24 +69,11 @@ function formatDate(d){
 
 if(!d) return "-";
 
-let date;
+let date = new Date(d);
 
-// formato YYYY-MM-DD (firebase)
-if(d.includes("-")){
-date = new Date(d);
-}
+if(isNaN(date)) return "-";
 
-// formato italiano DD/MM/YYYY
-else if(d.includes("/")){
-let parts = d.split("/");
-date = new Date(parts[2], parts[1]-1, parts[0]);
-}
-
-else{
-date = new Date(d);
-}
-
-return date.toLocaleDateString("it-IT", {
+return date.toLocaleDateString("it-IT",{
 day:"numeric",
 month:"short",
 year:"numeric"
@@ -652,8 +168,6 @@ colore: colore
 
 }
 
-
-
 async function render(){
 
 const appDiv=document.getElementById("app");
@@ -674,6 +188,23 @@ id:docSnap.id,
 data:docSnap.data()
 });
 });
+
+const manutSnap = await getDocs(collection(db,"manutenzioni"));
+
+let lista=document.getElementById("listaManut");
+
+if(lista){
+
+manutSnap.forEach(doc=>{
+
+let opt=document.createElement("option");
+opt.value = doc.data().nome;
+
+lista.appendChild(opt);
+
+});
+
+}
 
 
 manutList.sort((a,b)=>{
@@ -777,9 +308,6 @@ Manutenzioni
 </div>
 
 <button class="addBtn" onclick="aggiungiManutenzione()">+ Aggiungi manutenzione</button>
-<button onclick="importaManutenzioni()">
-Importa manutenzioni
-</button>
 
 <div class="list" id="lista"></div>
 
@@ -788,6 +316,420 @@ Importa manutenzioni
 }
 
 
+if(tab==="registro"){
+
+appDiv.innerHTML+=`
+
+<div class="header">
+
+Registro manutenzioni
+
+<button class="darkToggle" onclick="toggleDark()">🌙</button>
+
+</div>
+
+<button class="mainBtn" onclick="nav('registroAdd')">
+➕ Nuovo intervento
+</button>
+
+<div class="list" id="registro"></div>
+
+`;
+
+const storico = await getDocs(collection(db,"registro"));
+
+let storicoList=[];
+
+storico.forEach(docSnap=>{
+storicoList.push({
+id:docSnap.id,
+data:docSnap.data()
+});
+});
+
+storicoList.sort((a,b)=>{
+return new Date(b.data.data) - new Date(a.data.data);
+});
+
+storicoList.forEach(s=>{
+
+let row = `
+
+<div class="manutRow" onclick="apriRegistro('${s.id}')">
+
+<div class="manutInfo">
+
+<div class="manutTitle">
+${s.data.manutenzione}
+</div>
+
+<div class="manutFreq">
+${formatDate(s.data.data)} | ${formatKm(s.data.km)} km
+</div>
+
+${s.data.officina ? `<div class="manutFreq">Officina: ${s.data.officina}</div>` : ""}
+
+${s.data.note ? `<div class="manutFreq">Note: ${s.data.note}</div>` : ""}
+
+</div>
+
+</div>
+
+`;
+
+document.getElementById("registro").innerHTML+=row;
+
+});
+
+}
+
+if(tab==="registroAdd"){
+
+appDiv.innerHTML+=`
+
+<div class="header">
+Nuovo intervento
+<button onclick="nav('registro')">←</button>
+</div>
+
+<div class="group">
+
+<div class="row">
+<div>Intervento</div>
+<input list="listaManut" id="nomeInt">
+
+<datalist id="listaManut"></datalist>
+</div>
+
+<div class="row">
+<div>Km</div>
+<input id="kmInt">
+</div>
+
+<div class="row">
+<div>Officina</div>
+<input id="officinaInt">
+</div>
+
+<div class="row">
+<div>Note</div>
+<input id="noteInt">
+</div>
+
+<div class="row center">
+<button onclick="salvaRegistro()">Salva</button>
+</div>
+
+</div>
+
+`;
+
+}
+
+if(tab==="fuel"){
+
+appDiv.innerHTML+=`
+
+<div class="header">
+
+⛽ Rifornimenti
+
+<button class="darkToggle" onclick="toggleDark()">🌙</button>
+
+</div>
+
+<div class="widgets">
+
+<div class="widget">
+<div class="wTitle">⛽ Consumo medio</div>
+<div class="wValue" id="mediaConsumo">-</div>
+</div>
+
+<div class="widget">
+<div class="wTitle">💶️ Costo €/km</div>
+<div class="wValue" id="costoKm">-</div>
+</div>
+
+<div class="widget">
+<div class="wTitle">📅 Spesa mese</div>
+<div class="wValue" id="spesaMese">-</div>
+</div>
+
+<div class="widget">
+<div class="wTitle">🛣️ Autonomia</div>
+<div class="wValue" id="autonomia">-</div>
+</div>
+
+</div>
+
+<div class="group">
+
+<div class="row">
+<div style="width:100%; height:220px;">
+<canvas id="fuelChart"></canvas>
+</div>
+</div>
+
+</div>
+
+<button onclick="nav('fuelAdd')" class="mainBtn">
+➕ Nuovo rifornimento
+</button>
+
+<div class="list" id="fuelList"></div>
+
+`;
+
+const fuelSnap = await getDocs(collection(db,"fuel"));
+
+let fuelList=[];
+
+fuelSnap.forEach(docSnap=>{
+
+fuelList.push({
+id:docSnap.id,
+data:docSnap.data()
+});
+
+});
+
+fuelList.sort((a,b)=>{
+return Number(b.data.km || 0) - Number(a.data.km || 0);
+});
+
+let consumoTot=0;
+let countConsumi=0;
+
+let kmPercorsiTot=0;
+let spesaTot=0;
+let spesaMese=0;
+
+let oggi=new Date();
+let meseAttuale=oggi.getMonth();
+let annoAttuale=oggi.getFullYear();
+
+let chartLabels=[];
+let chartData=[];
+
+fuelList.forEach(item=>{
+
+let s = item.data;
+
+if(s.consumo){
+consumoTot+=s.consumo;
+countConsumi++;
+}
+
+if(s.consumo && s.litri){
+kmPercorsiTot += s.litri * s.consumo;
+}
+
+if(s.totale){
+spesaTot+=s.totale;
+}
+
+if(s.data){
+
+let d=new Date(s.data);
+
+if(d.getMonth()==meseAttuale && d.getFullYear()==annoAttuale){
+spesaMese+=s.totale;
+}
+
+}
+
+if(s.consumo){
+chartLabels.push(formatDate(s.data || ""));
+chartData.push(Number(s.consumo.toFixed(2)));
+}
+
+});
+
+let ultimoRifornimento = fuelList.length ? fuelList[0].data : null;
+
+if(countConsumi && ultimoRifornimento && ultimoRifornimento.litri){
+
+let media = consumoTot/countConsumi;
+
+let autonomia = media * ultimoRifornimento.litri;
+
+let autoBox = document.getElementById("autonomia");
+
+if(autoBox){
+autoBox.innerText = formatNumero(autonomia,0)+" km";
+}
+
+}
+
+if(chartData.length > 1 && typeof Chart !== "undefined"){
+
+new Chart(document.getElementById("fuelChart"),{
+
+type:"line",
+
+data:{
+labels:chartLabels,
+datasets:[{
+label:"Consumo km/l",
+data:chartData,
+borderColor:"#007aff",
+backgroundColor:"rgba(0,122,255,0.2)",
+tension:0.3,
+fill:true
+}]
+},
+
+options:{
+responsive:true,
+plugins:{
+legend:{display:false}
+},
+scales:{
+y:{
+beginAtZero:false
+}
+}
+
+}
+
+});
+
+}
+
+if(countConsumi){
+
+let media=(consumoTot/countConsumi);
+
+document.getElementById("mediaConsumo").innerText=
+formatNumero(media,2)+" km/l";
+
+}
+
+if(spesaTot && kmPercorsiTot){
+
+let costoKm=spesaTot/kmPercorsiTot;
+
+document.getElementById("costoKm").innerText=
+formatNumero(costoKm,2)+" €/km";
+
+}
+
+document.getElementById("spesaMese").innerText=
+formatNumero(spesaMese,2)+" €";
+
+fuelList.forEach(item=>{
+
+let s=item.data;
+let id=item.id;
+
+let row = `
+
+<div class="manutRow">
+
+<div class="manutInfo">
+
+<div class="manutTitle">
+${s.distributore || "Rifornimento"}
+</div>
+
+<div class="manutFreq">
+${formatDate(s.data)} | ${formatKm(s.km)} km
+</div>
+
+<div class="manutFreq">
+💧 ${formatNumero(s.litro,3)} €/L
+</div>
+
+<div class="manutFreq">
+⛽ ${formatNumero(s.litri,2)} L | 💶 ${formatNumero(s.totale,2)} €
+</div>
+
+${s.consumo ? `<div class="manutFreq">📈 Consumo: ${formatNumero(s.consumo,2)} km/l</div>` : ""}
+
+<div style="margin-top:8px">
+
+<button onclick="modificaFuel('${id}')">✏️</button>
+
+<button onclick="eliminaFuel('${id}')">🗑️</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+document.getElementById("fuelList").innerHTML+=row;
+
+});
+
+}
+
+if(tab==="fuelAdd"){
+
+let titoloFuel = fuelEditId ? "Modifica rifornimento" : "Nuovo rifornimento";
+
+appDiv.innerHTML+=`
+
+<div class="header">
+
+${titoloFuel}
+
+<button class="darkToggle" onclick="toggleDark()">🌙</button>
+
+</div>
+
+<div class="group">
+
+<div class="row">
+<div>Prezzo totale</div>
+<input id="totale" oninput="calcolaFuel('totale')">
+</div>
+
+<div class="row">
+<div>Prezzo al litro</div>
+<input id="litro" oninput="calcolaFuel('litro')">
+</div>
+
+<div class="row">
+<div>Litri</div>
+<input id="litri" oninput="calcolaFuel('litri')">
+</div>
+
+<div class="row">
+<div>Km auto</div>
+<input id="kmFuel">
+</div>
+
+<div class="row">
+<div>Distributore</div>
+<input id="distributore">
+</div>
+
+<div class="row center">
+<button onclick="salvaFuel()">Salva</button>
+</div>
+
+</div>
+
+`;
+
+if(fuelEditId){
+
+const snap = await getDoc(doc(db,"fuel",fuelEditId));
+
+let f = snap.data();
+
+document.getElementById("totale").value = f.totale || "";
+document.getElementById("litro").value = f.litro || "";
+document.getElementById("litri").value = f.litri || "";
+document.getElementById("kmFuel").value = f.km || "";
+document.getElementById("distributore").value = f.distributore || "";
+
+}
+
+}
 
 if(tab==="dettaglio"){
 
@@ -799,7 +741,7 @@ appDiv.innerHTML+=`
 
 <div class="header">
 
-<button onclick="nav('manut')" class="backBtn">←</button>
+<button onclick="nav(tabPrecedente)" class="backBtn">←</button>
 
 <button class="darkToggle" onclick="toggleDark()">🌙</button>
 
@@ -994,6 +936,184 @@ prodotto
 
 }
 
+function parseNumero(val){
+
+if(!val) return null;
+
+return parseFloat(
+val.replace(",",".")
+);
+
+}
+
+window.salvaRegistro = async function(){
+
+let nome=document.getElementById("nomeInt").value;
+let km=document.getElementById("kmInt").value;
+let officina=document.getElementById("officinaInt").value;
+let note=document.getElementById("noteInt").value;
+
+let data=new Date().toISOString().split("T")[0];
+
+await addDoc(collection(db,"registro"),{
+manutenzione:nome,
+km:Number(km),
+data:data,
+officina:officina,
+note:note
+});
+
+tab="registro";
+render();
+
+}
+
+window.calcolaFuel = function(campo){
+
+let totale=parseNumero(document.getElementById("totale").value);
+let litro=parseNumero(document.getElementById("litro").value);
+let litri=parseNumero(document.getElementById("litri").value);
+
+if(campo==="totale" && litro){
+
+document.getElementById("litri").value=
+formatNumero(totale/litro,2);
+
+}
+
+if(campo==="litro" && totale){
+
+document.getElementById("litri").value=
+formatNumero(totale/litro,2);
+
+}
+
+if(campo==="litri" && litro){
+
+document.getElementById("totale").value=
+formatNumero(litro*litri,2);
+
+}
+
+if(campo==="litri" && totale){
+
+document.getElementById("litro").value=
+formatNumero(totale/litri,3);
+
+}
+
+}
+
+
+window.salvaFuel = async function(){
+
+let totale = parseNumero(document.getElementById("totale").value);
+let litro = parseNumero(document.getElementById("litro").value);
+let litri = parseNumero(document.getElementById("litri").value);
+let km = Number(document.getElementById("kmFuel").value);
+let distributore = document.getElementById("distributore").value;
+
+let consumo = null;
+
+if(litri && km){
+
+const fuelSnap = await getDocs(collection(db,"fuel"));
+
+let ultimoKm = null;
+
+fuelSnap.forEach(d=>{
+let k = Number(d.data().km);
+
+if(km > k){
+if(ultimoKm === null || k > ultimoKm){
+ultimoKm = k;
+}
+}
+});
+
+let kmPercorsi = km - ultimoKm;
+
+if(kmPercorsi>0 && kmPercorsi<1200){
+consumo = kmPercorsi / litri;
+}
+
+}
+
+if(fuelEditId){
+
+// MODIFICA
+
+await setDoc(doc(db,"fuel",fuelEditId),{
+
+totale,
+litro,
+litri,
+km,
+distributore,
+consumo,
+data:new Date().toISOString().split("T")[0]
+
+},{merge:true});
+
+fuelEditId=null;
+
+}
+
+else{
+
+// NUOVO
+
+await addDoc(collection(db,"fuel"),{
+
+totale,
+litro,
+litri,
+km,
+distributore,
+consumo,
+data:new Date().toISOString().split("T")[0]
+
+});
+
+}
+
+tab="fuel";
+render();
+
+}
+
+
+window.apriRegistro = async function(id){
+
+let scelta = prompt(
+"1 = Modifica\n2 = Elimina"
+);
+
+if(scelta=="2"){
+
+if(confirm("Eliminare intervento?")){
+await deleteDoc(doc(db,"registro",id));
+render();
+}
+
+}
+
+if(scelta=="1"){
+
+let nuovoKm = prompt("Nuovi KM");
+
+if(!nuovoKm) return;
+
+await setDoc(doc(db,"registro",id),{
+km:Number(nuovoKm)
+},{merge:true});
+
+render();
+
+}
+
+}
+
 
 
 window.saveKm=async function(){
@@ -1026,20 +1146,44 @@ render();
 
 }
 
+window.eliminaFuel = async function(id){
 
+if(confirm("Eliminare questo rifornimento?")){
 
-window.segnaFatto=async function(){
+await deleteDoc(doc(db,"fuel",id));
 
-let km=prompt("KM intervento");
+render();
 
+}
+
+}
+
+window.modificaFuel = function(id){
+
+fuelEditId = id;
+
+tab = "fuelAdd";
+
+render();
+
+}
+
+window.segnaFatto = async function(){
+
+let km = prompt("KM intervento");
 if(!km) return;
 
-let data=new Date().toISOString().split("T")[0];
+let officina = prompt("Officina (facoltativo)");
+let note = prompt("Note (facoltativo)");
+
+let data = new Date().toISOString().split("T")[0];
 
 await addDoc(collection(db,"registro"),{
-manutenzione:dettaglioManut.nome,
-km:Number(km),
-data:data
+manutenzione: dettaglioManut.nome,
+km: Number(km),
+data: data,
+officina: officina || "",
+note: note || ""
 });
 
 await setDoc(doc(db,"manutenzioni",dettaglioId),{
@@ -1069,7 +1213,7 @@ render();
 
 
 
-window.onload=function(){
+document.addEventListener("DOMContentLoaded", () => {
 
 if(localStorage.getItem("darkMode")==="true"){
 document.body.classList.add("dark");
@@ -1077,10 +1221,9 @@ document.body.classList.add("dark");
 
 render();
 
-}
+});
 
 </script>
-
 
 
 <style>
@@ -1321,6 +1464,15 @@ flex:1;
 background:#007aff;
 padding:14px;
 border-radius:14px;
+margin:16px;
+margin-bottom:90px;
+}
+
+.mainBtn,
+.deleteBtn{
+flex:1;
+padding:14px;
+border-radius:14px;
 }
 
 .deleteBtn{
@@ -1379,6 +1531,7 @@ border-top:1px solid #2c2c2e;
 <div onclick="nav('home')">🏠</div>
 <div onclick="nav('manut')">🔧</div>
 <div onclick="nav('registro')">📋</div>
+<div onclick="nav('fuel')">⛽</div>
 
 </div>
 
