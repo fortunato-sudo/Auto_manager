@@ -1076,7 +1076,7 @@ let distributore = document.getElementById("distributore").value;
 
 let consumo = null;
 
-if(litri && km){
+/* trova rifornimento precedente */
 
 const fuelSnap = await getDocs(collection(db,"fuel"));
 
@@ -1094,22 +1094,23 @@ ultimoKm = k;
 
 });
 
-if(ultimoKm !== null){
+/* calcola consumo */
+
+if(ultimoKm !== null && litri){
 
 let kmPercorsi = km - ultimoKm;
 
 if(kmPercorsi > 0){
-consumo = kmPercorsi / litri;
+consumo = Number((kmPercorsi / litri).toFixed(2));
 }
 
 }
+
+/* salva */
 
 if(fuelEditId){
 
-// MODIFICA
-
 await setDoc(doc(db,"fuel",fuelEditId),{
-
 totale,
 litro,
 litri,
@@ -1122,14 +1123,9 @@ data:new Date().toISOString().split("T")[0]
 
 fuelEditId=null;
 
-}
-
-else{
-
-// NUOVO
+}else{
 
 await addDoc(collection(db,"fuel"),{
-
 totale,
 litro,
 litri,
@@ -1137,7 +1133,6 @@ km,
 distributore,
 consumo,
 data:new Date().toISOString().split("T")[0]
-
 });
 
 }
