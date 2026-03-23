@@ -446,9 +446,27 @@ appDiv.innerHTML+=`
 </div>
 
 <div class="widget">
-<div class="wTitle">💶️ Costo €/km</div>
+<div class="wTitle">💶 Costo €/km</div>
 <div class="wValue" id="costoKm">-</div>
 </div>
+
+</div>
+
+<div class="widgets">
+
+<div class="widget">
+<div class="wTitle">🏆 Miglior consumo</div>
+<div class="wValue" id="bestConsumo">-</div>
+</div>
+
+<div class="widget">
+<div class="wTitle">⚠️ Peggior consumo</div>
+<div class="wValue" id="worstConsumo">-</div>
+</div>
+
+</div>
+
+<div class="widgets">
 
 <div class="widget">
 <div class="wTitle">📅 Spesa mese</div>
@@ -465,7 +483,7 @@ appDiv.innerHTML+=`
 <div class="group">
 
 <div class="row">
-<div style="width:100%; height:220px;">
+<div style="width:100%; height:260px;">
 <canvas id="fuelChart"></canvas>
 </div>
 </div>
@@ -475,6 +493,8 @@ appDiv.innerHTML+=`
 <button onclick="nav('fuelAdd')" class="mainBtn">
 ➕ Nuovo rifornimento
 </button>
+
+<div class="section">Ultimi rifornimenti</div>
 
 <div class="list" id="fuelList"></div>
 
@@ -504,6 +524,9 @@ let kmPercorsiTot=0;
 let spesaTot=0;
 let spesaMese=0;
 
+let migliorConsumo=null;
+let peggiorConsumo=null;
+
 let oggi=new Date();
 let meseAttuale=oggi.getMonth();
 let annoAttuale=oggi.getFullYear();
@@ -518,6 +541,18 @@ let s = item.data;
 if(s.consumo){
 consumoTot+=s.consumo;
 countConsumi++;
+}
+
+if(s.consumo){
+
+if(migliorConsumo===null || s.consumo>migliorConsumo){
+migliorConsumo=s.consumo;
+}
+
+if(peggiorConsumo===null || s.consumo<peggiorConsumo){
+peggiorConsumo=s.consumo;
+}
+
 }
 
 if(s.consumo && s.litri){
@@ -574,22 +609,30 @@ label:"Consumo km/l",
 data:chartData,
 borderColor:"#007aff",
 backgroundColor:"rgba(0,122,255,0.2)",
-tension:0.3,
-fill:true
+tension:0.35,
+fill:true,
+pointRadius:5,
+pointBackgroundColor:"#007aff",
+borderWidth:3
 }]
 },
 
-options:{
+ooptions:{
 responsive:true,
+maintainAspectRatio:false,
 plugins:{
 legend:{display:false}
 },
 scales:{
+x:{
+ticks:{
+maxTicksLimit:5
+}
+},
 y:{
 beginAtZero:false
 }
 }
-
 }
 
 });
@@ -602,6 +645,20 @@ let media=(consumoTot/countConsumi);
 
 document.getElementById("mediaConsumo").innerText=
 formatNumero(media,2)+" km/l";
+
+}
+
+if(migliorConsumo!==null){
+
+document.getElementById("bestConsumo").innerText=
+formatNumero(migliorConsumo,2)+" km/l";
+
+}
+
+if(peggiorConsumo!==null){
+
+document.getElementById("worstConsumo").innerText=
+formatNumero(peggiorConsumo,2)+" km/l";
 
 }
 
@@ -629,11 +686,11 @@ let row = `
 <div class="manutInfo">
 
 <div class="manutTitle">
-${s.distributore || "Rifornimento"}
+${formatDate(s.data)} • ${formatNumero(s.totale,2)} €
 </div>
 
 <div class="manutFreq">
-${formatDate(s.data)} | ${formatKm(s.km)} km
+${s.distributore ? `<div class="manutFreq">⛽ ${s.distributore}</div>` : ""}
 </div>
 
 <div class="manutFreq">
@@ -641,7 +698,7 @@ ${formatDate(s.data)} | ${formatKm(s.km)} km
 </div>
 
 <div class="manutFreq">
-⛽ ${formatNumero(s.litri,2)} L | 💶 ${formatNumero(s.totale,2)} €
+⛽ ${formatNumero(s.litri,2)} L
 </div>
 
 ${s.consumo ? `<div class="manutFreq">📈 Consumo: ${formatNumero(s.consumo,2)} km/l</div>` : ""}
