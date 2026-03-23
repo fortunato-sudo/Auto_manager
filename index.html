@@ -1083,6 +1083,7 @@ const fuelSnap = await getDocs(collection(db,"fuel"));
 let ultimoKm = null;
 
 fuelSnap.forEach(d=>{
+
 let k = Number(d.data().km);
 
 if(km > k){
@@ -1090,11 +1091,14 @@ if(ultimoKm === null || k > ultimoKm){
 ultimoKm = k;
 }
 }
+
 });
+
+if(ultimoKm !== null){
 
 let kmPercorsi = km - ultimoKm;
 
-if(kmPercorsi>0 && kmPercorsi<1200){
+if(kmPercorsi > 0){
 consumo = kmPercorsi / litri;
 }
 
