@@ -31,6 +31,7 @@ let dettaglioManut=null;
 let dettaglioId=null;
 let tabPrecedente = "home";
 let fuelEditId = null;
+let fuelChart = null;
 
 
 
@@ -514,7 +515,7 @@ data:docSnap.data()
 });
 
 fuelList.sort((a,b)=>{
-return Number(b.data.km || 0) - Number(a.data.km || 0);
+return new Date(a.data.data) - new Date(b.data.data);
 });
 
 let consumoTot=0;
@@ -598,8 +599,15 @@ autoBox.innerText = formatNumero(autonomia,0)+" km";
 
 if(chartData.length > 0 && typeof Chart !== "undefined"){
 
-new Chart(document.getElementById("fuelChart"),{
+const ctx = document.getElementById("fuelChart");
 
+if(ctx){
+
+if(fuelChart){
+fuelChart.destroy();
+}
+
+fuelChart = new Chart(ctx,{
 type:"line",
 
 data:{
@@ -612,23 +620,17 @@ backgroundColor:"rgba(0,122,255,0.2)",
 tension:0.35,
 fill:true,
 pointRadius:5,
-pointBackgroundColor:"#007aff",
 borderWidth:3
 }]
 },
 
-ooptions:{
+options:{
 responsive:true,
 maintainAspectRatio:false,
 plugins:{
 legend:{display:false}
 },
 scales:{
-x:{
-ticks:{
-maxTicksLimit:5
-}
-},
 y:{
 beginAtZero:false
 }
@@ -636,6 +638,8 @@ beginAtZero:false
 }
 
 });
+
+}
 
 }
 
