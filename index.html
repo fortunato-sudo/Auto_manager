@@ -563,6 +563,33 @@ autoBox.innerText = formatNumero(autonomia,0)+" km";
 
 if(chartData.length > 0 && typeof Chart !== "undefined"){
 
+const ctx = document.getElementById("fuelChart");
+
+if(ctx){
+new Chart(ctx,{
+type:"line",
+data:{
+labels:chartLabels,
+datasets:[{
+label:"Consumo km/l",
+data:chartData,
+borderColor:"#007aff",
+pointRadius:5,
+pointBackgroundColor:"#007aff",
+backgroundColor:"rgba(0,122,255,0.2)",
+tension:0.3,
+fill:true
+}]
+},
+options:{
+responsive:true,
+plugins:{legend:{display:false}},
+scales:{y:{beginAtZero:false}}
+}
+});
+}
+}
+
 new Chart(document.getElementById("fuelChart"),{
 
 type:"line",
