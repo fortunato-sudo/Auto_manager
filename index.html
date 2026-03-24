@@ -594,6 +594,7 @@ return new Date(b.data.data) - new Date(a.data.data);
 
 let consumoTot=0;
 let countConsumi=0;
+let anomaliaConsumo=null;
 
 let kmPercorsiTot=0;
 let spesaTot=0;
@@ -757,7 +758,19 @@ options:{
 responsive:true,
 maintainAspectRatio:false,
 plugins:{
-legend:{display:false}
+legend:{
+display:true,
+position:"top",
+labels:{
+boxWidth:12,
+boxHeight:12,
+padding:10,
+font:{
+size:12
+},
+color:"#6e6e73"
+}
+}
 },
 scales:{
 
@@ -793,6 +806,28 @@ formatNumero(media,2)+" km/l";
 
 }
 
+let ultimoConsumo=null;
+
+fuelList.forEach(item=>{
+if(item.data.consumo && !ultimoConsumo){
+ultimoConsumo=item.data.consumo;
+}
+});
+
+if(ultimoConsumo && countConsumi>2){
+
+let media=(consumoTot/countConsumi);
+
+let diff=((media-ultimoConsumo)/media)*100;
+
+if(diff>15){
+
+anomaliaConsumo=Math.round(diff);
+
+}
+
+}
+
 if(migliorConsumo!==null){
 
 document.getElementById("bestConsumo").innerText=
@@ -818,6 +853,20 @@ formatNumero(costoKm,2)+" €/km";
 
 document.getElementById("spesaMese").innerText=
 formatNumero(spesaMese,2)+" €";
+
+if(anomaliaConsumo){
+
+appDiv.innerHTML+=`
+
+<div class="anomaliaBox">
+
+⚠️ Consumo +${anomaliaConsumo}% rispetto alla media
+
+</div>
+
+`;
+
+}
 
 if(estateMedia){
 
@@ -1890,6 +1939,20 @@ color:white;
 .btnDelete{
 background:#ff3b30;
 color:white;
+}
+
+.anomaliaBox{
+margin:16px;
+padding:14px;
+background:#fff3cd;
+border-radius:12px;
+color:#8a6d3b;
+font-size:14px;
+}
+
+.dark .anomaliaBox{
+background:#3a2d00;
+color:#ffd60a;
 }
 
 </style>
