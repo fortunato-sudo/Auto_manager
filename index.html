@@ -284,7 +284,7 @@ appDiv.innerHTML+=`
 
 <div class="header">
 
-Manutenzioni
+🔧 Manutenzioni
 
 <button class="darkToggle" onclick="toggleDark()">🌙</button>
 
@@ -354,7 +354,7 @@ appDiv.innerHTML+=`
 
 <div class="header">
 
-Registro manutenzioni
+📋 Registro manutenzioni
 
 <button class="darkToggle" onclick="toggleDark()">🌙</button>
 
@@ -419,19 +419,6 @@ if(tab==="registroAdd"){
 
 appDiv.innerHTML+=`
 
-const manutSnap = await getDocs(collection(db,"manutenzioni"));
-
-let lista=document.getElementById("listaManut");
-
-manutSnap.forEach(doc=>{
-
-let opt=document.createElement("option");
-opt.value = doc.data().nome;
-
-lista.appendChild(opt);
-
-});
-
 <div class="header">
 Nuovo intervento
 <button onclick="nav('registro')">←</button>
@@ -468,6 +455,19 @@ Nuovo intervento
 </div>
 
 `;
+
+const manutSnap = await getDocs(collection(db,"manutenzioni"));
+
+let lista=document.getElementById("listaManut");
+
+manutSnap.forEach(doc=>{
+
+let opt=document.createElement("option");
+opt.value = doc.data().nome;
+
+lista.appendChild(opt);
+
+});
 
 }
 
