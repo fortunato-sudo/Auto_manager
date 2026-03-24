@@ -851,7 +851,7 @@ appDiv.innerHTML+=`
 
 <div class="header">
 
-<button onclick="nav(tabPrecedente)" class="backBtn">←</button>
+<button onclick="nav('manut')" class="backBtn">←</button>
 
 <button class="darkToggle" onclick="toggleDark()">🌙</button>
 
@@ -860,7 +860,7 @@ appDiv.innerHTML+=`
 
 <div class="detailTop">
 
-<img class="detailImg" src="${m.immagine||''}">
+<img class="detailImg" src="img/${m.nome}.JPG">
 
 <div>
 
@@ -1609,22 +1609,21 @@ display:flex;
 gap:10px;
 padding:20px;
 }
-
-.mainBtn{
+.
+.mainBtn,
+.deleteBtn{
 flex:1;
-background:#007aff;
 padding:14px;
 border-radius:14px;
 margin:0;
-margin-bottom:16px;
+}
+
+.mainBtn{
+background:#007aff;
 }
 
 .deleteBtn{
-flex:1;
 background:#ff3b30;
-padding:14px;
-border-radius:14px;
-margin:0;
 }
 
 /* ADD BUTTON */
