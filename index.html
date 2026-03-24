@@ -905,10 +905,20 @@ formatNumero(spesaMese,2)+" €";
 
 if(anomaliaConsumo){
 
+let media = listaConsumi.reduce((a,b)=>a+b,0) / listaConsumi.length;
+let ultimoConsumo = listaConsumi[0];
+
 document.getElementById("fuelList").innerHTML =
 `<div class="anomaliaBox">
-⚠️ Consumo +${anomaliaConsumo}% rispetto alla media
-</div>` 
+
+⚠️ Consumo +${anomaliaConsumo}% rispetto alla media<br>
+
+<span class="anomaliaDettaglio">
+Ultimo pieno: ${formatNumero(ultimoConsumo,2)} km/l<br>
+Media: ${formatNumero(media,2)} km/l
+</span>
+
+</div>`
 + document.getElementById("fuelList").innerHTML;
 
 }
@@ -1027,6 +1037,13 @@ ${titoloFuel}
 <div class="row">
 <div>Distributore</div>
 <input id="distributore">
+</div>
+
+<div class="row">
+<label style="display:flex; gap:8px; align-items:center;">
+<input type="checkbox" id="saltaConsumo">
+Rifornimento precedente perso
+</label>
 </div>
 
 <div class="row center">
@@ -1377,6 +1394,8 @@ let litri = parseNumero(document.getElementById("litri").value);
 let km = Number(document.getElementById("kmFuel").value);
 let distributore = document.getElementById("distributore").value;
 
+let saltoConsumo = document.getElementById("saltaConsumo")?.checked;
+  
 let consumo = null;
 
 /* trova rifornimento precedente */
@@ -1399,12 +1418,12 @@ ultimoKm = k;
 
 /* calcola consumo */
 
-if(ultimoKm !== null && litri){
+if(!saltoConsumo && ultimoKm !== null && litri){
 
 let kmPercorsi = km - ultimoKm;
 
-if(kmPercorsi > 0){
-consumo = Number((kmPercorsi / litri).toFixed(2));
+if(kmPercorsi>0){
+consumo = kmPercorsi / litri;
 }
 
 }
@@ -1998,6 +2017,13 @@ font-size:14px;
 .dark .anomaliaBox{
 background:#3a2d00;
 color:#ffd60a;
+}
+
+.anomaliaDettaglio{
+font-size:13px;
+opacity:0.8;
+display:block;
+margin-top:4px;
 }
 
 </style>
