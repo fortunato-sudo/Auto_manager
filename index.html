@@ -921,13 +921,13 @@ Periodicità: ${m.frequenza_km} km / ${m.frequenza_mesi} mesi
 </div>
 
 
-<div class="actions">
+<div class="manutActions">
 
-<button class="mainBtn" onclick="segnaFatto()">
+<button class="manutBtnPrimary" onclick="segnaFatto()">
 Registra intervento
 </button>
 
-<button class="deleteBtn" onclick="eliminaManutenzione()">
+<button class="manutBtnDelete" onclick="eliminaManutenzione()">
 Elimina manutenzione
 </button>
 
@@ -1643,12 +1643,12 @@ padding:20px;
 flex:1;
 padding:14px;
 border-radius:14px;
-font-size:16px;
 }
 
 .mainBtn{
 background:#007aff;
 color:white;
+margin:16px;
 }
 
 .deleteBtn{
@@ -1656,6 +1656,31 @@ background:#ff3b30;
 color:white;
 }
 
+.manutActions{
+display:flex;
+gap:10px;
+padding:20px;
+}
+
+.manutBtnPrimary,
+.manutBtnDelete{
+flex:1;
+padding:14px;
+border-radius:14px;
+font-size:16px;
+border:none;
+}
+
+.manutBtnPrimary{
+background:#007aff;
+color:white;
+}
+
+.manutBtnDelete{
+background:#ff3b30;
+color:white;
+}
+  
 /* ADD BUTTON */
 
 .addBtn{
