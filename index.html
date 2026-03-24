@@ -50,6 +50,18 @@ return Number(num)
 
 }
 
+function getConsumoClasse(consumo){
+
+if(consumo >= 18) return "consumoOttimo";
+
+if(consumo >= 15) return "consumoBuono";
+
+if(consumo >= 12) return "consumoMedio";
+
+return "consumoBasso";
+
+}
+
 
 window.nav=function(t){
 
@@ -742,6 +754,8 @@ ${formatDate(s.data)} • ${formatNumero(s.totale,2)} €
 
 ${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
 
+<div class="fuelGrid">
+
 <div class="fuelInfo">
 💧 ${formatNumero(s.litro,3)} €/L
 </div>
@@ -754,7 +768,7 @@ ${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
 🚗 ${formatKm(s.km)} km
 </div>
 
-${s.consumo ? `<div class="fuelConsumo">📈 ${formatNumero(s.consumo,2)} km/l</div>` : ""}
+${s.consumo ? `<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>` : ""}
 
 <div style="margin-top:8px">
 
@@ -1673,17 +1687,20 @@ border-top:1px solid #2c2c2e;
 .fuelTitle{
 font-size:18px;
 font-weight:600;
-color:#1c1c1e;
-}
-
-.dark .fuelTitle{
-color:white;
+margin-bottom:4px;
 }
 
 .fuelStation{
 font-size:14px;
 color:#6e6e73;
-margin-bottom:4px;
+margin-bottom:8px;
+}
+
+.fuelGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px 12px;
+margin-top:6px;
 }
 
 .fuelInfo{
@@ -1693,8 +1710,25 @@ color:#6e6e73;
 
 .fuelConsumo{
 font-size:15px;
-font-weight:500;
-color:#007aff;
+font-weight:600;
+}
+
+/* colori consumo */
+
+.consumoOttimo{
+color:#34c759;
+}
+
+.consumoBuono{
+color:#30b158;
+}
+
+.consumoMedio{
+color:#ff9f0a;
+}
+
+.consumoBasso{
+color:#ff3b30;
 }
 
 </style>
