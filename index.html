@@ -526,6 +526,21 @@ appDiv.innerHTML+=`
 
 </div>
 
+
+<div class="widgets">
+
+<div class="widget">
+<div class="wTitle">☀️ Consumo estate</div>
+<div class="wValue" id="consumoEstate">-</div>
+</div>
+
+<div class="widget">
+<div class="wTitle">❄️ Consumo inverno</div>
+<div class="wValue" id="consumoInverno">-</div>
+</div>
+
+</div>
+
 <div class="widgets">
 
 <div class="widget">
@@ -587,16 +602,43 @@ let spesaMese=0;
 let migliorConsumo=null;
 let peggiorConsumo=null;
 
+let consumoEstate=0;
+let consumoInverno=0;
+
+let countEstate=0;
+let countInverno=0;
+
 let oggi=new Date();
 let meseAttuale=oggi.getMonth();
 let annoAttuale=oggi.getFullYear();
 
 let chartLabels=[];
 let chartData=[];
+let chartPrezzo=[];
 
 fuelList.forEach(item=>{
 
 let s = item.data;
+
+if(s.consumo && s.data){
+
+let d=new Date(s.data);
+let mese=d.getMonth()+1;
+
+if(mese>=4 && mese<=9){
+
+consumoEstate+=s.consumo;
+countEstate++;
+
+}
+else{
+
+consumoInverno+=s.consumo;
+countInverno++;
+
+}
+
+}
 
 if(s.consumo){
 consumoTot+=s.consumo;
@@ -633,12 +675,24 @@ spesaMese+=s.totale;
 
 }
 
-if(s.consumo){
-chartLabels.push(formatDate(s.data || ""));
-chartData.push(Number(s.consumo.toFixed(2)));
+if(s.data){
+
+chartLabels.push(formatDate(s.data));
+
+chartData.push(
+s.consumo ? Number(s.consumo.toFixed(2)) : null
+);
+
+chartPrezzo.push(
+s.litro ? Number(s.litro.toFixed(3)) : null
+);
+
 }
 
 });
+
+let estateMedia = countEstate ? consumoEstate/countEstate : null;
+let invernoMedia = countInverno ? consumoInverno/countInverno : null;
 
 let ultimoRifornimento = fuelList.length ? fuelList[0].data : null;
 
@@ -671,16 +725,32 @@ type:"line",
 
 data:{
 labels:chartLabels,
-datasets:[{
+datasets:[
+
+{
 label:"Consumo km/l",
 data:chartData,
 borderColor:"#007aff",
-backgroundColor:"rgba(0,122,255,0.2)",
-tension:0.35,
-fill:true,
+backgroundColor:"rgba(0,122,255,0.15)",
+tension:0.3,
+yAxisID:"y1",
 pointRadius:5,
 borderWidth:3
-}]
+},
+
+{
+label:"Prezzo €/L",
+data:chartPrezzo,
+borderColor:"#ff9f0a",
+backgroundColor:"rgba(255,159,10,0.15)",
+tension:0.3,
+yAxisID:"y2",
+pointRadius:5,
+borderWidth:3
+}
+
+]
+
 },
 
 options:{
@@ -690,9 +760,21 @@ plugins:{
 legend:{display:false}
 },
 scales:{
-y:{
+
+y1:{
+position:"left",
 beginAtZero:false
+},
+
+y2:{
+position:"right",
+beginAtZero:false,
+grid:{
+drawOnChartArea:false
 }
+
+}
+
 }
 }
 
@@ -736,6 +818,20 @@ formatNumero(costoKm,2)+" €/km";
 
 document.getElementById("spesaMese").innerText=
 formatNumero(spesaMese,2)+" €";
+
+if(estateMedia){
+
+document.getElementById("consumoEstate").innerText=
+formatNumero(estateMedia,2)+" km/l";
+
+}
+
+if(invernoMedia){
+
+document.getElementById("consumoInverno").innerText=
+formatNumero(invernoMedia,2)+" km/l";
+
+}
 
 fuelList.forEach(item=>{
 
