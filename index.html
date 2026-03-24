@@ -272,6 +272,8 @@ appDiv.innerHTML+=`
 
 <div class="header">
 
+<button class="darkToggle" onclick="toggleDark()">🌙</button>
+
 <div class="titleBlock">
 
 <img src="img/logo.png" class="appLogoLarge">
@@ -281,8 +283,6 @@ Garage Manager
 </div>
 
 </div>
-
-<button class="darkToggle" onclick="toggleDark()">🌙</button>
 
 </div>
 
@@ -1727,6 +1727,7 @@ background:#1c1c1e;
 /* HEADER */
 
 .header{
+position:relative;
 display:flex;
 flex-direction:column;
 align-items:center;
@@ -1742,10 +1743,13 @@ gap:10px;
 /* DARK BUTTON */
 
 .darkToggle{
+position:absolute;
+top:20px;
+right:20px;
 background:#007aff;
 border:none;
 color:white;
-padding:10px 16px;
+padding:10px 14px;
 border-radius:14px;
 }
 
@@ -2139,8 +2143,8 @@ margin-bottom:10px;
 }
 
 .appLogoLarge{
-width:64px;
-height:64px;
+width:72px;
+height:72px;
 }
 
 .appTitle{
