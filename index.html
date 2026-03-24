@@ -549,6 +549,15 @@ appDiv.innerHTML+=`
 </div>
 
 <div class="widget">
+<div class="wTitle">⛽ €/100 km</div>
+<div class="wValue" id="costo100km">-</div>
+</div>
+
+</div>
+
+<div class="widgets">
+
+<div class="widget">
 <div class="wTitle">🛣️ Autonomia</div>
 <div class="wValue" id="autonomia">-</div>
 </div>
@@ -677,8 +686,14 @@ countInverno++;
 }
 
 if(s.consumo){
+
 consumoTot+=s.consumo;
 countConsumi++;
+
+if(s.litri){
+kmPercorsiTot += s.litri * s.consumo;
+}
+
 }
 
 if(s.consumo){
@@ -893,10 +908,14 @@ formatNumero(peggiorConsumo,2)+" km/l";
 
 if(spesaTot && kmPercorsiTot){
 
-let costoKm=spesaTot/kmPercorsiTot;
+let costoKm = spesaTot/kmPercorsiTot;
+let costo100km = costoKm*100;
 
-document.getElementById("costoKm").innerText=
+document.getElementById("costoKm").innerText =
 formatNumero(costoKm,2)+" €/km";
+
+document.getElementById("costo100km").innerText =
+formatNumero(costo100km,2)+" €/100 km";
 
 }
 
@@ -968,7 +987,11 @@ ${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
 🚗 ${formatKm(s.km)} km
 </div>
 
-${s.consumo ? `<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>` : ""}
+${s.consumo ? 
+`<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>` 
+: 
+`<div class="fuelNoConsumo">⚠️ Consumo non calcolato</div>`
+}
 
 </div>
 
@@ -2026,6 +2049,12 @@ display:block;
 margin-top:4px;
 }
 
+.fuelNoConsumo{
+font-size:14px;
+color:#ff9f0a;
+font-weight:500;
+}
+  
 </style>
 
 </head>
