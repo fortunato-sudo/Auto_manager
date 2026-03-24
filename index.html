@@ -770,7 +770,9 @@ ${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
 
 ${s.consumo ? `<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>` : ""}
 
-<div style="margin-top:8px">
+</div>
+
+<div class="fuelActions">
 
 <button onclick="modificaFuel('${id}')">✏️</button>
 
@@ -1729,6 +1731,18 @@ color:#ff9f0a;
 
 .consumoBasso{
 color:#ff3b30;
+}
+
+.fuelActions{
+margin-top:10px;
+display:flex;
+gap:10px;
+}
+
+.fuelActions button{
+padding:6px 10px;
+font-size:14px;
+border-radius:8px;
 }
 
 </style>
