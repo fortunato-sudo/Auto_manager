@@ -736,23 +736,25 @@ let row = `
 
 <div class="manutInfo">
 
-<div class="manutTitle">
+<div class="fuelTitle">
 ${formatDate(s.data)} • ${formatNumero(s.totale,2)} €
 </div>
 
-<div class="manutFreq">
-${s.distributore ? `<div class="manutFreq">⛽ ${s.distributore}</div>` : ""}
-</div>
+${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
 
-<div class="manutFreq">
+<div class="fuelInfo">
 💧 ${formatNumero(s.litro,3)} €/L
 </div>
 
-<div class="manutFreq">
+<div class="fuelInfo">
 ⛽ ${formatNumero(s.litri,2)} L
 </div>
 
-${s.consumo ? `<div class="manutFreq">📈 Consumo: ${formatNumero(s.consumo,2)} km/l</div>` : ""}
+<div class="fuelInfo">
+🚗 ${formatKm(s.km)} km
+</div>
+
+${s.consumo ? `<div class="fuelConsumo">📈 ${formatNumero(s.consumo,2)} km/l</div>` : ""}
 
 <div style="margin-top:8px">
 
@@ -1498,6 +1500,9 @@ padding-bottom:0px;
 padding-top:8px;
 margin-top:8px;
 color:#6e6e73;
+font-weight:600;
+font-size:17px;
+text-transform:uppercase;
 }
 
 /* LIST */
@@ -1663,6 +1668,33 @@ font-size:26px;
 .dark .nav{
 background:#1c1c1e;
 border-top:1px solid #2c2c2e;
+}
+
+.fuelTitle{
+font-size:18px;
+font-weight:600;
+color:#1c1c1e;
+}
+
+.dark .fuelTitle{
+color:white;
+}
+
+.fuelStation{
+font-size:14px;
+color:#6e6e73;
+margin-bottom:4px;
+}
+
+.fuelInfo{
+font-size:14px;
+color:#6e6e73;
+}
+
+.fuelConsumo{
+font-size:15px;
+font-weight:500;
+color:#007aff;
 }
 
 </style>
