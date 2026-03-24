@@ -506,8 +506,12 @@ appDiv.innerHTML+=`
 </div>
 
 <div class="widget">
-<div class="wTitle">💶 Costo €/km</div>
-<div class="wValue" id="costoKm">-</div>
+<div class="wTitle">⛽ Costo carburante</div>
+
+<div class="wValue" id="costo100km">-</div>
+
+<div class="wSubValue" id="costoKm">-</div>
+
 </div>
 
 </div>
@@ -547,15 +551,6 @@ appDiv.innerHTML+=`
 <div class="wTitle">📅 Spesa mese</div>
 <div class="wValue" id="spesaMese">-</div>
 </div>
-
-<div class="widget">
-<div class="wTitle">⛽ €/100 km</div>
-<div class="wValue" id="costo100km">-</div>
-</div>
-
-</div>
-
-<div class="widgets">
 
 <div class="widget">
 <div class="wTitle">🛣️ Autonomia</div>
@@ -2053,6 +2048,12 @@ margin-top:4px;
 font-size:14px;
 color:#ff9f0a;
 font-weight:500;
+}
+
+.wSubValue{
+font-size:12px;
+opacity:0.7;
+margin-top:2px;
 }
   
 </style>
