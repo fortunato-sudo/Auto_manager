@@ -6,7 +6,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Auto Manager</title>
+<title>Garage Manager</title>
+
+<link rel="apple-touch-icon" href="img/logo.png">
+<link rel="icon" href="img/logo.png">
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -270,7 +273,8 @@ appDiv.innerHTML+=`
 <div class="header">
 
 <div class="title">
-🚗 Auto Manager
+<img src="img/logo.png" class="appLogo">
+Garage Manager
 </div>
 
 <button class="darkToggle" onclick="toggleDark()">🌙</button>
@@ -318,7 +322,7 @@ ${spesaMese ? formatNumero(spesaMese,2)+" €" : "-"}
 
 <div class="widget">
 
-<div class="wTitle">Urgenti</div>
+<div class="wTitle">Interventi Urgenti</div>
 
 <div class="wValue">${urg}</div>
 
@@ -326,7 +330,7 @@ ${spesaMese ? formatNumero(spesaMese,2)+" €" : "-"}
 
 <div class="widget">
 
-<div class="wTitle">Imminenti</div>
+<div class="wTitle">Interventi Imminenti</div>
 
 <div class="wValue">${imm}</div>
 
@@ -2106,6 +2110,13 @@ font-weight:500;
 font-size:12px;
 opacity:0.7;
 margin-top:2px;
+}
+
+.appLogo{
+width:28px;
+height:28px;
+vertical-align:middle;
+margin-right:8px;
 }
   
 </style>
