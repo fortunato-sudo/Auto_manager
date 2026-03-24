@@ -594,7 +594,38 @@ return new Date(b.data.data) - new Date(a.data.data);
 
 let consumoTot=0;
 let countConsumi=0;
+  
 let anomaliaConsumo=null;
+
+if(countConsumi>2){
+
+let media=consumoTot/countConsumi;
+
+// consumo ultimo rifornimento
+let ultimoConsumo=null;
+
+for(let i=0;i<fuelList.length;i++){
+
+if(fuelList[i].data.consumo){
+ultimoConsumo=fuelList[i].data.consumo;
+break;
+}
+
+}
+
+if(ultimoConsumo){
+
+let diff=((media-ultimoConsumo)/media)*100;
+
+if(diff>15){
+
+anomaliaConsumo=Math.round(diff);
+
+}
+
+}
+
+}
 
 let kmPercorsiTot=0;
 let spesaTot=0;
