@@ -594,7 +594,7 @@ return new Date(b.data.data) - new Date(a.data.data);
 
 let consumoTot=0;
 let countConsumi=0;
-  
+let listaConsumi=[];
 let anomaliaConsumo=null;
 
 if(countConsumi>2){
@@ -651,6 +651,10 @@ let chartPrezzo=[];
 fuelList.forEach(item=>{
 
 let s = item.data;
+
+if(s.consumo){
+listaConsumi.push(s.consumo);
+}
 
 if(s.consumo && s.data){
 
@@ -723,6 +727,20 @@ s.litro ? Number(s.litro.toFixed(3)) : null
 
 });
 
+if(listaConsumi.length>=2){
+
+let ultimoConsumo = listaConsumi[0];
+
+let media = listaConsumi.reduce((a,b)=>a+b,0) / listaConsumi.length;
+
+let diff = ((media-ultimoConsumo)/media)*100;
+
+if(diff>15){
+anomaliaConsumo = Math.round(diff);
+}
+
+}
+  
 let estateMedia = countEstate ? consumoEstate/countEstate : null;
 let invernoMedia = countInverno ? consumoInverno/countInverno : null;
 
@@ -887,15 +905,11 @@ formatNumero(spesaMese,2)+" €";
 
 if(anomaliaConsumo){
 
-appDiv.innerHTML+=`
-
-<div class="anomaliaBox">
-
+document.getElementById("fuelList").innerHTML =
+`<div class="anomaliaBox">
 ⚠️ Consumo +${anomaliaConsumo}% rispetto alla media
-
-</div>
-
-`;
+</div>` 
++ document.getElementById("fuelList").innerHTML;
 
 }
 
