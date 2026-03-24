@@ -53,7 +53,10 @@ return Number(num)
 
 window.nav=function(t){
 
+if(t !== "back"){
 tabPrecedente = tab;
+}
+
 tab = t;
 render();
 
@@ -779,6 +782,8 @@ appDiv.innerHTML+=`
 
 <div class="header">
 
+<button onclick="nav('fuel')">←</button>
+
 ${titoloFuel}
 
 <button class="darkToggle" onclick="toggleDark()">🌙</button>
@@ -1083,12 +1088,31 @@ let note=document.getElementById("noteInt").value;
 
 let data=new Date().toISOString().split("T")[0];
 
+/* salva nel registro */
+
 await addDoc(collection(db,"registro"),{
 manutenzione:nome,
 km:Number(km),
 data:data,
 officina:officina,
 note:note
+});
+
+/* aggiorna la manutenzione */
+
+const manutSnap = await getDocs(collection(db,"manutenzioni"));
+
+manutSnap.forEach(async docSnap=>{
+
+if(docSnap.data().nome===nome){
+
+await setDoc(doc(db,"manutenzioni",docSnap.id),{
+ultimo_km:Number(km),
+ultima_data:data
+},{merge:true});
+
+}
+
 });
 
 tab="registro";
@@ -1595,18 +1619,12 @@ margin:0;
 margin-bottom:16px;
 }
 
-.mainBtn,
-.deleteBtn{
-flex:1;
-padding:14px;
-border-radius:14px;
-}
-
 .deleteBtn{
 flex:1;
 background:#ff3b30;
 padding:14px;
 border-radius:14px;
+margin:0;
 }
 
 /* ADD BUTTON */
