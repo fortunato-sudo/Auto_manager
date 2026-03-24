@@ -774,9 +774,13 @@ ${s.consumo ? `<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${fo
 
 <div class="fuelActions">
 
-<button onclick="modificaFuel('${id}')">✏️</button>
+<button class="btnEdit" onclick="modificaFuel('${id}')">
+✏️ Modifica
+</button>
 
-<button onclick="eliminaFuel('${id}')">🗑️</button>
+<button class="btnDelete" onclick="eliminaFuel('${id}')">
+🗑 Elimina
+</button>
 
 </div>
 
@@ -1734,15 +1738,36 @@ color:#ff3b30;
 }
 
 .fuelActions{
-margin-top:10px;
+margin-top:12px;
 display:flex;
 gap:10px;
 }
 
 .fuelActions button{
-padding:6px 10px;
+flex:1;
+padding:8px 10px;
 font-size:14px;
-border-radius:8px;
+border-radius:10px;
+border:none;
+font-weight:500;
+}
+
+.fuelActions button:active{
+transform:scale(0.97);
+}
+
+/* modifica */
+
+.btnEdit{
+background:#007aff;
+color:white;
+}
+
+/* elimina */
+
+.btnDelete{
+background:#ff3b30;
+color:white;
 }
 
 </style>
