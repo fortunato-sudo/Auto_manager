@@ -190,24 +190,6 @@ data:docSnap.data()
 });
 });
 
-const manutSnap = await getDocs(collection(db,"manutenzioni"));
-
-let lista=document.getElementById("listaManut");
-
-if(lista){
-
-manutSnap.forEach(doc=>{
-
-let opt=document.createElement("option");
-opt.value = doc.data().nome;
-
-lista.appendChild(opt);
-
-});
-
-}
-
-
 manutList.sort((a,b)=>{
 
 let kmA=(a.data.ultimo_km||0)+(a.data.frequenza_km||0);
@@ -308,9 +290,58 @@ Manutenzioni
 
 </div>
 
-<button class="addBtn" onclick="aggiungiManutenzione()">+ Aggiungi manutenzione</button>
+<button class="addBtn" onclick="nav('manutAdd')">+ Aggiungi manutenzione</button>
 
 <div class="list" id="lista"></div>
+
+`;
+
+}
+
+if(tab==="manutAdd"){
+
+appDiv.innerHTML+=`
+
+<div class="header">
+
+Nuova manutenzione
+
+<button onclick="nav('manut')">←</button>
+
+</div>
+
+<div class="group">
+
+<div class="row">
+<div>Nome manutenzione</div>
+<input id="nomeMan">
+</div>
+
+<div class="row">
+<div>Frequenza km</div>
+<input id="freqKm">
+</div>
+
+<div class="row">
+<div>Frequenza mesi</div>
+<input id="freqMesi">
+</div>
+
+<div class="row">
+<div>Prodotto</div>
+<input id="prodottoMan">
+</div>
+
+<div class="row">
+<div>Immagine (URL GitHub)</div>
+<input id="imgMan">
+</div>
+
+<div class="row center">
+<button onclick="salvaManutenzione()">Salva</button>
+</div>
+
+</div>
 
 `;
 
@@ -387,6 +418,19 @@ document.getElementById("registro").innerHTML+=row;
 if(tab==="registroAdd"){
 
 appDiv.innerHTML+=`
+
+const manutSnap = await getDocs(collection(db,"manutenzioni"));
+
+let lista=document.getElementById("listaManut");
+
+manutSnap.forEach(doc=>{
+
+let opt=document.createElement("option");
+opt.value = doc.data().nome;
+
+lista.appendChild(opt);
+
+});
 
 <div class="header">
 Nuovo intervento
@@ -997,6 +1041,29 @@ prodotto
 
 }
 
+window.salvaManutenzione = async function(){
+
+let nome = document.getElementById("nomeMan").value;
+let km = document.getElementById("freqKm").value;
+let mesi = document.getElementById("freqMesi").value;
+let prodotto = document.getElementById("prodottoMan").value;
+let img = document.getElementById("imgMan").value;
+
+await addDoc(collection(db,"manutenzioni"),{
+
+nome:nome,
+frequenza_km:Number(km),
+frequenza_mesi:Number(mesi),
+prodotto:prodotto,
+immagine:img
+
+});
+
+tab="manut";
+render();
+
+}
+
 function parseNumero(val){
 
 if(!val) return null;
@@ -1524,8 +1591,7 @@ flex:1;
 background:#007aff;
 padding:14px;
 border-radius:14px;
-margin:16px;
-margin-bottom:90px;
+margin:0;
 }
 
 .mainBtn,
