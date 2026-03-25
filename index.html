@@ -567,8 +567,65 @@ appDiv.innerHTML+=`
 </div>
 
 <div class="widget">
+<div class="wTitle">💶 Costo carburante</div>
+
+<div class="wValue" id="costo100km">-</div>
+
+<div class="wSubValue" id="costoKm">-</div>
+
+</div>
+
+</div>
+
+<div class="widgets">
+
+<div class="widget">
+<div class="wTitle">🏆 Miglior consumo</div>
+<div class="wValue" id="bestConsumo">-</div>
+</div>
+
+<div class="widget">
+<div class="wTitle">⚠️ Peggior consumo</div>
+<div class="wValue" id="worstConsumo">-</div>
+</div>
+
+</div>
+
+
+<div class="widgets">
+
+<div class="widget">
+<div class="wTitle">☀️ Consumo estate</div>
+<div class="wValue" id="consumoEstate">-</div>
+</div>
+
+<div class="widget">
+<div class="wTitle">❄️ Consumo inverno</div>
+<div class="wValue" id="consumoInverno">-</div>
+</div>
+
+</div>
+
+<div class="widgets">
+
+<div class="widget">
+<div class="wTitle">📅 Spesa mese</div>
+<div class="wValue" id="spesaMese">-</div>
+</div>
+
+<div class="widget">
 <div class="wTitle">🛣️ Autonomia</div>
 <div class="wValue" id="autonomia">-</div>
+</div>
+
+</div>
+
+<div class="group">
+
+<div class="row">
+<div style="width:100%; height:260px;">
+<canvas id="fuelChart"></canvas>
+</div>
 </div>
 
 </div>
@@ -1089,93 +1146,6 @@ document.getElementById("kmFuel").value = f.km || "";
 document.getElementById("distributore").value = f.distributore || "";
 
 }
-
-}
-
-if(tab==="stats"){
-
-appDiv.innerHTML+=`
-
-<div class="header">
-
-📊 Statistiche
-
-<button class="darkToggle" onclick="toggleDark()">🌙</button>
-
-</div>
-
-<div class="widgets">
-
-<div class="widget">
-<div class="wTitle">⛽ Consumo medio</div>
-<div class="wValue" id="mediaConsumo">-</div>
-</div>
-
-<div class="widget">
-<div class="wTitle">💶 Costo carburante</div>
-
-<div class="wValue" id="costo100km">-</div>
-
-<div class="wSubValue" id="costoKm">-</div>
-
-</div>
-
-</div>
-
-<div class="widgets">
-
-<div class="widget">
-<div class="wTitle">🏆 Miglior consumo</div>
-<div class="wValue" id="bestConsumo">-</div>
-</div>
-
-<div class="widget">
-<div class="wTitle">⚠️ Peggior consumo</div>
-<div class="wValue" id="worstConsumo">-</div>
-</div>
-
-</div>
-
-
-<div class="widgets">
-
-<div class="widget">
-<div class="wTitle">☀️ Consumo estate</div>
-<div class="wValue" id="consumoEstate">-</div>
-</div>
-
-<div class="widget">
-<div class="wTitle">❄️ Consumo inverno</div>
-<div class="wValue" id="consumoInverno">-</div>
-</div>
-
-</div>
-
-<div class="widgets">
-
-<div class="widget">
-<div class="wTitle">📅 Spesa mese</div>
-<div class="wValue" id="spesaMese">-</div>
-</div>
-
-<div class="widget">
-<div class="wTitle">🛣️ Autonomia</div>
-<div class="wValue" id="autonomia">-</div>
-</div>
-
-</div>
-
-<div class="group">
-
-<div class="row">
-<div style="width:100%; height:260px;">
-<canvas id="fuelChart"></canvas>
-</div>
-</div>
-
-</div>
-
-`;
 
 }
 
@@ -2197,7 +2167,6 @@ font-weight:600;
 <div onclick="nav('manut')">🔧</div>
 <div onclick="nav('registro')">📋</div>
 <div onclick="nav('fuel')">⛽</div>
-<div onclick="nav('stats')">📊</div>
 
 </div>
 
