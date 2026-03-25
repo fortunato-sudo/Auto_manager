@@ -654,36 +654,6 @@ let countConsumi=0;
 let listaConsumi=[];
 let anomaliaConsumo=null;
 
-if(countConsumi>2){
-
-let media=consumoTot/countConsumi;
-
-// consumo ultimo rifornimento
-let ultimoConsumo=null;
-
-for(let i=0;i<fuelList.length;i++){
-
-if(fuelList[i].data.consumo){
-ultimoConsumo=fuelList[i].data.consumo;
-break;
-}
-
-}
-
-if(ultimoConsumo){
-
-let diff=((media-ultimoConsumo)/media)*100;
-
-if(diff>15){
-
-anomaliaConsumo=Math.round(diff);
-
-}
-
-}
-
-}
-
 let kmPercorsiTot=0;
 let spesaTot=0;
 let spesaMese=0;
@@ -1182,6 +1152,26 @@ document.getElementById("fuelList").innerHTML+=row;
 
 });
 
+if(listaConsumi.length >= 3){
+
+let ultimoConsumo = listaConsumi[0];
+
+let media = 0;
+
+for(let i=1;i<listaConsumi.length;i++){
+media += listaConsumi[i];
+}
+
+media = media/(listaConsumi.length-1);
+
+let diff=((media-ultimoConsumo)/media)*100;
+
+if(diff>15){
+anomaliaConsumo=Math.round(diff);
+}
+
+}
+  
 }
 
 
