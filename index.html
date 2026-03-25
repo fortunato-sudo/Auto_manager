@@ -196,11 +196,7 @@ appDiv.innerHTML="";
 
 let km=0;
 
-alert("prima query config");
-
 const conf=await getDocs(collection(db,"config"));
-
-alert("query config ok");
 
 conf.forEach(d=>{
 km=d.data().km_attuali||0;
@@ -208,7 +204,11 @@ km=d.data().km_attuali||0;
 
 /* MANUTENZIONI */
 
+alert("prima query manutenzioni");
+
 const manut=await getDocs(collection(db,"manutenzioni"));
+
+alert("query manutenzioni ok");
 
 let manutList=[];
 
