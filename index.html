@@ -192,6 +192,104 @@ async function render(){
 const appDiv=document.getElementById("app");
 appDiv.innerHTML="";
 
+// ===== DATI RIFORNIMENTI GLOBALI =====
+
+const fuelSnap = await getDocs(collection(db,"fuel"));
+
+let fuelList=[];
+
+fuelSnap.forEach(docSnap=>{
+
+fuelList.push({
+id:docSnap.id,
+data:docSnap.data()
+});
+
+});
+
+fuelList.sort((a,b)=>{
+return new Date(b.data.data) - new Date(a.data.data);
+});
+
+let consumoTot=0;
+let countConsumi=0;
+let listaConsumi=[];
+
+let kmPercorsiTot=0;
+let spesaTot=0;
+let spesaMese=0;
+
+let migliorConsumo=null;
+let peggiorConsumo=null;
+
+let consumoEstate=0;
+let consumoInverno=0;
+
+let countEstate=0;
+let countInverno=0;
+
+let oggi=new Date();
+let meseAttuale=oggi.getMonth();
+let annoAttuale=oggi.getFullYear();
+
+fuelList.forEach(item=>{
+
+let s=item.data;
+
+if(s.consumo){
+
+consumoTot+=s.consumo;
+countConsumi++;
+
+listaConsumi.push(s.consumo);
+
+if(migliorConsumo===null || s.consumo>migliorConsumo){
+migliorConsumo=s.consumo;
+}
+
+if(peggiorConsumo===null || s.consumo<peggiorConsumo){
+peggiorConsumo=s.consumo;
+}
+
+if(s.litri){
+kmPercorsiTot+=s.litri*s.consumo;
+}
+
+}
+
+if(s.totale){
+spesaTot+=s.totale;
+}
+
+if(s.data){
+
+let d=new Date(s.data);
+
+if(d.getMonth()==meseAttuale && d.getFullYear()==annoAttuale){
+spesaMese+=s.totale||0;
+}
+
+let mese=d.getMonth()+1;
+
+if(mese>=4 && mese<=9){
+
+consumoEstate+=s.consumo||0;
+countEstate++;
+
+}else{
+
+consumoInverno+=s.consumo||0;
+countInverno++;
+
+}
+
+}
+
+});
+
+let estateMedia = countEstate ? consumoEstate/countEstate : null;
+let invernoMedia = countInverno ? consumoInverno/countInverno : null;
+
 let km=0;
 
 const conf=await getDocs(collection(db,"config"));
@@ -582,19 +680,6 @@ appDiv.innerHTML+=`
 <div class="list" id="fuelList"></div>
 
 `;
-
-const fuelSnap = await getDocs(collection(db,"fuel"));
-
-let fuelList=[];
-
-fuelSnap.forEach(docSnap=>{
-
-fuelList.push({
-id:docSnap.id,
-data:docSnap.data()
-});
-
-});
 
 fuelList.sort((a,b)=>{
 return new Date(b.data.data) - new Date(a.data.data);
