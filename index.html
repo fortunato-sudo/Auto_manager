@@ -192,12 +192,60 @@ async function render(){
 const appDiv=document.getElementById("app");
 appDiv.innerHTML="";
 
+/* CARICO TUTTI I DATI UNA VOLTA */
+
+const [
+confSnap,
+manutSnap,
+fuelSnap,
+registroSnap
+] = await Promise.all([
+getDocs(collection(db,"config")),
+getDocs(collection(db,"manutenzioni")),
+getDocs(collection(db,"fuel")),
+getDocs(collection(db,"registro"))
+]);
+
+/* CONFIG */
+
 let km=0;
 
-const conf=await getDocs(collection(db,"config"));
-conf.forEach(d=>km=d.data().km_attuali||0);
+confSnap.forEach(d=>{
+km=d.data().km_attuali||0;
+});
 
-const manut=await getDocs(collection(db,"manutenzioni"));
+/* MANUTENZIONI */
+
+let manutList=[];
+
+manutSnap.forEach(docSnap=>{
+manutList.push({
+id:docSnap.id,
+data:docSnap.data()
+});
+});
+
+/* FUEL */
+
+let fuelList=[];
+
+fuelList.forEach(docSnap=>{
+fuelList.push({
+id:docSnap.id,
+data:docSnap.data()
+});
+});
+
+/* REGISTRO */
+
+let registroList=[];
+
+registroSnap.forEach(docSnap=>{
+registroList.push({
+id:docSnap.id,
+data:docSnap.data()
+});
+});
 
 let manutList=[];
 
@@ -236,7 +284,6 @@ if(stato.stato==="imminente") imm++;
 // ---- DATI DASHBOARD ----
 
 // rifornimenti
-const fuelSnap = await getDocs(collection(db,"fuel"));
 
 let consumoTot=0;
 let countConsumi=0;
@@ -246,7 +293,7 @@ let oggi=new Date();
 let meseAttuale=oggi.getMonth();
 let annoAttuale=oggi.getFullYear();
 
-fuelSnap.forEach(doc=>{
+fuelList.forEach(doc=>{
 let s=doc.data();
 
 if(s.consumo){
@@ -444,11 +491,9 @@ appDiv.innerHTML+=`
 
 `;
 
-const storico = await getDocs(collection(db,"registro"));
-
 let storicoList=[];
 
-storico.forEach(docSnap=>{
+registroList.forEach(docSnap=>{
 storicoList.push({
 id:docSnap.id,
 data:docSnap.data()
@@ -632,11 +677,9 @@ appDiv.innerHTML+=`
 
 `;
 
-const fuelSnap = await getDocs(collection(db,"fuel"));
-
 let fuelList=[];
 
-fuelSnap.forEach(docSnap=>{
+fuelList.forEach(docSnap=>{
 
 fuelList.push({
 id:docSnap.id,
@@ -1019,11 +1062,9 @@ appDiv.innerHTML+=`
 
 `;
 
-const fuelSnap = await getDocs(collection(db,"fuel"));
-
 let fuelList=[];
 
-fuelSnap.forEach(docSnap=>{
+fuelList.forEach(docSnap=>{
 
 fuelList.push({
 id:docSnap.id,
@@ -1604,7 +1645,7 @@ const fuelSnap = await getDocs(collection(db,"fuel"));
 
 let ultimoKm = null;
 
-fuelSnap.forEach(d=>{
+fuelList.forEach(d=>{
 
 let k = Number(d.data().km);
 
