@@ -204,11 +204,7 @@ km=d.data().km_attuali||0;
 
 /* MANUTENZIONI */
 
-alert("prima query manutenzioni");
-
 const manut=await getDocs(collection(db,"manutenzioni"));
-
-alert("query manutenzioni ok");
 
 let manutList=[];
 
@@ -227,6 +223,8 @@ let kmB=(b.data.ultimo_km||0)+(b.data.frequenza_km||0);
 return kmA-kmB;
 
 });
+
+alert("sort manut ok");
 
 
 
