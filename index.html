@@ -1096,6 +1096,10 @@ fuelList.forEach(item=>{
 let s=item.data;
 let id=item.id;
 
+if(s.consumo){
+listaConsumi.push(s.consumo);
+}
+
 let row = `
 
 <div class="manutRow">
