@@ -189,6 +189,8 @@ colore: colore
 
 async function render(){
 
+alert("render iniziato");
+
 const appDiv=document.getElementById("app");
 appDiv.innerHTML="";
 
@@ -1797,8 +1799,6 @@ render();
 
 
 document.addEventListener("DOMContentLoaded", () => {
-
-alert("script partito");
 
 if(localStorage.getItem("darkMode")==="true"){
 document.body.classList.add("dark");
