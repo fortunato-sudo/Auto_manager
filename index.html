@@ -790,16 +790,20 @@ s.litro ? Number(s.litro.toFixed(3)) : null
 
 });
 
-if(listaConsumi.length>=2){
+iif(listaConsumi.length >= 3){
 
-let ultimoConsumo = listaConsumi[0];
+let ultimoConsumo = listaConsumi[listaConsumi.length-1];
 
-let media = listaConsumi.reduce((a,b)=>a+b,0) / listaConsumi.length;
+let media = listaConsumi
+.slice(0, listaConsumi.length-1)
+.reduce((a,b)=>a+b,0) / (listaConsumi.length-1);
 
 let diff = ((media-ultimoConsumo)/media)*100;
 
-if(diff>15){
+if(diff > 15){
+
 anomaliaConsumo = Math.round(diff);
+
 }
 
 }
