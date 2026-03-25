@@ -1075,6 +1075,192 @@ document.getElementById("fuelList").innerHTML+=row;
 
 }
 
+
+
+
+
+
+
+
+
+
+
+
+if(tab==="stats"){
+
+appDiv.innerHTML+=`
+
+<div class="header">
+
+📊 Statistiche
+
+<button class="darkToggle" onclick="toggleDark()">🌙</button>
+
+</div>
+
+<button onclick="nav('fuelAdd')" class="mainBtn">
+➕ Nuovo rifornimento
+</button>
+
+<div class="section">Ultimi rifornimenti</div>
+
+<div class="list" id="fuelList"></div>
+
+`;
+
+const fuelSnap = await getDocs(collection(db,"fuel"));
+
+let fuelList=[];
+
+fuelSnap.forEach(docSnap=>{
+
+fuelList.push({
+id:docSnap.id,
+data:docSnap.data()
+});
+
+});
+
+fuelList.sort((a,b)=>{
+return new Date(b.data.data) - new Date(a.data.data);
+});
+
+let consumoTot=0;
+let countConsumi=0;
+let listaConsumi=[];
+let anomaliaConsumo=null;
+
+if(countConsumi>2){
+
+let media=consumoTot/countConsumi;
+
+// consumo ultimo rifornimento
+let ultimoConsumo=null;
+
+for(let i=0;i<fuelList.length;i++){
+
+if(fuelList[i].data.consumo){
+ultimoConsumo=fuelList[i].data.consumo;
+break;
+}
+
+}
+
+if(ultimoConsumo){
+
+let diff=((media-ultimoConsumo)/media)*100;
+
+if(diff>15){
+
+anomaliaConsumo=Math.round(diff);
+
+}
+
+}
+
+}
+
+if(anomaliaConsumo){
+
+let media = listaConsumi.reduce((a,b)=>a+b,0) / listaConsumi.length;
+let ultimoConsumo = listaConsumi[0];
+
+document.getElementById("fuelList").innerHTML =
+`<div class="anomaliaBox">
+
+⚠️ Consumo +${anomaliaConsumo}% rispetto alla media<br>
+
+<span class="anomaliaDettaglio">
+Ultimo pieno: ${formatNumero(ultimoConsumo,2)} km/l<br>
+Media: ${formatNumero(media,2)} km/l
+</span>
+
+</div>`
++ document.getElementById("fuelList").innerHTML;
+
+}
+
+fuelList.forEach(item=>{
+
+let s=item.data;
+let id=item.id;
+
+let row = `
+
+<div class="manutRow">
+
+<div class="manutInfo">
+
+<div class="fuelTitle">
+${formatDate(s.data)} • ${formatNumero(s.totale,2)} €
+</div>
+
+${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
+
+<div class="fuelGrid">
+
+<div class="fuelInfo">
+💧 ${formatNumero(s.litro,3)} €/L
+</div>
+
+<div class="fuelInfo">
+⛽ ${formatNumero(s.litri,2)} L
+</div>
+
+<div class="fuelInfo">
+🚗 ${formatKm(s.km)} km
+</div>
+
+${s.consumo ? 
+`<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>` 
+: 
+`<div class="fuelNoConsumo">⚠️ Consumo non calcolato</div>`
+}
+
+</div>
+
+<div class="fuelActions">
+
+<button class="btnEdit" onclick="modificaFuel('${id}')">
+✏️ Modifica
+</button>
+
+<button class="btnDelete" onclick="eliminaFuel('${id}')">
+🗑 Elimina
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`;
+
+document.getElementById("fuelList").innerHTML+=row;
+
+});
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 if(tab==="fuelAdd"){
 
 let titoloFuel = fuelEditId ? "Modifica rifornimento" : "Nuovo rifornimento";
