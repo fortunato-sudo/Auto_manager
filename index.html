@@ -190,61 +190,22 @@ colore: colore
 
 async function render(){
 
-alert("render partito");
-
 const appDiv=document.getElementById("app");
 appDiv.innerHTML="";
-
-const appDiv=document.getElementById("app");
-appDiv.innerHTML="";
-
-/* CARICO TUTTI I DATI UNA VOLTA */
-
-const confSnap = await getDocs(collection(db,"config"));
-const manutSnap = await getDocs(collection(db,"manutenzioni"));
-const fuelSnap = await getDocs(collection(db,"fuel"));
-const registroSnap = await getDocs(collection(db,"registro"));
 
 /* CONFIG */
 
 let km=0;
 
-confSnap.forEach(d=>{
+const conf=await getDocs(collection(db,"config"));
+
+conf.forEach(d=>{
 km=d.data().km_attuali||0;
 });
 
 /* MANUTENZIONI */
 
-let manutList=[];
-
-manutSnap.forEach(docSnap=>{
-manutList.push({
-id:docSnap.id,
-data:docSnap.data()
-});
-});
-
-/* FUEL */
-
-let fuelList=[];
-
-fuelList.forEach(docSnap=>{
-fuelList.push({
-id:docSnap.id,
-data:docSnap.data()
-});
-});
-
-/* REGISTRO */
-
-let registroList=[];
-
-registroSnap.forEach(docSnap=>{
-registroList.push({
-id:docSnap.id,
-data:docSnap.data()
-});
-});
+const manut=await getDocs(collection(db,"manutenzioni"));
 
 let manutList=[];
 
@@ -255,8 +216,6 @@ data:docSnap.data()
 });
 });
 
-console.log("render start");
-  
 manutList.sort((a,b)=>{
 
 let kmA=(a.data.ultimo_km||0)+(a.data.frequenza_km||0);
