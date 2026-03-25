@@ -189,8 +189,6 @@ colore: colore
 
 async function render(){
 
-alert("render iniziato");
-
 const appDiv=document.getElementById("app");
 appDiv.innerHTML="";
 
@@ -198,7 +196,11 @@ appDiv.innerHTML="";
 
 let km=0;
 
+alert("prima query config");
+
 const conf=await getDocs(collection(db,"config"));
+
+alert("query config ok");
 
 conf.forEach(d=>{
 km=d.data().km_attuali||0;
