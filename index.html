@@ -630,14 +630,6 @@ appDiv.innerHTML+=`
 
 </div>
 
-<button onclick="nav('fuelAdd')" class="mainBtn">
-➕ Nuovo rifornimento
-</button>
-
-<div class="section">Ultimi rifornimenti</div>
-
-<div class="list" id="fuelList"></div>
-
 `;
 
 const fuelSnap = await getDocs(collection(db,"fuel"));
