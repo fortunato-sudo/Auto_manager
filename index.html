@@ -792,11 +792,11 @@ s.litro ? Number(s.litro.toFixed(3)) : null
 
 if(listaConsumi.length >= 3){
 
-let ultimoConsumo = listaConsumi[listaConsumi.length - 1];
+let ultimoConsumo = listaConsumi[0];
 
 let somma = 0;
 
-for(let i = 0; i < listaConsumi.length - 1; i++){
+for(let i = 1; i < listaConsumi.length; i++){
 somma += listaConsumi[i];
 }
 
