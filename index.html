@@ -199,17 +199,10 @@ appDiv.innerHTML="";
 
 /* CARICO TUTTI I DATI UNA VOLTA */
 
-const [
-confSnap,
-manutSnap,
-fuelSnap,
-registroSnap
-] = await Promise.all([
-getDocs(collection(db,"config")),
-getDocs(collection(db,"manutenzioni")),
-getDocs(collection(db,"fuel")),
-getDocs(collection(db,"registro"))
-]);
+const confSnap = await getDocs(collection(db,"config"));
+const manutSnap = await getDocs(collection(db,"manutenzioni"));
+const fuelSnap = await getDocs(collection(db,"fuel"));
+const registroSnap = await getDocs(collection(db,"registro"));
 
 /* CONFIG */
 
