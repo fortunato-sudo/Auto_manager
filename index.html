@@ -1094,6 +1094,182 @@ document.getElementById("distributore").value = f.distributore || "";
 
 if(tab==="stats"){
 
+const fuelSnap = await getDocs(collection(db,"fuel"));
+
+let fuelList=[];
+
+fuelSnap.forEach(docSnap=>{
+
+fuelList.push({
+id:docSnap.id,
+data:docSnap.data()
+});
+
+});
+
+fuelList.sort((a,b)=>{
+return new Date(b.data.data) - new Date(a.data.data);
+});
+
+let consumoTot=0;
+let countConsumi=0;
+let listaConsumi=[];
+let anomaliaConsumo=null;
+
+if(countConsumi>2){
+
+let media=consumoTot/countConsumi;
+
+// consumo ultimo rifornimento
+let ultimoConsumo=null;
+
+for(let i=0;i<fuelList.length;i++){
+
+if(fuelList[i].data.consumo){
+ultimoConsumo=fuelList[i].data.consumo;
+break;
+}
+
+}
+
+if(ultimoConsumo){
+
+let diff=((media-ultimoConsumo)/media)*100;
+
+if(diff>15){
+
+anomaliaConsumo=Math.round(diff);
+
+}
+
+}
+
+}
+
+let kmPercorsiTot=0;
+let spesaTot=0;
+let spesaMese=0;
+
+let migliorConsumo=null;
+let peggiorConsumo=null;
+
+let consumoEstate=0;
+let consumoInverno=0;
+
+let countEstate=0;
+let countInverno=0;
+
+let oggi=new Date();
+let meseAttuale=oggi.getMonth();
+let annoAttuale=oggi.getFullYear();
+
+let chartLabels=[];
+let chartData=[];
+let chartPrezzo=[];
+
+fuelList.forEach(item=>{
+
+let s = item.data;
+
+if(s.consumo){
+listaConsumi.push(s.consumo);
+}
+
+if(s.consumo && s.data){
+
+let d=new Date(s.data);
+let mese=d.getMonth()+1;
+
+if(mese>=4 && mese<=9){
+
+consumoEstate+=s.consumo;
+countEstate++;
+
+}
+else{
+
+consumoInverno+=s.consumo;
+countInverno++;
+
+}
+
+}
+
+if(s.consumo){
+
+consumoTot+=s.consumo;
+countConsumi++;
+
+if(s.litri){
+kmPercorsiTot += s.litri * s.consumo;
+}
+
+}
+
+if(s.consumo){
+
+if(migliorConsumo===null || s.consumo>migliorConsumo){
+migliorConsumo=s.consumo;
+}
+
+if(peggiorConsumo===null || s.consumo<peggiorConsumo){
+peggiorConsumo=s.consumo;
+}
+
+}
+
+if(s.consumo && s.litri){
+kmPercorsiTot += s.litri * s.consumo;
+}
+
+if(s.totale){
+spesaTot+=s.totale;
+}
+
+if(s.data){
+
+let d=new Date(s.data);
+
+if(d.getMonth()==meseAttuale && d.getFullYear()==annoAttuale){
+spesaMese+=s.totale;
+}
+
+}
+
+if(s.data){
+
+chartLabels.push(formatDate(s.data));
+
+chartData.push(
+s.consumo ? Number(s.consumo.toFixed(2)) : null
+);
+
+chartPrezzo.push(
+s.litro ? Number(s.litro.toFixed(3)) : null
+);
+
+}
+
+});
+
+if(listaConsumi.length>=2){
+
+let ultimoConsumo = listaConsumi[0];
+
+let media = listaConsumi.reduce((a,b)=>a+b,0) / listaConsumi.length;
+
+let diff = ((media-ultimoConsumo)/media)*100;
+
+if(diff>15){
+anomaliaConsumo = Math.round(diff);
+}
+
+}
+  
+let estateMedia = countEstate ? consumoEstate/countEstate : null;
+let invernoMedia = countInverno ? consumoInverno/countInverno : null;
+  
+
 appDiv.innerHTML+=`
 
 <div class="header">
