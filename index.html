@@ -244,6 +244,10 @@ if(stato.stato==="imminente") imm++;
 
 // rifornimenti
 
+const fuelSnap = await getDocs(collection(db,"fuel"));
+
+alert("query fuel ok");
+
 let consumoTot=0;
 let countConsumi=0;
 let spesaMese=0;
