@@ -17,7 +17,7 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-  
+
 const firebaseConfig={
 apiKey:"AIzaSy...",
 authDomain:"auto-manutenzione.firebaseapp.com",
@@ -192,17 +192,10 @@ async function render(){
 const appDiv=document.getElementById("app");
 appDiv.innerHTML="";
 
-/* CONFIG */
-
 let km=0;
 
 const conf=await getDocs(collection(db,"config"));
-
-conf.forEach(d=>{
-km=d.data().km_attuali||0;
-});
-
-/* MANUTENZIONI */
+conf.forEach(d=>km=d.data().km_attuali||0);
 
 const manut=await getDocs(collection(db,"manutenzioni"));
 
@@ -224,9 +217,9 @@ return kmA-kmB;
 
 });
 
-if(tab==="home"){
 
-alert("entro home");
+
+if(tab==="home"){
 
 let urg=0;
 let imm=0;
@@ -243,10 +236,7 @@ if(stato.stato==="imminente") imm++;
 // ---- DATI DASHBOARD ----
 
 // rifornimenti
-
 const fuelSnap = await getDocs(collection(db,"fuel"));
-
-alert("query fuel ok");
 
 let consumoTot=0;
 let countConsumi=0;
@@ -256,9 +246,8 @@ let oggi=new Date();
 let meseAttuale=oggi.getMonth();
 let annoAttuale=oggi.getFullYear();
 
-fuelList.forEach(item=>{
-
-let s=item.data;
+fuelSnap.forEach(doc=>{
+let s=doc.data();
 
 if(s.consumo){
 consumoTot+=s.consumo;
@@ -455,9 +444,11 @@ appDiv.innerHTML+=`
 
 `;
 
+const storico = await getDocs(collection(db,"registro"));
+
 let storicoList=[];
 
-registroList.forEach(docSnap=>{
+storico.forEach(docSnap=>{
 storicoList.push({
 id:docSnap.id,
 data:docSnap.data()
@@ -641,9 +632,11 @@ appDiv.innerHTML+=`
 
 `;
 
+const fuelSnap = await getDocs(collection(db,"fuel"));
+
 let fuelList=[];
 
-fuelList.forEach(docSnap=>{
+fuelSnap.forEach(docSnap=>{
 
 fuelList.push({
 id:docSnap.id,
@@ -1026,9 +1019,11 @@ appDiv.innerHTML+=`
 
 `;
 
+const fuelSnap = await getDocs(collection(db,"fuel"));
+
 let fuelList=[];
 
-fuelList.forEach(docSnap=>{
+fuelSnap.forEach(docSnap=>{
 
 fuelList.push({
 id:docSnap.id,
@@ -1609,7 +1604,7 @@ const fuelSnap = await getDocs(collection(db,"fuel"));
 
 let ultimoKm = null;
 
-fuelList.forEach(d=>{
+fuelSnap.forEach(d=>{
 
 let k = Number(d.data().km);
 
