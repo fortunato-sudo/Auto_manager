@@ -256,6 +256,8 @@ data:docSnap.data()
 });
 });
 
+console.log("render start");
+  
 manutList.sort((a,b)=>{
 
 let kmA=(a.data.ultimo_km||0)+(a.data.frequenza_km||0);
@@ -293,8 +295,9 @@ let oggi=new Date();
 let meseAttuale=oggi.getMonth();
 let annoAttuale=oggi.getFullYear();
 
-fuelList.forEach(doc=>{
-let s=doc.data();
+fuelList.forEach(item=>{
+
+let s=item.data;
 
 if(s.consumo){
 consumoTot+=s.consumo;
