@@ -1,0 +1,462 @@
+body{
+    margin:0;
+    font-family:-apple-system;
+    background:#f2f2f7;
+    color:#1c1c1e;
+}
+
+/* DARK MODE */
+
+.dark{
+    background:#000;
+    color:white;
+}
+
+.dark .widget,
+.dark .group{
+    background:#1c1c1e;
+}
+
+.dark .manutRow{
+    border-bottom:1px solid #2c2c2e;
+}
+
+.dark .manutFreq{
+    color:#9a9a9a;
+}
+
+.dark .progressBar{
+    background:#2c2c2e;
+}
+
+.dark .nav{
+    background:#1c1c1e;
+}
+
+/* HEADER */
+
+.header{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:20px;
+}
+
+.title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+/* DARK BUTTON */
+
+.darkToggle{
+    position:absolute;
+    top:20px;
+    right:20px;
+    background:#007aff;
+    border:none;
+    color:white;
+    padding:10px 14px;
+    border-radius:14px;
+}
+
+/* WIDGETS */
+
+.widgets{
+    display:flex;
+    gap:14px;
+    padding:16px;
+}
+
+.widget{
+    background:white;
+    padding:20px;
+    border-radius:18px;
+    flex:1;
+    text-align:center;
+}
+
+.kmWidget{
+    flex:1 1 100%;
+}
+
+/* KM BOX */
+
+.kmBox{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:10px;
+}
+
+/* INPUT */
+
+input{
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #d1d1d6;
+    width:90px;
+    text-align:center;
+    background:white;
+    color:#1c1c1e;
+}
+
+.dark input{
+    background:#2c2c2e;
+    border:1px solid #3a3a3c;
+    color:white;
+}
+
+/* BUTTON */
+
+button{
+    background:#007aff;
+    color:white;
+    border:none;
+    padding:10px 14px;
+    border-radius:12px;
+}
+
+/* SECTION */
+
+.section{
+    padding:16px;
+    padding-bottom:0px;
+    padding-top:8px;
+    margin-top:8px;
+    color:#6e6e73;
+    font-weight:600;
+    font-size:17px;
+    text-transform:uppercase;
+}
+
+/* LIST */
+
+.manutRow{
+    display:flex;
+    gap:14px;
+    padding:16px;
+    border-bottom:1px solid #e5e5ea;
+}
+
+.manutImg{
+    width:50px;
+    height:50px;
+    border-radius:12px;
+}
+
+.manutNext{
+    color:#007aff;
+    font-size:14px;
+}
+
+.manutTitle{
+    font-size:18px;
+    color:#1c1c1e;
+}
+
+.dark .manutTitle{
+    color:white;
+}
+
+.manutFreq{
+    color:#6e6e73;
+}
+
+.list{
+    padding-bottom:120px;
+}
+
+/* PROGRESS BAR */
+
+.progressBar{
+    width:50%;
+    max-width:200px;
+    height:6px;
+    background:#e5e5ea;
+    border-radius:6px;
+    margin-top:8px;
+}
+
+.manutInfo{
+    flex:1;
+    min-width:0;
+}
+
+.progressFill{
+    height:6px;
+    background:#007aff;
+    border-radius:6px;
+    max-width:100%;
+}
+
+/* GROUP */
+
+.group{
+    margin:16px;
+    background:white;
+    border-radius:16px;
+    overflow:hidden;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    padding:16px;
+    border-bottom:1px solid #e5e5ea;
+}
+
+.row.productLabel{
+    border-bottom:none !important;
+}
+
+.dark .row.productLabel{
+    border-bottom:none !important;
+}
+
+.productValue{
+    padding-top:6px;
+}
+
+.dark .row{
+    border-bottom:1px solid #2c2c2e;
+}
+
+/* DETAIL */
+
+.detailTop{
+    display:flex;
+    gap:16px;
+    padding:20px;
+}
+
+.detailImg{
+    width:90px;
+    border-radius:12px;
+}
+
+/* ACTION BUTTONS */
+
+.actions{
+    display:flex;
+    gap:10px;
+    padding:20px;
+}
+
+.mainBtn,
+.deleteBtn{
+    flex:1;
+    padding:14px;
+    border-radius:14px;
+}
+
+.mainBtn{
+    background:#007aff;
+    color:white;
+    margin:16px;
+}
+
+.deleteBtn{
+    background:#ff3b30;
+    color:white;
+}
+
+.manutActions{
+    display:flex;
+    gap:10px;
+    padding:20px;
+}
+
+.manutBtnPrimary,
+.manutBtnDelete{
+    flex:1;
+    padding:14px;
+    border-radius:14px;
+    font-size:16px;
+    border:none;
+}
+
+.manutBtnPrimary{
+    background:#007aff;
+    color:white;
+}
+
+.manutBtnDelete{
+    background:#ff3b30;
+    color:white;
+}
+  
+/* ADD BUTTON */
+
+.addBtn{
+    background:#007aff;
+    color:white;
+    border:none;
+    padding:10px 16px;
+    border-radius:12px;
+    margin:16px;
+    margin-bottom:8px;
+}
+
+/* NAV BAR */
+
+.nav{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    background:white;
+    border-top:1px solid #e5e5ea;
+    display:flex;
+}
+
+.nav div{
+    flex:1;
+    text-align:center;
+    padding:16px;
+    font-size:26px;
+}
+
+.dark .nav{
+    background:#1c1c1e;
+    border-top:1px solid #2c2c2e;
+}
+
+.fuelTitle{
+    font-size:18px;
+    font-weight:600;
+    margin-bottom:4px;
+}
+
+.fuelStation{
+    font-size:14px;
+    color:#6e6e73;
+    margin-bottom:8px;
+}
+
+.fuelGrid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px 12px;
+    margin-top:6px;
+}
+
+.fuelInfo{
+    font-size:14px;
+    color:#6e6e73;
+}
+
+.fuelConsumo{
+    font-size:15px;
+    font-weight:600;
+}
+
+/* colori consumo */
+
+.consumoOttimo{
+    color:#34c759;
+}
+
+.consumoBuono{
+    color:#30b158;
+}
+
+.consumoMedio{
+    color:#ff9f0a;
+}
+
+.consumoBasso{
+    color:#ff3b30;
+}
+
+.fuelActions{
+    margin-top:12px;
+    display:flex;
+    gap:10px;
+}
+
+.fuelActions button{
+    flex:1;
+    padding:8px 10px;
+    font-size:14px;
+    border-radius:10px;
+    border:none;
+    font-weight:500;
+}
+
+.fuelActions button:active{
+    transform:scale(0.97);
+}
+
+/* modifica */
+
+.btnEdit{
+    background:#007aff;
+    color:white;
+}
+
+/* elimina */
+
+.btnDelete{
+    background:#ff3b30;
+    color:white;
+}
+
+.anomaliaBox{
+    margin:16px;
+    padding:14px;
+    background:#fff3cd;
+    border-radius:12px;
+    color:#8a6d3b;
+    font-size:14px;
+}
+
+.dark .anomaliaBox{
+    background:#3a2d00;
+    color:#ffd60a;
+}
+
+.anomaliaDettaglio{
+    font-size:13px;
+    opacity:0.8;
+    display:block;
+    margin-top:4px;
+}
+
+.fuelNoConsumo{
+    font-size:14px;
+    color:#ff9f0a;
+    font-weight:500;
+}
+
+.wSubValue{
+    font-size:12px;
+    opacity:0.7;
+    margin-top:2px;
+}
+
+.appLogo{
+    width:40px;
+    height:40px;
+    vertical-align:middle;
+    margin-right:10px;
+}
+
+.titleBlock{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    margin-bottom:10px;
+}
+
+.appLogoLarge{
+    width:82px;
+    height:82px;
+}
+
+.appTitle{
+    font-size:22px;
+    font-weight:600;
+}
