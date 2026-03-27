@@ -60,7 +60,10 @@ body{
 
 .headerBack{
 	position:absolute;
-	left:20px;
+	left:16px;
+	background:#007aff;
+	border-radius:14px;
+	padding:10px 14px;
 }
 
 .headerDark{
