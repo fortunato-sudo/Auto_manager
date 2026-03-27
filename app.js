@@ -16,7 +16,6 @@ let dettaglioId=null;
 let tabPrecedente = "home";
 let fuelEditId = null;
 let fuelChart = null;
-let cacheFuel=null;
 let rendering = false;
 let cacheFuel=null;
 let cacheManut=null;
