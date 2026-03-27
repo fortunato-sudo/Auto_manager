@@ -116,10 +116,6 @@ function calcolaStatisticheFuel(fuelList){
                 kmPercorsiTot += s.litri * s.consumo;
             }
 
-            if(s.litro){
-                listaPrezzi.push(s.litro);
-            }
-
             if(s.data){
                 let d=new Date(s.data);
                 let mese=d.getMonth()+1;
@@ -138,6 +134,10 @@ function calcolaStatisticheFuel(fuelList){
 			prezzoMedio += s.litro;
 			countPrezzi++;
 		}
+        
+        if(s.litro){
+            listaPrezzi.push(s.litro);
+        }
 
         if(s.totale){
             spesaTot+=s.totale;
@@ -191,14 +191,17 @@ function calcolaStatisticheFuel(fuelList){
         }
     });
     
-    if(countPrezzi >= 5){
-		prezzoMedio = prezzoMedio / countPrezzi;
-		let ultimo = fuelList[0]?.data?.litro;
-		if(ultimo){
-			let diff = ((ultimo - prezzoMedio) / prezzoMedio) * 100;
-			if(diff > 10){
-				prezzoAlto = Math.round(diff);
-			}
+	if(listaPrezzi.length >= 5){
+		let ultimo = listaPrezzi[0];
+		let somma = 0;
+		for(let i=1;i<listaPrezzi.length;i++){
+			somma += listaPrezzi[i];
+		}
+
+		let media = somma/(listaPrezzi.length-1);
+		let diff=((ultimo-media)/media)*100;
+		if(diff>10){
+			prezzoAlto = Math.round(diff);
 		}
 	}
 
@@ -383,7 +386,7 @@ function renderHome(appDiv, km, manutList, stats){
         </div>
 
         <div class="section">Interventi imminenti o urgenti</div>
-        <div class="list" id="imminenti"></div>
+        <div id="imminenti"></div>
     `;
 }
 
@@ -394,7 +397,7 @@ function renderManut(appDiv){
             <button class="darkToggle" onclick="toggleDark()">🌙</button>
         </div>
         <button class="addBtn" onclick="nav('manutAdd')">+ Aggiungi manutenzione</button>
-        <div class="list" id="lista"></div>
+        <div id="lista"></div>
     `;
 }
 
@@ -578,7 +581,7 @@ async function renderRegistro(appDiv){
         <button class="mainBtn" onclick="nav('registroAdd')">
             ➕ Nuovo intervento
         </button>
-        <div class="list" id="registro"></div>
+        <div id="registro"></div>
     `;
 
     const storico = await getDocs(collection(db,"registro"));
@@ -669,7 +672,7 @@ function renderFuel(appDiv, fuelList, stats){
             ➕ Nuovo rifornimento
         </button>
         <div class="section">Ultimi rifornimenti</div>
-        <div class="list" id="fuelList"></div>
+        <div id="fuelList"></div>
     `;
 
     let fuelBox=document.getElementById("fuelList");
@@ -1181,24 +1184,38 @@ async function render(){
     try{
         const appDiv=document.getElementById("app");
         appDiv.innerHTML = "";
-        if(!cacheFuel){
-            cacheFuel = await getFuelList();
-        }
-        const fuelList = cacheFuel;
+        let fuelList=[];
+		if(tab==="home" || tab==="fuel" || tab==="stats"){
+			if(!cacheFuel){
+				cacheFuel = await getFuelList();
+			}
+			fuelList = cacheFuel;
+		}
         const stats = calcolaStatisticheFuel(fuelList);
 
-        let km=0;
-        const conf=await getDocs(collection(db,"config"));
-        conf.forEach(d=>km=d.data().km_attuali||0);
-        const manut=await getDocs(collection(db,"manutenzioni"));
+        let km = 0;
+		if(!cacheConfig){
+			const conf = await getDocs(collection(db,"config"));
+			conf.forEach(d=>{
+				cacheConfig = d.data().km_attuali || 0;
+			});
+		}
 
-        let manutList=[];
-        manut.forEach(docSnap=>{
-            manutList.push({
-                id:docSnap.id,
-                data:docSnap.data()
-            });
-        });
+km = cacheConfig;
+        let manutList = [];
+		if(tab==="home" || tab==="manut" || tab==="dettaglio"){
+			if(!cacheManut){
+				cacheManut = [];
+				const manut = await getDocs(collection(db,"manutenzioni"));
+				manut.forEach(docSnap=>{
+					cacheManut.push({
+						id:docSnap.id,
+						data:docSnap.data()
+					});
+				});
+			}
+			manutList = cacheManut;
+		}
 
         manutList.sort((a,b)=>{
             let kmA=(a.data.ultimo_km||0)+(a.data.frequenza_km||0);
@@ -1292,6 +1309,7 @@ window.salvaManutenzione = async function(){
         prodotto:prodotto,
         immagine:img
     });
+    cacheManut = null;
     tab="manut";
     render();
 }
@@ -1445,6 +1463,7 @@ window.saveKm=async function(){
     await setDoc(doc(db,"config","auto"),{
         km_attuali:Number(km)
     });
+    cacheConfig = Number(km);
     render();
 }
 
@@ -1501,6 +1520,7 @@ window.segnaFatto = async function(){
 window.eliminaManutenzione=async function(){
     if(confirm("Eliminare questa manutenzione?")){
         await deleteDoc(doc(db,"manutenzioni",dettaglioId));
+        cacheManut = null;
         tab="manut";
         render();
     }
