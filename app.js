@@ -237,10 +237,7 @@ function calcolaStatisticheFuel(fuelList){
 }
 
 window.nav=function(t){
-    if(t !== "back"){
-        tabPrecedente = tab;
-    }
-
+    tabPrecedente = tab;
     tab = t;
     render();
 }
@@ -486,11 +483,9 @@ function renderManutList(manutList, km){
 function renderDettaglio(appDiv, m, km){
     let stato=calcolaStato(m,km);
     appDiv.innerHTML+=`
-        <div class="header">
-    		<div class="headerRow">
-            	<button onclick="indietro()">←</button>
-            	<button class="darkToggle" onclick="toggleDark()">🌙</button>
-            </div>
+        <div class="headerBar">
+            	<button class="headerBack" onclick="indietro()">←</button>
+            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
         </div>
 
         <div class="detailTop">
@@ -534,12 +529,10 @@ function renderDettaglio(appDiv, m, km){
 function renderManutAdd(appDiv){
     if(tab==="manutAdd"){
         appDiv.innerHTML+=`
-            <div class="header">
-            	<div class="headerRow">
-            		<button onclick="indietro()">←</button>
-                    <div>Nuova manutenzione</div>
-            		<button class="darkToggle" onclick="toggleDark()">🌙</button>
-            	</div>
+            <div class="headerBar">
+            		<button class="headerBack" onclick="indietro()">←</button>
+                Nuova manutenzione
+            		<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
             </div>
 
             <div class="group">
@@ -623,12 +616,10 @@ async function renderRegistro(appDiv){
 
 async function renderRegistroAdd(appDiv){
     appDiv.innerHTML+=`
-        <div class="header">
-            	<div class="headerRow">
-            		<button onclick="indietro()">←</button>
-                <div>Nuovo intervento</div>
-            		<button class="darkToggle" onclick="toggleDark()">🌙</button>
-            	</div>
+        <div class="headerBar">
+            	<button class="headerBack" onclick="indietro()">←</button>
+            Nuovo intervento
+            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
         </div>
 
         <div class="group">
@@ -835,12 +826,10 @@ function renderFuel(appDiv, fuelList, stats){
 async function renderFuelAdd(appDiv){
     let titoloFuel = fuelEditId ? "Modifica rifornimento" : "Nuovo rifornimento";
     appDiv.innerHTML+=`
-    		<div class="header">
-            	<div class="headerRow">
-            		<button onclick="indietro()">←</button>
-                <div>${titoloFuel}</div>
-            		<button class="darkToggle" onclick="toggleDark()">🌙</button>
-            	</div>
+    		<div class="headerBar">
+            	<button class="headerBack" onclick="indietro()">←</button>
+            ${titoloFuel}
+            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
         </div>
 
         <div class="group">
@@ -1265,6 +1254,11 @@ async function render(){
     finally{
         rendering = false;
     }
+}
+
+window.indietro=function(){
+	tab = tabPrecedente;
+	render();
 }
 
 window.aggiungiManutenzione=function(){
