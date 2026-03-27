@@ -16,7 +16,26 @@ let dettaglioId=null;
 let tabPrecedente = "home";
 let fuelEditId = null;
 let fuelChart = null;
+let cacheFuel=null;
 let rendering = false;
+let cacheFuel=null;
+let cacheManut=null;
+let cacheConfig=null;
+let cacheRegistro=null;
+
+async function aggiornaKmAutoSeMaggiore(kmNuovi){
+	const conf=await getDocs(collection(db,"config"));
+	let kmAttuali=0;
+	conf.forEach(d=>{
+		kmAttuali=d.data().km_attuali||0;
+	});
+
+	if(kmNuovi > kmAttuali){
+		await setDoc(doc(db,"config","auto"),{
+			km_attuali:Number(kmNuovi)
+		});
+	}
+}
 
 async function getFuelList(){
     const fuelSnap = await getDocs(collection(db,"fuel"));
@@ -68,6 +87,9 @@ function calcolaStatisticheFuel(fuelList){
     let consumoInverno=0;
     let countEstate=0;
     let countInverno=0;
+    let prezzoMedio = 0;
+	let countPrezzi = 0;
+	let prezzoAlto = null;
     let spesaTot=0;
     let kmPercorsiTot=0;
     let oggi=new Date();
@@ -112,6 +134,11 @@ function calcolaStatisticheFuel(fuelList){
                 }
             }
         }
+        
+        if(s.litro){
+			prezzoMedio += s.litro;
+			countPrezzi++;
+		}
 
         if(s.totale){
             spesaTot+=s.totale;
@@ -164,6 +191,17 @@ function calcolaStatisticheFuel(fuelList){
             }
         }
     });
+    
+    if(countPrezzi >= 5){
+		prezzoMedio = prezzoMedio / countPrezzi;
+		let ultimo = fuelList[0]?.data?.litro;
+		if(ultimo){
+			let diff = ((ultimo - prezzoMedio) / prezzoMedio) * 100;
+			if(diff > 10){
+				prezzoAlto = Math.round(diff);
+			}
+		}
+	}
 
     let consumoMedio = countConsumi ? consumoTot/countConsumi : null;
     let estateMedia = countEstate ? consumoEstate/countEstate : null;
@@ -194,7 +232,8 @@ function calcolaStatisticheFuel(fuelList){
         autonomia,
         anomaliaConsumo,
         miglioramentoConsumo,
-        anomaliaPrezzo
+        anomaliaPrezzo,
+        prezzoAlto
     };
 }
 
@@ -449,8 +488,10 @@ function renderDettaglio(appDiv, m, km){
     let stato=calcolaStato(m,km);
     appDiv.innerHTML+=`
         <div class="header">
-            <button onclick="nav('manut')" class="backBtn">←</button>
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
+    		<div class="headerRow">
+            	<button onclick="indietro()">←</button>
+            	<button class="darkToggle" onclick="toggleDark()">🌙</button>
+            </div>
         </div>
 
         <div class="detailTop">
@@ -495,8 +536,11 @@ function renderManutAdd(appDiv){
     if(tab==="manutAdd"){
         appDiv.innerHTML+=`
             <div class="header">
-                Nuova manutenzione
-                <button onclick="nav('manut')">←</button>
+            	<div class="headerRow">
+            		<button onclick="indietro()">←</button>
+                    <div>Nuova manutenzione</div>
+            		<button class="darkToggle" onclick="toggleDark()">🌙</button>
+            	</div>
             </div>
 
             <div class="group">
@@ -581,8 +625,11 @@ async function renderRegistro(appDiv){
 async function renderRegistroAdd(appDiv){
     appDiv.innerHTML+=`
         <div class="header">
-            Nuovo intervento
-            <button onclick="nav('registro')">←</button>
+            	<div class="headerRow">
+            		<button onclick="indietro()">←</button>
+                <div>Nuovo intervento</div>
+            		<button class="darkToggle" onclick="toggleDark()">🌙</button>
+            	</div>
         </div>
 
         <div class="group">
@@ -789,10 +836,12 @@ function renderFuel(appDiv, fuelList, stats){
 async function renderFuelAdd(appDiv){
     let titoloFuel = fuelEditId ? "Modifica rifornimento" : "Nuovo rifornimento";
     appDiv.innerHTML+=`
-        <div class="header">
-            <button onclick="nav('fuel')">←</button>
-            ${titoloFuel}
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
+    		<div class="header">
+            	<div class="headerRow">
+            		<button onclick="indietro()">←</button>
+                <div>${titoloFuel}</div>
+            		<button class="darkToggle" onclick="toggleDark()">🌙</button>
+            	</div>
         </div>
 
         <div class="group">
@@ -1138,13 +1187,24 @@ function renderStats(appDiv, fuelList, stats){
     }
 }
 
+appDiv.innerHTML = `
+	<div style="padding:20px">
+		<div class="skeleton"></div>
+		<div class="skeleton"></div>
+		<div class="skeleton"></div>
+	</div>
+`;
+
 async function render(){
     if(rendering) return;
     rendering = true;
     try{
         const appDiv=document.getElementById("app");
         appDiv.innerHTML="";
-        const fuelList = await getFuelList();
+        if(!cacheFuel){
+            cacheFuel = await getFuelList();
+        }
+        const fuelList = cacheFuel;
         const stats = calcolaStatisticheFuel(fuelList);
 
         let km=0;
@@ -1261,6 +1321,7 @@ function parseNumero(val){
 window.salvaRegistro = async function(){
     let nome=document.getElementById("nomeInt").value;
     let km=document.getElementById("kmInt").value;
+    await aggiornaKmAutoSeMaggiore(km);
     let officina=document.getElementById("officinaInt").value;
     let note=document.getElementById("noteInt").value;
     let data=new Date().toISOString().split("T")[0];
@@ -1320,6 +1381,7 @@ window.salvaFuel = async function(){
     let litri = parseNumero(document.getElementById("litri").value);
     let km = Number(document.getElementById("kmFuel").value);
     let distributore = document.getElementById("distributore").value;
+    await aggiornaKmAutoSeMaggiore(km);
     let saltoConsumo = document.getElementById("saltaConsumo")?.checked;
     let consumo = null;
 
@@ -1366,6 +1428,7 @@ window.salvaFuel = async function(){
             data:new Date().toISOString().split("T")[0]
         });
     }
+    cacheFuel=null;
     tab="fuel";
     render();
 }
@@ -1415,6 +1478,7 @@ window.apriDettaglio=async function(id){
 window.eliminaFuel = async function(id){
     if(confirm("Eliminare questo rifornimento?")){
         await deleteDoc(doc(db,"fuel",id));
+        cacheFuel=null;
         render();
     }
 }
@@ -1428,6 +1492,7 @@ window.modificaFuel = function(id){
 window.segnaFatto = async function(){
     let km = prompt("KM intervento");
     if(!km) return;
+    await aggiornaKmAutoSeMaggiore(km);
     let officina = prompt("Officina (facoltativo)");
     let note = prompt("Note (facoltativo)");
     let data = new Date().toISOString().split("T")[0];
