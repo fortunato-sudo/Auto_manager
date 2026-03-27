@@ -1186,20 +1186,19 @@ function renderStats(appDiv, fuelList, stats){
     }
 }
 
-appDiv.innerHTML = `
-	<div style="padding:20px">
-		<div class="skeleton"></div>
-		<div class="skeleton"></div>
-		<div class="skeleton"></div>
-	</div>
-`;
-
 async function render(){
     if(rendering) return;
     rendering = true;
     try{
         const appDiv=document.getElementById("app");
-        appDiv.innerHTML="";
+        appDiv.innerHTML = `
+			<div style="padding:20px">
+				<div class="skeleton"></div>
+				<div class="skeleton"></div>
+				<div class="skeleton"></div>
+			</div>
+		`;
+        
         if(!cacheFuel){
             cacheFuel = await getFuelList();
         }
