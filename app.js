@@ -345,6 +345,26 @@ function calcolaStato(m, kmAttuali){
     };
 }
 
+function headerMenu(titolo){
+	return `
+		<div class="headerBar">
+			<button class="menuButton" onclick="toggleMenu()">☰</button>
+			<div class="appTitle">${titolo}</div>
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+		</div>
+	`;
+}
+
+function headerBack(titolo){
+	return `
+		<div class="headerBar">
+			<button class="menuButton" onclick="indietro()">←</button>
+			<div class="appTitle">${titolo}</div>
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+		</div>
+	`;
+}
+
 function renderHome(appDiv, km, manutList, stats){
     let urg=0;
     let imm=0;
@@ -357,7 +377,6 @@ function renderHome(appDiv, km, manutList, stats){
   
     appDiv.innerHTML+=`
         <div class="header">
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
             <div class="titleBlock">
                 <img src="img/logo.png" class="appLogoLarge">
                 <div class="appTitle">
