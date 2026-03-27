@@ -352,15 +352,20 @@ button{
 	top:0;
 	left:-260px;
 	width:240px;
-	height:100%;
+	height:100vh;
 	background:#1c1c1e;
 	padding-top:80px;
 	transition:0.25s;
 	z-index:1000;
+    overflow-y:auto;
 }
 
 .menuOpen{
 	left:0;
+}
+
+body.menuOpen{
+	overflow:hidden;
 }
 
 .menuItem{
@@ -371,6 +376,24 @@ button{
 
 .menuItem:active{
 	background:#2c2c2e;
+}
+
+.menuOverlay{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background:rgba(0,0,0,0.35);
+	opacity:0;
+	pointer-events:none;
+	transition:0.25s;
+	z-index:900;
+}
+
+.menuOverlayOpen{
+	opacity:1;
+	pointer-events:auto;
 }
 
 /* NAV BAR */
