@@ -44,10 +44,10 @@ body{
 }
 
 .headerRow{
-display:flex;
-align-items:center;
-justify-content:space-between;
-width:100%;
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	width:100%;
 }
 
 .title{
@@ -57,7 +57,26 @@ width:100%;
 }
 
 #app{
-padding-bottom:120px;
+	padding-bottom:120px;
+}
+
+.skeleton{
+	height:70px;
+	border-radius:14px;
+	background:linear-gradient(
+		90deg,
+		#e5e5ea 25%,
+		#f2f2f7 50%,
+		#e5e5ea 75%
+	);
+	background-size:200% 100%;
+	animation:skeleton 1.4s infinite;
+	margin-bottom:12px;
+}
+
+@keyframes skeleton{
+	0%{background-position:200% 0;}
+	100%{background-position:-200% 0;}
 }
 
 /* DARK BUTTON */
