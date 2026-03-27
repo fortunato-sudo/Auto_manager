@@ -78,7 +78,7 @@ body{
 }
 
 #app{
-	padding-bottom:120px;
+	padding-bottom:40px;
 }
 
 .skeleton{
@@ -345,6 +345,18 @@ button{
     border-radius:12px;
     margin:16px;
     margin-bottom:8px;
+}
+
+.menuButton{
+	position:absolute;
+	left:16px;
+	top:20px;
+	background:#007aff;
+	border:none;
+	color:white;
+	padding:10px 14px;
+	border-radius:14px;
+	font-size:18px;
 }
 
 .menuDrawer{
