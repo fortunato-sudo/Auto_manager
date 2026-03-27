@@ -244,6 +244,7 @@ window.toggleMenu=function(){
 	const overlay=document.getElementById("menuOverlay");
 	menu.classList.toggle("menuOpen");
 	overlay.classList.toggle("menuOverlayOpen");
+    document.body.classList.toggle("menuOpen");
 }
 
 window.nav=function(t){
@@ -1567,13 +1568,13 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 
-    const overlay=document.getElementById("menuOverlay");
+    const overlay = document.getElementById("menuOverlay");
 	if(overlay){
-		overlay.onclick=function(){
+		overlay.addEventListener("click",function(){
 			document.getElementById("menuDrawer")
 			.classList.remove("menuOpen");
-			document.getElementById("menuOverlay")
-			.classList.remove("menuOverlayOpen");
-		};
+			overlay.classList.remove("menuOverlayOpen");
+			document.body.classList.remove("menuOpen");
+		});
 	}
 });
