@@ -241,13 +241,24 @@ function calcolaStatisticheFuel(fuelList){
 
 window.toggleMenu=function(){
 	const menu=document.getElementById("menuDrawer");
+	const overlay=document.getElementById("menuOverlay");
 	menu.classList.toggle("menuOpen");
+	overlay.classList.toggle("menuOverlayOpen");
 }
 
 window.nav=function(t){
-    tabPrecedente = tab;
-    tab = t;
-    render();
+	tabPrecedente = tab;
+	tab = t;
+	const menu = document.getElementById("menuDrawer");
+	const overlay = document.getElementById("menuOverlay");
+	if(menu){
+		menu.classList.remove("menuOpen");
+	}
+
+	if(overlay){
+		overlay.classList.remove("menuOverlayOpen");
+	}
+	render();
 }
 
 window.toggleDark=function(){
@@ -1532,8 +1543,37 @@ window.eliminaManutenzione=async function(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    if(localStorage.getItem("darkMode")==="true"){
-        document.body.classList.add("dark");
-    }
-    render();
+	if(localStorage.getItem("darkMode")==="true"){
+		document.body.classList.add("dark");
+	}
+	render();
+
+	/* swipe menu */
+	let startX = 0;
+	document.addEventListener("touchstart",function(e){
+		startX = e.touches[0].clientX;
+	});
+
+	document.addEventListener("touchmove",function(e){
+		let currentX = e.touches[0].clientX;
+		let diff = currentX - startX;
+		const menu=document.getElementById("menuDrawer");
+		if(menu && menu.classList.contains("menuOpen")){
+			if(diff < -50){
+				menu.classList.remove("menuOpen");
+				document.getElementById("menuOverlay")
+				.classList.remove("menuOverlayOpen");
+			}
+		}
+	});
+
+    const overlay=document.getElementById("menuOverlay");
+	if(overlay){
+		overlay.onclick=function(){
+			document.getElementById("menuDrawer")
+			.classList.remove("menuOpen");
+			document.getElementById("menuOverlay")
+			.classList.remove("menuOverlayOpen");
+		};
+	}
 });
