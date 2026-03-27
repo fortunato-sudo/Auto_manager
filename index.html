@@ -3,7 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+		
+        <button onclick="toggleMenu()">☰</button>
         <title>Garage Manager</title>
 
         <link rel="apple-touch-icon" sizes="1024x1024" href="img/icon.png">
@@ -17,12 +18,12 @@
     <body>
         <div id="app"></div>
         
-        <div class="nav">
-            <div onclick="nav('home')">🏠</div>
-            <div onclick="nav('manut')">🔧</div>
-            <div onclick="nav('registro')">📋</div>
-            <div onclick="nav('fuel')">⛽</div>
-            <div onclick="nav('stats')">📊</div>
-        </div>
-    </body>
+        <div id="menuDrawer" class="menuDrawer">
+			<div class="menuItem" onclick="nav('home')">🏠 Home</div>
+			<div class="menuItem" onclick="nav('manut')">🔧 Manutenzioni</div>
+			<div class="menuItem" onclick="nav('registro')">📋 Registro</div>
+			<div class="menuItem" onclick="nav('fuel')">⛽ Rifornimenti</div>
+			<div class="menuItem" onclick="nav('stats')">📊 Statistiche</div>
+		</div>
+	</body>
 </html>
