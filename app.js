@@ -1191,14 +1191,7 @@ async function render(){
     rendering = true;
     try{
         const appDiv=document.getElementById("app");
-        appDiv.innerHTML = `
-			<div style="padding:20px">
-				<div class="skeleton"></div>
-				<div class="skeleton"></div>
-				<div class="skeleton"></div>
-			</div>
-		`;
-        
+        appDiv.innerHTML = "";
         if(!cacheFuel){
             cacheFuel = await getFuelList();
         }
