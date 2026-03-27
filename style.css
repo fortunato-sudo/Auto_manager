@@ -50,6 +50,24 @@ body{
 	width:100%;
 }
 
+.headerBar{
+	position:relative;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	padding:20px;
+}
+
+.headerBack{
+	position:absolute;
+	left:20px;
+}
+
+.headerDark{
+	position:absolute;
+	right:20px;
+}
+
 .title{
     display:flex;
     align-items:center;
