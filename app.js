@@ -239,6 +239,11 @@ function calcolaStatisticheFuel(fuelList){
     };
 }
 
+window.toggleMenu=function(){
+	const menu=document.getElementById("menuDrawer");
+	menu.classList.toggle("menuOpen");
+}
+
 window.nav=function(t){
     tabPrecedente = tab;
     tab = t;
