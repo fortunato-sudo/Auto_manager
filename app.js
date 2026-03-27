@@ -16,6 +16,7 @@ let dettaglioId=null;
 let tabPrecedente = "home";
 let fuelEditId = null;
 let fuelChart = null;
+let rendering = false;
 
 async function getFuelList(){
     const fuelSnap = await getDocs(collection(db,"fuel"));
@@ -1138,6 +1139,8 @@ function renderStats(appDiv, fuelList, stats){
 }
 
 async function render(){
+    if(rendering) return;
+    rendering = true;
     try{
         const appDiv=document.getElementById("app");
         appDiv.innerHTML="";
@@ -1207,6 +1210,9 @@ async function render(){
             Errore app.<br>
             Apri la console (F12).
         </div>`;
+    }
+    finally{
+        rendering = false;
     }
 }
 
