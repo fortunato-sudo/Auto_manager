@@ -345,26 +345,6 @@ function calcolaStato(m, kmAttuali){
     };
 }
 
-function headerMenu(titolo){
-	return `
-		<div class="headerBar">
-			<button class="menuButton" onclick="toggleMenu()">☰</button>
-			<div class="appTitle">${titolo}</div>
-			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-		</div>
-	`;
-}
-
-function headerBack(titolo){
-	return `
-		<div class="headerBar">
-			<button class="menuButton" onclick="indietro()">←</button>
-			<div class="appTitle">${titolo}</div>
-			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-		</div>
-	`;
-}
-
 function renderHome(appDiv, km, manutList, stats){
     let urg=0;
     let imm=0;
@@ -376,7 +356,15 @@ function renderHome(appDiv, km, manutList, stats){
     });
   
     appDiv.innerHTML+=`
-        headerMenu("Garage Manager")
+        <div class="header">
+            <button class="darkToggle" onclick="toggleDark()">🌙</button>
+            <div class="titleBlock">
+                <img src="img/logo.png" class="appLogoLarge">
+                <div class="appTitle">
+                    Garage Manager
+                </div>
+            </div>
+        </div>
 
         <div class="widgets">
             <div class="widget kmWidget">
@@ -421,7 +409,10 @@ function renderHome(appDiv, km, manutList, stats){
 
 function renderManut(appDiv){
     appDiv.innerHTML+=`
-        headerMenu("Manutenzioni")
+        <div class="header">
+            🔧 Manutenzioni
+            <button class="darkToggle" onclick="toggleDark()">🌙</button>
+        </div>
         <button class="addBtn" onclick="nav('manutAdd')">+ Aggiungi manutenzione</button>
         <div id="lista"></div>
     `;
