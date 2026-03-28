@@ -7,6 +7,37 @@ body{
     color:#1c1c1e;
 }
 
+#splash{
+	position:fixed;
+	inset:0;
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	background:black;
+	z-index:9999;
+	transition:opacity .35s;
+}
+
+.splashContent{
+	display:flex;
+	flex-direction:column;
+	align-items:center;
+	gap:14px;
+}
+
+.splashLogo{
+	width:72px;
+	height:auto;
+	opacity:0.95;
+}
+
+.splashTitle{
+	font-size:26px;
+	font-weight:700;
+	letter-spacing:.4px;
+	color:white;
+}
+
 /* DARK MODE */
 
 .dark{
