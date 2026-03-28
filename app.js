@@ -259,6 +259,7 @@ window.nav=function(t){
 	if(overlay){
 		overlay.classList.remove("menuOverlayOpen");
 	}
+	document.body.classList.remove("menuOpen");
 	render();
 }
 
@@ -1185,9 +1186,12 @@ function renderStats(appDiv, fuelList, stats){
 }
 
 async function render(){
-    if(rendering) return;
-    rendering = true;
-    try{
+    if(rendering){
+        console.warn("Render bloccato, reset automatico");
+        rendering = false;
+    }
+    rendering = true;    
+	try{
         const appDiv=document.getElementById("app");
         appDiv.innerHTML = "";
         let fuelList=[];
