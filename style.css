@@ -55,7 +55,8 @@ body{
 	display:flex;
 	align-items:center;
 	justify-content:space-between;
-	padding:20px;
+	padding:16px 20px;
+	min-height:64px;
 }
 
 .headerBack{
@@ -365,6 +366,7 @@ button{
     border-radius:12px;
     margin:16px;
     margin-bottom:8px;
+	margin-top:10px;
 }
 
 .menuButton{
@@ -378,6 +380,7 @@ button{
 	padding:10px 14px;
 	border-radius:14px;
 	font-size:18px;
+	margin-right:10px;
 }
 
 .menuButton,
@@ -599,7 +602,8 @@ body.menuOpen{
 .appTitle{
 	position:absolute;
 	left:50%;
-	transform:translateX(-50%);
+	top:50%;
+	transform:translate(-50%,-50%);
 	font-size:28px;
 	font-weight:700;
 	white-space:nowrap;
