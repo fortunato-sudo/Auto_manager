@@ -1,3 +1,5 @@
+const splashStart = Date.now();
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -1279,8 +1281,19 @@ km = cacheConfig;
         </div>`;
     }
     finally{
-        rendering = false;
-    }
+		rendering = false;
+		const splash = document.getElementById("splash");
+		if(splash){
+			const elapsed = Date.now() - splashStart;
+			const remaining = Math.max(0, 1000 - elapsed);
+			setTimeout(()=>{
+				splash.style.opacity="0";
+				setTimeout(()=>{
+					splash.style.display="none";
+				},350);
+			}, remaining);
+		}
+	}
 }
 
 window.indietro=function(){
