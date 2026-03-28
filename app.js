@@ -378,10 +378,8 @@ function renderHome(appDiv, km, manutList, stats){
     appDiv.innerHTML+=`
         <div class="headerBar">
 			<button class="menuButton" onclick="toggleMenu()">☰</button>
-			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-		</div>
-		<div class="titleBlock">
 			<img src="img/logo.png" class="appLogoLarge">
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
 		</div>
 
         <div class="widgets">
