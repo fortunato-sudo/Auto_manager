@@ -382,6 +382,15 @@ function renderHome(appDiv, km, manutList, stats){
 		
         ${headerMenu('<img src="img/logo.png" class="appLogoLarge">')}
 
+		<div class="widgets">
+			<div class="widget skeleton" style="height:70px"></div>
+			<div class="widget skeleton" style="height:70px"></div>
+		</div>
+		<div class="widgets">
+			<div class="widget skeleton" style="height:70px"></div>
+			<div class="widget skeleton" style="height:70px"></div>
+		</div>
+		
         <div class="widgets">
             <div class="widget kmWidget">
                 <div class="wTitle">Km auto</div>
@@ -1285,14 +1294,18 @@ km = cacheConfig;
 		const splash = document.getElementById("splash");
 		if(splash){
 			const elapsed = Date.now() - splashStart;
-			const remaining = Math.max(0, 2000 - elapsed);
+
+			/* splash minimo 1.8s */
+			const remaining = Math.max(0, 1800 - elapsed);
 			setTimeout(()=>{
 				splash.style.opacity="0";
 				setTimeout(()=>{
 					splash.style.display="none";
+
+					/* mostra app già pronta */
 					document.body.classList.remove("loading");
-				},350);
-			}, remaining);
+				},600);
+			},remaining);
 		}
 	}
 }
