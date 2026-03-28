@@ -142,6 +142,7 @@ body{
     display:flex;
     gap:14px;
     padding:16px;
+	margin-bottom:14px;
 }
 
 .widget{
@@ -583,19 +584,17 @@ body.menuOpen{
 }
 
 .titleBlock{
-	display:flex;
-	justify-content:center;
-	margin-top:4px;
-	margin-bottom:10px;
+	text-align:center;
+	margin-top:6px;
+	margin-bottom:8px;
 }
 
 .appLogoLarge{
-	width:48px;
-	height:48px;
-	margin-top:6px;
-	margin-bottom:10px;
+	width:64px;
+	height:64px;
+	display:block;
+	margin:10px auto 18px auto;
 	opacity:0.95;
-	filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
 }
 
 .appTitle{
