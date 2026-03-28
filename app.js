@@ -382,9 +382,6 @@ function renderHome(appDiv, km, manutList, stats){
 		</div>
 		<div class="titleBlock">
 			<img src="img/logo.png" class="appLogoLarge">
-			<div class="appTitleHome">
-				Garage Manager
-			</div>
 		</div>
 
         <div class="widgets">
