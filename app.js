@@ -376,7 +376,16 @@ function renderHome(appDiv, km, manutList, stats){
     });
   
     appDiv.innerHTML+=`
-        ${headerMenu("Garage Manager")}
+        <div class="headerHome">
+			<button class="menuButton" onclick="toggleMenu()">☰</button>
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+		</div>
+		<div class="titleBlock">
+			<img src="img/logo.png" class="appLogoLarge">
+			<div class="appTitleHome">
+				Garage Manager
+			</div>
+		</div>
 
         <div class="widgets">
             <div class="widget kmWidget">
