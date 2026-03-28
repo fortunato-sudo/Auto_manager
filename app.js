@@ -279,6 +279,26 @@ function formatDate(d){
     });
 }
 
+function headerMenu(titolo){
+	return `
+		<div class="headerBar">
+			<button class="menuButton" onclick="toggleMenu()">☰</button>
+			<div class="appTitle">${titolo}</div>
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+		</div>
+	`;
+}
+
+function headerBack(titolo){
+	return `
+		<div class="headerBar">
+			<button class="headerBack" onclick="indietro()">←</button>
+			<div class="appTitle">${titolo}</div>
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+		</div>
+	`;
+}
+
 function calcolaStato(m, kmAttuali){
     let nextKm = null;
     let kmLeft = null;
@@ -356,15 +376,7 @@ function renderHome(appDiv, km, manutList, stats){
     });
   
     appDiv.innerHTML+=`
-        <div class="header">
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-            <div class="titleBlock">
-                <img src="img/logo.png" class="appLogoLarge">
-                <div class="appTitle">
-                    Garage Manager
-                </div>
-            </div>
-        </div>
+        ${headerMenu("Garage Manager")}
 
         <div class="widgets">
             <div class="widget kmWidget">
@@ -409,10 +421,7 @@ function renderHome(appDiv, km, manutList, stats){
 
 function renderManut(appDiv){
     appDiv.innerHTML+=`
-        <div class="header">
-            🔧 Manutenzioni
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerMenu("Manutenzioni")}
         <button class="addBtn" onclick="nav('manutAdd')">+ Aggiungi manutenzione</button>
         <div id="lista"></div>
     `;
@@ -549,11 +558,7 @@ function renderDettaglio(appDiv, m, km){
 function renderManutAdd(appDiv){
     if(tab==="manutAdd"){
         appDiv.innerHTML+=`
-            <div class="headerBar">
-            		<button class="headerBack" onclick="indietro()">←</button>
-                Nuova manutenzione
-            		<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-            </div>
+            ${headerBack("Nuova manutenzione")}
 
             <div class="group">
                 <div class="row">
@@ -591,10 +596,7 @@ function renderManutAdd(appDiv){
 
 async function renderRegistro(appDiv){
     appDiv.innerHTML+=`
-        <div class="header">
-            📋 Registro manutenzioni
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerMenu("Registro")}
         <button class="mainBtn" onclick="nav('registroAdd')">
             ➕ Nuovo intervento
         </button>
@@ -636,11 +638,7 @@ async function renderRegistro(appDiv){
 
 async function renderRegistroAdd(appDiv){
     appDiv.innerHTML+=`
-        <div class="headerBar">
-            	<button class="headerBack" onclick="indietro()">←</button>
-            Nuovo intervento
-            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerBack("Nuovo intervento")}
 
         <div class="group">
             <div class="row">
@@ -681,10 +679,7 @@ async function renderRegistroAdd(appDiv){
 
 function renderFuel(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
-        <div class="header">
-            ⛽ Rifornimenti
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerMenu("Rifornimenti")}
         <button onclick="nav('fuelAdd')" class="mainBtn">
             ➕ Nuovo rifornimento
         </button>
@@ -846,11 +841,7 @@ function renderFuel(appDiv, fuelList, stats){
 async function renderFuelAdd(appDiv){
     let titoloFuel = fuelEditId ? "Modifica rifornimento" : "Nuovo rifornimento";
     appDiv.innerHTML+=`
-    		<div class="headerBar">
-            	<button class="headerBack" onclick="indietro()">←</button>
-            ${titoloFuel}
-            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-        </div>
+    	${headerBack(titoloFuel)}
 
         <div class="group">
             <div class="row">
@@ -904,10 +895,7 @@ async function renderFuelAdd(appDiv){
 
 function renderStats(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
-        <div class="header">
-            📊 Statistiche
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerMenu("Statistiche")}
 
         <div class="widgets">
             <div class="widget">
