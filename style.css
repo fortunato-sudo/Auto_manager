@@ -84,8 +84,8 @@ body{
 .menuButton,
 .headerBack,
 .headerDark{
-	width:48px;
-	height:48px;
+	width:44px;
+	height:44px;
 	display:flex;
 	align-items:center;
 	justify-content:center;
@@ -362,9 +362,10 @@ button{
     background:#007aff;
     color:white;
     border:none;
-    padding:10px 16px;
+    padding:12px 18px;
     border-radius:12px;
     margin:16px;
+	font-size:16px;
     margin-bottom:8px;
 	margin-top:10px;
 }
@@ -604,7 +605,7 @@ body.menuOpen{
 	left:50%;
 	top:50%;
 	transform:translate(-50%,-50%);
-	font-size:28px;
+	font-size:22px;
 	font-weight:700;
 	white-space:nowrap;
 }
