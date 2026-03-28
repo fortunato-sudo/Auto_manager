@@ -1290,6 +1290,7 @@ km = cacheConfig;
 				splash.style.opacity="0";
 				setTimeout(()=>{
 					splash.style.display="none";
+					document.getElementById("app").style.opacity="1";
 				},350);
 			}, remaining);
 		}
