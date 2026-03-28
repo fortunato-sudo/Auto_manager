@@ -604,7 +604,7 @@ body.menuOpen{
 	position:absolute;
 	left:50%;
 	top:50%;
-	transform:translate(-50%,-50%);
+	transform:translate(-50%,-55%);
 	font-size:22px;
 	font-weight:700;
 	white-space:nowrap;
@@ -613,5 +613,5 @@ body.menuOpen{
 .appTitleHome{
 	font-size:36px;
 	font-weight:700;
-	margin-top:6px;
+	margin-top:10px;
 }
