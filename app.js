@@ -376,14 +376,7 @@ function renderHome(appDiv, km, manutList, stats){
     });
   
     appDiv.innerHTML+=`
-        <div class="header">
-            <div class="titleBlock">
-                <img src="img/logo.png" class="appLogoLarge">
-                <div class="appTitle">
-                    Garage Manager
-                </div>
-            </div>
-        </div>
+        headerMenu("Garage Manager")
 
         <div class="widgets">
             <div class="widget kmWidget">
@@ -428,10 +421,7 @@ function renderHome(appDiv, km, manutList, stats){
 
 function renderManut(appDiv){
     appDiv.innerHTML+=`
-        <div class="header">
-            🔧 Manutenzioni
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-        </div>
+        headerMenu("Manutenzioni")
         <button class="addBtn" onclick="nav('manutAdd')">+ Aggiungi manutenzione</button>
         <div id="lista"></div>
     `;
