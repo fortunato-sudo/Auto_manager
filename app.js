@@ -376,7 +376,7 @@ function renderHome(appDiv, km, manutList, stats){
     });
   
     appDiv.innerHTML+=`
-        <div class="headerHome">
+        <div class="headerBar">
 			<button class="menuButton" onclick="toggleMenu()">☰</button>
 			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
 		</div>
