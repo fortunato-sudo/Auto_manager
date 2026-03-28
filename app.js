@@ -376,7 +376,8 @@ function renderHome(appDiv, km, manutList, stats){
     });
   
     appDiv.innerHTML+=`
-        ${headerMenu(<img src="img/logo.png" class="appLogoLarge">)}
+		
+        ${headerMenu('<img src="img/logo.png" class="appLogoLarge">')}
 
         <div class="widgets">
             <div class="widget kmWidget">
