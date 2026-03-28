@@ -43,24 +43,14 @@ body{
     padding:20px;
 }
 
-.headerLogo{
-	position:absolute;
-	left:50%;
-	top:50%;
-	transform:translate(-50%,-50%);
-	height:34px;
-	width:auto;
-	opacity:0.95;
-}
-
-.Row{
+.headerRow{
 	display:flex;
 	align-items:center;
 	justify-content:space-between;
 	width:100%;
 }
 
-.Bar{
+.headerBar{
 	position:relative;
 	display:flex;
 	align-items:center;
@@ -69,7 +59,7 @@ body{
 	min-height:64px;
 }
 
-.Back{
+.headerBack{
 	position:absolute;
 	justify-self:start;
 	left:16px;
@@ -78,22 +68,22 @@ body{
 	padding:10px 14px;
 }
 
-.Home{
+.headerHome{
 	display:flex;
 	justify-content:space-between;
 	align-items:center;
 	padding:20px;
 }
 
-.Dark{
+.headerDark{
 	position:absolute;
 	justify-self:end;
 	right:20px;
 }
 
 .menuButton,
-.Back,
-.Dark{
+.headerBack,
+.headerDark{
 	width:44px;
 	height:44px;
 	display:flex;
@@ -395,11 +385,11 @@ button{
 }
 
 .menuButton,
-.Back{
+.headerBack{
 	z-index:2;
 }
 
-.Dark{
+.headerDark{
 	z-index:2;
 }
 
@@ -606,10 +596,6 @@ body.menuOpen{
 }
 
 .appLogoLarge{
-	position:absolute;
-	left:50%;
-	top:50%;
-	transform:translate(-50%,-60%);
     width:82px;
     height:82px;
 }
