@@ -51,9 +51,10 @@ body{
 }
 
 .headerBar{
-	display:grid;
-	grid-template-columns:60px 1fr 60px;
-	align-items:center;	
+	position:relative;
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
 	padding:20px;
 }
 
@@ -379,6 +380,15 @@ button{
 	font-size:18px;
 }
 
+.menuButton,
+.headerBack{
+	z-index:2;
+}
+
+.headerDark{
+	z-index:2;
+}
+
 .menuDrawer{
 	position:fixed;
 	top:0;
@@ -587,9 +597,12 @@ body.menuOpen{
 }
 
 .appTitle{
-	text-align:center;
+	position:absolute;
+	left:50%;
+	transform:translateX(-50%);
 	font-size:28px;
 	font-weight:700;
+	white-space:nowrap;
 }
 
 .appTitleHome{
