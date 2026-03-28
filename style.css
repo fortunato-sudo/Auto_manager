@@ -16,19 +16,27 @@ body{
 	background:black;
 	z-index:9999;
 	transition:opacity .35s;
+	visibility:visible;
+	background:linear-gradient(
+		180deg,
+		#0f1115,
+		#08090c
+	);
 }
 
 .splashContent{
 	display:flex;
 	flex-direction:column;
 	align-items:center;
+	justify-content:center;
 	gap:14px;
+	text-align:center;
 }
 
 .splashLogo{
 	width:72px;
 	height:auto;
-	opacity:0.95;
+	filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));
 }
 
 .splashTitle{
@@ -36,6 +44,8 @@ body{
 	font-weight:700;
 	letter-spacing:.4px;
 	color:white;
+	text-align:center;
+	width:100%;
 }
 
 /* DARK MODE */
@@ -133,6 +143,8 @@ body{
 }
 
 #app{
+	opacity:0;
+	transition:opacity .35s;
 	padding-bottom:40px;
 }
 
