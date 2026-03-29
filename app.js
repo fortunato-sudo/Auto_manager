@@ -265,7 +265,15 @@ window.toggleMenu=function(){
 	const overlay=document.getElementById("menuOverlay");
 	menu.classList.toggle("menuOpen");
 	overlay.classList.toggle("menuOverlayOpen");
-    document.body.classList.toggle("menuOpen");
+	document.body.classList.toggle("menuOpen");
+
+	/* FIX status bar iOS */
+	setTimeout(()=>{
+		document.body.style.background="transparent";
+		requestAnimationFrame(()=>{
+			document.body.style.background="";
+		});
+	},50);
 }
 
 window.nav=function(t){
@@ -1601,6 +1609,12 @@ document.addEventListener("DOMContentLoaded", () => {
 			.classList.remove("menuOpen");
 			overlay.classList.remove("menuOverlayOpen");
 			document.body.classList.remove("menuOpen");
+
+			/* refresh status bar */
+			document.body.style.background="transparent";
+			requestAnimationFrame(()=>{
+				document.body.style.background="";
+			});
 		});
 	}
 });
