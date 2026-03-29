@@ -3,11 +3,13 @@
 	transition:opacity .35s;
 	padding-bottom:40px;
 	min-height:100vh;
+	padding-top:env(safe-area-inset-top);
+	padding-bottom:env(safe-area-inset-bottom);
+	min-height:100vh;
 }
 
 html,body{
-	padding-top:env(safe-area-inset-top);
-	padding-bottom:env(safe-area-inset-bottom);
+	height:100%;
 }
 
 body{
@@ -15,8 +17,6 @@ body{
 	font-family:-apple-system;
 	background:#f2f2f7;
 	color:#1c1c1e;
-	min-height:100vh;
-	padding-top:env(safe-area-inset-top);
 }
 
 body.loading #app{
