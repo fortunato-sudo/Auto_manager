@@ -1,7 +1,17 @@
 const splashStart = Date.now();
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+	getFirestore,
+	enableIndexedDbPersistence,
+	collection,
+	getDocs,
+	getDoc,
+	doc,
+	setDoc,
+	addDoc,
+	deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig={
     apiKey:"AIzaSy...",
@@ -11,6 +21,10 @@ const firebaseConfig={
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
+
+enableIndexedDbPersistence(db).catch((err)=>{
+	console.warn("Offline persistence non disponibile", err);
+});
 
 let tab="home";
 let dettaglioManut=null;
@@ -39,7 +53,7 @@ async function aggiornaKmAutoSeMaggiore(kmNuovi){
 }
 
 async function getFuelList(){
-    const fuelSnap = await getDocs(collection(db,"fuel"));
+    const fuelSnap = await getDocs(collection(db,"fuel"),{source:"cache"});
 
     let fuelList=[];
     fuelSnap.forEach(docSnap=>{
@@ -379,17 +393,7 @@ function renderHome(appDiv, km, manutList, stats){
     });
   
     appDiv.innerHTML+=`
-		
         ${headerMenu('<img src="img/logo.png" class="appLogoLarge">')}
-
-		<div class="widgets">
-			<div class="widget skeleton" style="height:70px"></div>
-			<div class="widget skeleton" style="height:70px"></div>
-		</div>
-		<div class="widgets">
-			<div class="widget skeleton" style="height:70px"></div>
-			<div class="widget skeleton" style="height:70px"></div>
-		</div>
 		
         <div class="widgets">
             <div class="widget kmWidget">
@@ -1426,7 +1430,7 @@ window.salvaFuel = async function(){
     let consumo = null;
 
     /* trova rifornimento precedente */
-    const fuelSnap = await getDocs(collection(db,"fuel"));
+    const fuelSnap = await getDocs(collection(db,"fuel"),{source:"cache"});
     let ultimoKm = null;
     fuelSnap.forEach(d=>{
         let k = Number(d.data().km);
