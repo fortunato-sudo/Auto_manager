@@ -19,7 +19,7 @@ body{
     background:#f2f2f7;
     color:#1c1c1e;
 }
-
+x
 body.loading #app{
 	opacity:0;
 }
@@ -456,6 +456,7 @@ button{
 .mainBtn{
     background:#007aff;
     color:white;
+	font-size:14px;
     margin:16px;
 }
 
@@ -498,8 +499,8 @@ button{
     padding:12px 18px;
     border-radius:12px;
     margin:16px;
-	font-size:16px;
-    margin-bottom:8px;
+	font-size:14px;
+    margin-bottom:12px;
 	margin-top:10px;
 }
 
