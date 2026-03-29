@@ -620,7 +620,7 @@ async function renderRegistro(appDiv){
     appDiv.innerHTML+=`
         ${headerMenu("Registro")}
         <button class="mainBtn" onclick="nav('registroAdd')">
-            ➕ Nuovo intervento
+            + Nuovo intervento
         </button>
         <div id="registro"></div>
     `;
@@ -703,7 +703,7 @@ function renderFuel(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
         ${headerMenu("Rifornimenti")}
         <button onclick="nav('fuelAdd')" class="mainBtn">
-            ➕ Nuovo rifornimento
+            + Nuovo rifornimento
         </button>
         <div class="section">Ultimi rifornimenti</div>
         <div id="fuelList"></div>
