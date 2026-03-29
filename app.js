@@ -53,20 +53,23 @@ async function aggiornaKmAutoSeMaggiore(kmNuovi){
 }
 
 async function getFuelList(){
-    const fuelSnap = await getDocs(collection(db,"fuel"),{source:"cache"});
+	if(cacheFuel){
+		return cacheFuel;
+	}
 
-    let fuelList=[];
-    fuelSnap.forEach(docSnap=>{
-        fuelList.push({
-            id:docSnap.id,
-            data:docSnap.data()
-        });
-    });
+	const fuelSnap = await getDocs(collection(db,"fuel"));
+	cacheFuel = [];
+	fuelSnap.forEach(docSnap=>{
+		cacheFuel.push({
+			id:docSnap.id,
+			data:docSnap.data()
+		});
+	});
 
-    fuelList.sort((a,b)=>{
-        return new Date(b.data.data) - new Date(a.data.data);
-    });
-    return fuelList;
+	cacheFuel.sort((a,b)=>{
+		return new Date(b.data.data) - new Date(a.data.data);
+	});
+	return cacheFuel;
 }
 
 function formatKm(km){
