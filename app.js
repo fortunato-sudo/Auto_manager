@@ -1,17 +1,7 @@
 const splashStart = Date.now();
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-	getFirestore,
-	enableIndexedDbPersistence,
-	collection,
-	getDocs,
-	getDoc,
-	doc,
-	setDoc,
-	addDoc,
-	deleteDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig={
     apiKey:"AIzaSy...",
@@ -21,12 +11,6 @@ const firebaseConfig={
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
-
-entry{
-	enableIndexedDbPersistence(db);
-}catch(err){
-	console.warn("Offline persistence non disponibile", err);
-}
 
 let tab="home";
 let dettaglioManut=null;
@@ -55,23 +39,20 @@ async function aggiornaKmAutoSeMaggiore(kmNuovi){
 }
 
 async function getFuelList(){
-	if(cacheFuel){
-		return cacheFuel;
-	}
+    const fuelSnap = await getDocs(collection(db,"fuel"));
 
-	const fuelSnap = await getDocs(collection(db,"fuel"));
-	cacheFuel = [];
-	fuelSnap.forEach(docSnap=>{
-		cacheFuel.push({
-			id:docSnap.id,
-			data:docSnap.data()
-		});
-	});
+    let fuelList=[];
+    fuelSnap.forEach(docSnap=>{
+        fuelList.push({
+            id:docSnap.id,
+            data:docSnap.data()
+        });
+    });
 
-	cacheFuel.sort((a,b)=>{
-		return new Date(b.data.data) - new Date(a.data.data);
-	});
-	return cacheFuel;
+    fuelList.sort((a,b)=>{
+        return new Date(b.data.data) - new Date(a.data.data);
+    });
+    return fuelList;
 }
 
 function formatKm(km){
@@ -285,9 +266,8 @@ window.nav=function(t){
 }
 
 window.toggleDark=function(){
-	document.body.classList.toggle("dark");
-	const dark=document.body.classList.contains("dark");
-	localStorage.setItem("darkMode",dark);
+    document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode",document.body.classList.contains("dark"));
 }
 
 function formatDate(d){
@@ -397,11 +377,11 @@ function renderHome(appDiv, km, manutList, stats){
         if(stato.stato==="urgente") urg++;
         if(stato.stato==="imminente") imm++;
     });
-
-	appDiv.style.opacity = 0;
+  
     appDiv.innerHTML+=`
-        ${headerMenu('<img src="img/logo.png" class="appLogoLarge">')}
 		
+        ${headerMenu('<img src="img/logo.png" class="appLogoLarge">')}
+
         <div class="widgets">
             <div class="widget kmWidget">
                 <div class="wTitle">Km auto</div>
@@ -441,7 +421,6 @@ function renderHome(appDiv, km, manutList, stats){
         <div class="section">Interventi imminenti o urgenti</div>
         <div id="imminenti"></div>
     `;
-	appDiv.style.opacity = 1;
 }
 
 function renderManut(appDiv){
@@ -453,7 +432,6 @@ function renderManut(appDiv){
 }
 
 function renderManutList(manutList, km){
-	let html="";
     manutList.forEach(item=>{
         let m=item.data;
         let id=item.id;
@@ -531,11 +509,8 @@ function renderManutList(manutList, km){
             document.getElementById("imminenti").innerHTML+=row;
 
         if(tab==="manut")
-            html += row;
+            document.getElementById("lista").innerHTML+=row;
     });
-	if(tab==="manut"){
-		document.getElementById("lista").innerHTML = html;
-	}
 }
 
 function renderDettaglio(appDiv, m, km){
@@ -627,7 +602,7 @@ async function renderRegistro(appDiv){
     appDiv.innerHTML+=`
         ${headerMenu("Registro")}
         <button class="mainBtn" onclick="nav('registroAdd')">
-            + Nuovo intervento
+            ➕ Nuovo intervento
         </button>
         <div id="registro"></div>
     `;
@@ -710,7 +685,7 @@ function renderFuel(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
         ${headerMenu("Rifornimenti")}
         <button onclick="nav('fuelAdd')" class="mainBtn">
-            + Nuovo rifornimento
+            ➕ Nuovo rifornimento
         </button>
         <div class="section">Ultimi rifornimenti</div>
         <div id="fuelList"></div>
@@ -1213,8 +1188,11 @@ function renderStats(appDiv, fuelList, stats){
 }
 
 async function render(){
-    if(rendering) return;
-	rendering = true;
+    if(rendering){
+        console.warn("Render bloccato, reset automatico");
+        rendering = false;
+    }
+    rendering = true;    
 	try{
         const appDiv=document.getElementById("app");
         appDiv.innerHTML = "";
@@ -1228,12 +1206,14 @@ async function render(){
         const stats = calcolaStatisticheFuel(fuelList);
 
         let km = 0;
-		if(cacheConfig===null){
-			const snap = await getDoc(doc(db,"config","auto"));
-			cacheConfig = snap.data()?.km_attuali || 0;
+		if(!cacheConfig){
+			const conf = await getDocs(collection(db,"config"));
+			conf.forEach(d=>{
+				cacheConfig = d.data().km_attuali || 0;
+			});
 		}
 
-		km = cacheConfig;
+km = cacheConfig;
         let manutList = [];
 		if(tab==="home" || tab==="manut" || tab==="dettaglio"){
 			if(!cacheManut){
@@ -1300,6 +1280,21 @@ async function render(){
             Apri la console (F12).
         </div>`;
     }
+    finally{
+		rendering = false;
+		const splash = document.getElementById("splash");
+		if(splash){
+			const elapsed = Date.now() - splashStart;
+			const remaining = Math.max(0, 1000 - elapsed);
+			setTimeout(()=>{
+				splash.style.opacity="0";
+				setTimeout(()=>{
+					splash.style.display="none";
+					document.getElementById("app").style.opacity="1";
+				},350);
+			}, remaining);
+		}
+	}
 }
 
 window.indietro=function(){
@@ -1418,7 +1413,7 @@ window.salvaFuel = async function(){
     let consumo = null;
 
     /* trova rifornimento precedente */
-    const fuelSnap = await getDocs(collection(db,"fuel"),{source:"cache"});
+    const fuelSnap = await getDocs(collection(db,"fuel"));
     let ultimoKm = null;
     fuelSnap.forEach(d=>{
         let k = Number(d.data().km);
@@ -1559,7 +1554,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	if(localStorage.getItem("darkMode")==="true"){
 		document.body.classList.add("dark");
 	}
-	getFuelList();
 	render();
 
 	/* swipe menu */
@@ -1590,23 +1584,4 @@ document.addEventListener("DOMContentLoaded", () => {
 			document.body.classList.remove("menuOpen");
 		});
 	}
-
-	document.addEventListener("DOMContentLoaded", () => {
-		if(localStorage.getItem("darkMode")==="true"){
-			document.body.classList.add("dark");
-		}
-		render();
-
-		/* splash indipendente dal render */
-		setTimeout(()=>{
-			const splash=document.getElementById("splash");
-			if(splash){
-				splash.style.opacity="0";
-				setTimeout(()=>{
-					splash.remove();
-				},400);
-			}
-			document.body.classList.remove("loading");
-		},1800);
-	});
 });
