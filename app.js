@@ -286,12 +286,6 @@ window.toggleDark=function(){
 	document.body.classList.toggle("dark");
 	const dark=document.body.classList.contains("dark");
 	localStorage.setItem("darkMode",dark);
-	const themeMeta=document.getElementById("themeColor");
-	if(dark){
-		themeMeta.setAttribute("content","#000000");
-	}else{
-		themeMeta.setAttribute("content","#f2f2f7");
-	}
 }
 
 function formatDate(d){
@@ -1615,13 +1609,6 @@ document.addEventListener("DOMContentLoaded", () => {
 	document.addEventListener("DOMContentLoaded", () => {
 		if(localStorage.getItem("darkMode")==="true"){
 			document.body.classList.add("dark");
-		}
-
-		const themeMeta=document.getElementById("themeColor");
-		if(document.body.classList.contains("dark")){
-			themeMeta.setAttribute("content","#000000");
-		}else{
-			themeMeta.setAttribute("content","#f2f2f7");
 		}
 		render();
 	});
