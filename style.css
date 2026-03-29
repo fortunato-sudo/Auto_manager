@@ -69,7 +69,7 @@ body:not(.dark) .menuItem{
 .splashLogo{
 	width:120px;
 	height:auto;
-	animation:logoIntro 1.1s ease-out;
+	animation:logoIntro 1.2s ease-out;
 	filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));
 }
 
@@ -98,7 +98,7 @@ body:not(.dark) .menuItem{
 	}
 
 	60%{
-		transform:scale(1.08);
+		transform:scale(1.05);
 		opacity:1;
 	}
 
