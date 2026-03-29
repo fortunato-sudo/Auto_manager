@@ -1304,10 +1304,11 @@ km = cacheConfig;
 			/* splash minimo 1.8s */
 			const remaining = Math.max(0, 1800 - elapsed);
 			setTimeout(()=>{
-				splash.style.opacity="0";
-
-				/* non rimuoviamo lo splash, lo lasciamo sopra invisibile */
-				document.body.classList.remove("loading");
+    			splash.style.opacity="0";
+    			setTimeout(()=>{
+        			splash.remove();   // ← FIX
+    			},400);
+    			document.body.classList.remove("loading");
 			},remaining);
 		}
 	}
