@@ -22,9 +22,11 @@ const firebaseConfig={
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 
-enableIndexedDbPersistence(db).catch((err)=>{
+entry{
+	enableIndexedDbPersistence(db);
+}catch(err){
 	console.warn("Offline persistence non disponibile", err);
-});
+}
 
 let tab="home";
 let dettaglioManut=null;
@@ -1309,7 +1311,9 @@ async function render(){
 			setTimeout(()=>{
     			splash.style.opacity="0";
     			setTimeout(()=>{
-        			splash.remove();   // ← FIX
+					if(splash){
+						splash.remove();
+					}
     			},400);
     			document.body.classList.remove("loading");
 			},remaining);
@@ -1611,5 +1615,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			document.body.classList.add("dark");
 		}
 		render();
+		enableIndexedDbPersistence(db).catch(()=>{});
 	});
 });
