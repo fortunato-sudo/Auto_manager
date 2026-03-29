@@ -284,7 +284,14 @@ window.nav=function(t){
 
 window.toggleDark=function(){
     document.body.classList.toggle("dark");
-    localStorage.setItem("darkMode",document.body.classList.contains("dark"));
+    const dark=document.body.classList.contains("dark");
+    localStorage.setItem("darkMode",dark);
+    const themeMeta=document.getElementById("themeColor");
+    if(dark){
+        themeMeta.setAttribute("content","#000000");
+    }else{
+        themeMeta.setAttribute("content","#f2f2f7");
+    }
 }
 
 function formatDate(d){
@@ -1603,5 +1610,12 @@ document.addEventListener("DOMContentLoaded", () => {
 			overlay.classList.remove("menuOverlayOpen");
 			document.body.classList.remove("menuOpen");
 		});
+	}
+
+	const themeMeta=document.getElementById("themeColor");
+	if(document.body.classList.contains("dark")){
+    	themeMeta.setAttribute("content","#000000");
+	}else{
+    	themeMeta.setAttribute("content","#f2f2f7");
 	}
 });
