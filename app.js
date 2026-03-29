@@ -1613,3 +1613,4 @@ document.addEventListener("DOMContentLoaded", () => {
 		render();
 	});
 });
+document.body.style.background="red";
