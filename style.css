@@ -1,51 +1,8 @@
 body{
-	overflow-y:auto;
-	-webkit-overflow-scrolling:touch;
     margin:0;
     font-family:-apple-system;
     background:#f2f2f7;
     color:#1c1c1e;
-}
-
-#splash{
-	position:fixed;
-	inset:0;
-	display:flex;
-	align-items:center;
-	justify-content:center;
-	background:black;
-	z-index:9999;
-	transition:opacity .35s;
-	visibility:visible;
-	background:linear-gradient(
-		180deg,
-		#0f1115,
-		#08090c
-	);
-}
-
-.splashContent{
-	display:flex;
-	flex-direction:column;
-	align-items:center;
-	justify-content:center;
-	gap:14px;
-	text-align:center;
-}
-
-.splashLogo{
-	width:72px;
-	height:auto;
-	filter:drop-shadow(0 6px 18px rgba(0,0,0,.5));
-}
-
-.splashTitle{
-	font-size:26px;
-	font-weight:700;
-	letter-spacing:.4px;
-	color:white;
-	text-align:center;
-	width:100%;
 }
 
 /* DARK MODE */
@@ -97,43 +54,21 @@ body{
 	position:relative;
 	display:flex;
 	align-items:center;
-	justify-content:space-between;
-	padding:16px 20px;
-	min-height:64px;
+	justify-content:center;
+	padding:20px;
 }
 
 .headerBack{
 	position:absolute;
-	justify-self:start;
 	left:16px;
-	top:20px;
 	background:#007aff;
 	border-radius:14px;
 	padding:10px 14px;
 }
 
-.headerHome{
-	display:flex;
-	justify-content:space-between;
-	align-items:center;
-	padding:20px;
-}
-
 .headerDark{
 	position:absolute;
-	justify-self:end;
 	right:20px;
-}
-
-.menuButton,
-.headerBack,
-.headerDark{
-	width:44px;
-	height:44px;
-	display:flex;
-	align-items:center;
-	justify-content:center;
-	border-radius:12px;
 }
 
 .title{
@@ -143,8 +78,6 @@ body{
 }
 
 #app{
-	opacity:0;
-	transition:opacity .35s;
 	padding-bottom:40px;
 }
 
@@ -408,17 +341,14 @@ button{
     background:#007aff;
     color:white;
     border:none;
-    padding:12px 18px;
+    padding:10px 16px;
     border-radius:12px;
     margin:16px;
-	font-size:16px;
     margin-bottom:8px;
-	margin-top:10px;
 }
 
 .menuButton{
 	position:absolute;
-	justify-self:start;
 	left:16px;
 	top:20px;
 	background:#007aff;
@@ -427,16 +357,6 @@ button{
 	padding:10px 14px;
 	border-radius:14px;
 	font-size:18px;
-	margin-right:10px;
-}
-
-.menuButton,
-.headerBack{
-	z-index:2;
-}
-
-.headerDark{
-	z-index:2;
 }
 
 .menuDrawer{
@@ -635,9 +555,7 @@ body.menuOpen{
     display:flex;
     flex-direction:column;
     align-items:center;
-	text-align:center;
     gap:6px;
-	margin-top:10px;
     margin-bottom:10px;
 }
 
@@ -647,17 +565,6 @@ body.menuOpen{
 }
 
 .appTitle{
-	position:absolute;
-	left:50%;
-	top:50%;
-	transform:translate(-50%,-60%);
-	font-size:22px;
-	font-weight:700;
-	white-space:nowrap;
-}
-
-.appTitleHome{
-	font-size:36px;
-	font-weight:700;
-	margin-top:10px;
+    font-size:22px;
+    font-weight:600;
 }
