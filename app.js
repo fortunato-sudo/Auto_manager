@@ -1,5 +1,3 @@
-const splashStart = Date.now();
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -261,7 +259,6 @@ window.nav=function(t){
 	if(overlay){
 		overlay.classList.remove("menuOverlayOpen");
 	}
-	document.body.classList.remove("menuOpen");
 	render();
 }
 
@@ -280,26 +277,6 @@ function formatDate(d){
         month:"short",
         year:"numeric"
     });
-}
-
-function headerMenu(titolo){
-	return `
-		<div class="headerBar">
-			<button class="menuButton" onclick="toggleMenu()">☰</button>
-			<div class="appTitle">${titolo}</div>
-			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-		</div>
-	`;
-}
-
-function headerBack(titolo){
-	return `
-		<div class="headerBar">
-			<button class="headerBack" onclick="indietro()">←</button>
-			<div class="appTitle">${titolo}</div>
-			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-		</div>
-	`;
 }
 
 function calcolaStato(m, kmAttuali){
@@ -368,6 +345,26 @@ function calcolaStato(m, kmAttuali){
     };
 }
 
+function headerMenu(titolo){
+	return `
+		<div class="headerBar">
+			<button class="menuButton" onclick="toggleMenu()">☰</button>
+			<div class="appTitle">${titolo}</div>
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+		</div>
+	`;
+}
+
+function headerBack(titolo){
+	return `
+		<div class="headerBar">
+			<button class="menuButton" onclick="indietro()">←</button>
+			<div class="appTitle">${titolo}</div>
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+		</div>
+	`;
+}
+
 function renderHome(appDiv, km, manutList, stats){
     let urg=0;
     let imm=0;
@@ -379,8 +376,14 @@ function renderHome(appDiv, km, manutList, stats){
     });
   
     appDiv.innerHTML+=`
-		
-        ${headerMenu('<img src="img/logo.png" class="appLogoLarge">')}
+        <div class="header">
+            <div class="titleBlock">
+                <img src="img/logo.png" class="appLogoLarge">
+                <div class="appTitle">
+                    Garage Manager
+                </div>
+            </div>
+        </div>
 
         <div class="widgets">
             <div class="widget kmWidget">
@@ -425,7 +428,10 @@ function renderHome(appDiv, km, manutList, stats){
 
 function renderManut(appDiv){
     appDiv.innerHTML+=`
-        ${headerMenu("Manutenzioni")}
+        <div class="header">
+            🔧 Manutenzioni
+            <button class="darkToggle" onclick="toggleDark()">🌙</button>
+        </div>
         <button class="addBtn" onclick="nav('manutAdd')">+ Aggiungi manutenzione</button>
         <div id="lista"></div>
     `;
@@ -562,7 +568,11 @@ function renderDettaglio(appDiv, m, km){
 function renderManutAdd(appDiv){
     if(tab==="manutAdd"){
         appDiv.innerHTML+=`
-            ${headerBack("Nuova manutenzione")}
+            <div class="headerBar">
+            		<button class="headerBack" onclick="indietro()">←</button>
+                Nuova manutenzione
+            		<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+            </div>
 
             <div class="group">
                 <div class="row">
@@ -600,7 +610,10 @@ function renderManutAdd(appDiv){
 
 async function renderRegistro(appDiv){
     appDiv.innerHTML+=`
-        ${headerMenu("Registro")}
+        <div class="header">
+            📋 Registro manutenzioni
+            <button class="darkToggle" onclick="toggleDark()">🌙</button>
+        </div>
         <button class="mainBtn" onclick="nav('registroAdd')">
             ➕ Nuovo intervento
         </button>
@@ -642,7 +655,11 @@ async function renderRegistro(appDiv){
 
 async function renderRegistroAdd(appDiv){
     appDiv.innerHTML+=`
-        ${headerBack("Nuovo intervento")}
+        <div class="headerBar">
+            	<button class="headerBack" onclick="indietro()">←</button>
+            Nuovo intervento
+            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+        </div>
 
         <div class="group">
             <div class="row">
@@ -683,7 +700,10 @@ async function renderRegistroAdd(appDiv){
 
 function renderFuel(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
-        ${headerMenu("Rifornimenti")}
+        <div class="header">
+            ⛽ Rifornimenti
+            <button class="darkToggle" onclick="toggleDark()">🌙</button>
+        </div>
         <button onclick="nav('fuelAdd')" class="mainBtn">
             ➕ Nuovo rifornimento
         </button>
@@ -845,7 +865,11 @@ function renderFuel(appDiv, fuelList, stats){
 async function renderFuelAdd(appDiv){
     let titoloFuel = fuelEditId ? "Modifica rifornimento" : "Nuovo rifornimento";
     appDiv.innerHTML+=`
-    	${headerBack(titoloFuel)}
+    		<div class="headerBar">
+            	<button class="headerBack" onclick="indietro()">←</button>
+            ${titoloFuel}
+            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+        </div>
 
         <div class="group">
             <div class="row">
@@ -899,7 +923,10 @@ async function renderFuelAdd(appDiv){
 
 function renderStats(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
-        ${headerMenu("Statistiche")}
+        <div class="header">
+            📊 Statistiche
+            <button class="darkToggle" onclick="toggleDark()">🌙</button>
+        </div>
 
         <div class="widgets">
             <div class="widget">
@@ -1188,12 +1215,9 @@ function renderStats(appDiv, fuelList, stats){
 }
 
 async function render(){
-    if(rendering){
-        console.warn("Render bloccato, reset automatico");
-        rendering = false;
-    }
-    rendering = true;    
-	try{
+    if(rendering) return;
+    rendering = true;
+    try{
         const appDiv=document.getElementById("app");
         appDiv.innerHTML = "";
         let fuelList=[];
@@ -1281,20 +1305,8 @@ km = cacheConfig;
         </div>`;
     }
     finally{
-		rendering = false;
-		const splash = document.getElementById("splash");
-		if(splash){
-			const elapsed = Date.now() - splashStart;
-			const remaining = Math.max(0, 1000 - elapsed);
-			setTimeout(()=>{
-				splash.style.opacity="0";
-				setTimeout(()=>{
-					splash.style.display="none";
-					document.getElementById("app").style.opacity="1";
-				},350);
-			}, remaining);
-		}
-	}
+        rendering = false;
+    }
 }
 
 window.indietro=function(){
