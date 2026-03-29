@@ -1,15 +1,14 @@
 html,body{
 	height:100%;
-	background:#0b0f14;
+	margin:0;
+	background:#0f0f12;
+	font-family:-apple-system;
+	color:#1c1c1e;
 }
 
 body{
 	overflow-y:auto;
 	-webkit-overflow-scrolling:touch;
-    margin:0;
-    font-family:-apple-system;
-	background:#f2f2f7;
-    color:#1c1c1e;
 	min-height:100vh;
 }
 
@@ -102,6 +101,8 @@ body:not(.loading) #app{
 }
 
 .skeleton{
+	height:70px;
+	border-radius:14px;
 	background:linear-gradient(
 		90deg,
 		#1b1f26 25%,
@@ -111,6 +112,7 @@ body:not(.loading) #app{
 	background-size:200% 100%;
 	animation:skeletonLoading 1.4s infinite;
 	border-radius:12px;
+	margin-bottom:12px;
 }
 
 @keyframes skeletonLoading{
@@ -221,26 +223,6 @@ body:not(.loading) #app{
 	transition:opacity .35s;
 	padding-top:env(safe-area-inset-top);
 	padding-bottom:40px;
-	min-height:100vh;
-}
-
-.skeleton{
-	height:70px;
-	border-radius:14px;
-	background:linear-gradient(
-		90deg,
-		#e5e5ea 25%,
-		#f2f2f7 50%,
-		#e5e5ea 75%
-	);
-	background-size:200% 100%;
-	animation:skeleton 1.4s infinite;
-	margin-bottom:12px;
-}
-
-@keyframes skeleton{
-	0%{background-position:200% 0;}
-	100%{background-position:-200% 0;}
 }
 
 /* DARK BUTTON */
