@@ -1567,6 +1567,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	setTimeout(()=>{
 		const splash=document.getElementById("splash");
 		if(splash){
+			/* animazione stile Tesla */
+			splash.style.transform="scale(1.05)";
 			splash.style.opacity="0";
 			setTimeout(()=>{
 				splash.remove();
