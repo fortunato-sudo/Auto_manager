@@ -7,7 +7,6 @@
 	transition:opacity .35s;
 	padding-bottom:40px;
 	min-height:100dvh;
-	background:inherit;
 	box-sizing:border-box;
 }
 
@@ -19,7 +18,7 @@ body{
     background:#f2f2f7;
     color:#1c1c1e;
 }
-x
+
 body.loading #app{
 	opacity:0;
 }
