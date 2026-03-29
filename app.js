@@ -1570,8 +1570,8 @@ document.addEventListener("DOMContentLoaded", () => {
 	if(localStorage.getItem("darkMode")==="true"){
 		document.body.classList.add("dark");
 	}
-	getFuelList();
 	render();
+	document.body.classList.remove("loading");
 
 	/* splash indipendente dal render */
 	setTimeout(()=>{
