@@ -1,5 +1,17 @@
+const splashStart = Date.now();
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+	getFirestore,
+	enableIndexedDbPersistence,
+	collection,
+	getDocs,
+	getDoc,
+	doc,
+	setDoc,
+	addDoc,
+	deleteDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig={
     apiKey:"AIzaSy...",
@@ -9,6 +21,12 @@ const firebaseConfig={
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
+
+entry{
+	enableIndexedDbPersistence(db);
+}catch(err){
+	console.warn("Offline persistence non disponibile", err);
+}
 
 let tab="home";
 let dettaglioManut=null;
@@ -37,20 +55,23 @@ async function aggiornaKmAutoSeMaggiore(kmNuovi){
 }
 
 async function getFuelList(){
-    const fuelSnap = await getDocs(collection(db,"fuel"));
+	if(cacheFuel){
+		return cacheFuel;
+	}
 
-    let fuelList=[];
-    fuelSnap.forEach(docSnap=>{
-        fuelList.push({
-            id:docSnap.id,
-            data:docSnap.data()
-        });
-    });
+	const fuelSnap = await getDocs(collection(db,"fuel"));
+	cacheFuel = [];
+	fuelSnap.forEach(docSnap=>{
+		cacheFuel.push({
+			id:docSnap.id,
+			data:docSnap.data()
+		});
+	});
 
-    fuelList.sort((a,b)=>{
-        return new Date(b.data.data) - new Date(a.data.data);
-    });
-    return fuelList;
+	cacheFuel.sort((a,b)=>{
+		return new Date(b.data.data) - new Date(a.data.data);
+	});
+	return cacheFuel;
 }
 
 function formatKm(km){
@@ -259,12 +280,14 @@ window.nav=function(t){
 	if(overlay){
 		overlay.classList.remove("menuOverlayOpen");
 	}
+	document.body.classList.remove("menuOpen");
 	render();
 }
 
 window.toggleDark=function(){
-    document.body.classList.toggle("dark");
-    localStorage.setItem("darkMode",document.body.classList.contains("dark"));
+	document.body.classList.toggle("dark");
+	const dark=document.body.classList.contains("dark");
+	localStorage.setItem("darkMode",dark);
 }
 
 function formatDate(d){
@@ -277,6 +300,26 @@ function formatDate(d){
         month:"short",
         year:"numeric"
     });
+}
+
+function headerMenu(titolo){
+	return `
+		<div class="headerBar">
+			<button class="menuButton" onclick="toggleMenu()">☰</button>
+			<div class="appTitle">${titolo}</div>
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+		</div>
+	`;
+}
+
+function headerBack(titolo){
+	return `
+		<div class="headerBar">
+			<button class="headerBack" onclick="indietro()">←</button>
+			<div class="appTitle">${titolo}</div>
+			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+		</div>
+	`;
 }
 
 function calcolaStato(m, kmAttuali){
@@ -345,26 +388,6 @@ function calcolaStato(m, kmAttuali){
     };
 }
 
-function headerMenu(titolo){
-	return `
-		<div class="headerBar">
-			<button class="menuButton" onclick="toggleMenu()">☰</button>
-			<div class="appTitle">${titolo}</div>
-			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-		</div>
-	`;
-}
-
-function headerBack(titolo){
-	return `
-		<div class="headerBar">
-			<button class="menuButton" onclick="indietro()">←</button>
-			<div class="appTitle">${titolo}</div>
-			<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-		</div>
-	`;
-}
-
 function renderHome(appDiv, km, manutList, stats){
     let urg=0;
     let imm=0;
@@ -374,17 +397,11 @@ function renderHome(appDiv, km, manutList, stats){
         if(stato.stato==="urgente") urg++;
         if(stato.stato==="imminente") imm++;
     });
-  
-    appDiv.innerHTML+=`
-        <div class="header">
-            <div class="titleBlock">
-                <img src="img/logo.png" class="appLogoLarge">
-                <div class="appTitle">
-                    Garage Manager
-                </div>
-            </div>
-        </div>
 
+	appDiv.style.opacity = 0;
+    appDiv.innerHTML+=`
+        ${headerMenu('<img src="img/logo.png" class="appLogoLarge">')}
+		
         <div class="widgets">
             <div class="widget kmWidget">
                 <div class="wTitle">Km auto</div>
@@ -424,20 +441,19 @@ function renderHome(appDiv, km, manutList, stats){
         <div class="section">Interventi imminenti o urgenti</div>
         <div id="imminenti"></div>
     `;
+	appDiv.style.opacity = 1;
 }
 
 function renderManut(appDiv){
     appDiv.innerHTML+=`
-        <div class="header">
-            🔧 Manutenzioni
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerMenu("Manutenzioni")}
         <button class="addBtn" onclick="nav('manutAdd')">+ Aggiungi manutenzione</button>
         <div id="lista"></div>
     `;
 }
 
 function renderManutList(manutList, km){
+	let html="";
     manutList.forEach(item=>{
         let m=item.data;
         let id=item.id;
@@ -515,8 +531,11 @@ function renderManutList(manutList, km){
             document.getElementById("imminenti").innerHTML+=row;
 
         if(tab==="manut")
-            document.getElementById("lista").innerHTML+=row;
+            html += row;
     });
+	if(tab==="manut"){
+		document.getElementById("lista").innerHTML = html;
+	}
 }
 
 function renderDettaglio(appDiv, m, km){
@@ -568,11 +587,7 @@ function renderDettaglio(appDiv, m, km){
 function renderManutAdd(appDiv){
     if(tab==="manutAdd"){
         appDiv.innerHTML+=`
-            <div class="headerBar">
-            		<button class="headerBack" onclick="indietro()">←</button>
-                Nuova manutenzione
-            		<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-            </div>
+            ${headerBack("Nuova manutenzione")}
 
             <div class="group">
                 <div class="row">
@@ -610,12 +625,9 @@ function renderManutAdd(appDiv){
 
 async function renderRegistro(appDiv){
     appDiv.innerHTML+=`
-        <div class="header">
-            📋 Registro manutenzioni
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerMenu("Registro")}
         <button class="mainBtn" onclick="nav('registroAdd')">
-            ➕ Nuovo intervento
+            + Nuovo intervento
         </button>
         <div id="registro"></div>
     `;
@@ -655,11 +667,7 @@ async function renderRegistro(appDiv){
 
 async function renderRegistroAdd(appDiv){
     appDiv.innerHTML+=`
-        <div class="headerBar">
-            	<button class="headerBack" onclick="indietro()">←</button>
-            Nuovo intervento
-            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerBack("Nuovo intervento")}
 
         <div class="group">
             <div class="row">
@@ -700,12 +708,9 @@ async function renderRegistroAdd(appDiv){
 
 function renderFuel(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
-        <div class="header">
-            ⛽ Rifornimenti
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerMenu("Rifornimenti")}
         <button onclick="nav('fuelAdd')" class="mainBtn">
-            ➕ Nuovo rifornimento
+            + Nuovo rifornimento
         </button>
         <div class="section">Ultimi rifornimenti</div>
         <div id="fuelList"></div>
@@ -865,11 +870,7 @@ function renderFuel(appDiv, fuelList, stats){
 async function renderFuelAdd(appDiv){
     let titoloFuel = fuelEditId ? "Modifica rifornimento" : "Nuovo rifornimento";
     appDiv.innerHTML+=`
-    		<div class="headerBar">
-            	<button class="headerBack" onclick="indietro()">←</button>
-            ${titoloFuel}
-            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
-        </div>
+    	${headerBack(titoloFuel)}
 
         <div class="group">
             <div class="row">
@@ -923,10 +924,7 @@ async function renderFuelAdd(appDiv){
 
 function renderStats(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
-        <div class="header">
-            📊 Statistiche
-            <button class="darkToggle" onclick="toggleDark()">🌙</button>
-        </div>
+        ${headerMenu("Statistiche")}
 
         <div class="widgets">
             <div class="widget">
@@ -1216,8 +1214,8 @@ function renderStats(appDiv, fuelList, stats){
 
 async function render(){
     if(rendering) return;
-    rendering = true;
-    try{
+	rendering = true;
+	try{
         const appDiv=document.getElementById("app");
         appDiv.innerHTML = "";
         let fuelList=[];
@@ -1230,14 +1228,12 @@ async function render(){
         const stats = calcolaStatisticheFuel(fuelList);
 
         let km = 0;
-		if(!cacheConfig){
-			const conf = await getDocs(collection(db,"config"));
-			conf.forEach(d=>{
-				cacheConfig = d.data().km_attuali || 0;
-			});
+		if(cacheConfig===null){
+			const snap = await getDoc(doc(db,"config","auto"));
+			cacheConfig = snap.data()?.km_attuali || 0;
 		}
 
-km = cacheConfig;
+		km = cacheConfig;
         let manutList = [];
 		if(tab==="home" || tab==="manut" || tab==="dettaglio"){
 			if(!cacheManut){
@@ -1303,9 +1299,6 @@ km = cacheConfig;
             Errore app.<br>
             Apri la console (F12).
         </div>`;
-    }
-    finally{
-        rendering = false;
     }
 }
 
@@ -1425,7 +1418,7 @@ window.salvaFuel = async function(){
     let consumo = null;
 
     /* trova rifornimento precedente */
-    const fuelSnap = await getDocs(collection(db,"fuel"));
+    const fuelSnap = await getDocs(collection(db,"fuel"),{source:"cache"});
     let ultimoKm = null;
     fuelSnap.forEach(d=>{
         let k = Number(d.data().km);
@@ -1566,6 +1559,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	if(localStorage.getItem("darkMode")==="true"){
 		document.body.classList.add("dark");
 	}
+	getFuelList();
 	render();
 
 	/* swipe menu */
@@ -1596,4 +1590,23 @@ document.addEventListener("DOMContentLoaded", () => {
 			document.body.classList.remove("menuOpen");
 		});
 	}
+
+	document.addEventListener("DOMContentLoaded", () => {
+		if(localStorage.getItem("darkMode")==="true"){
+			document.body.classList.add("dark");
+		}
+		render();
+
+		/* splash indipendente dal render */
+		setTimeout(()=>{
+			const splash=document.getElementById("splash");
+			if(splash){
+				splash.style.opacity="0";
+				setTimeout(()=>{
+					splash.remove();
+				},400);
+			}
+			document.body.classList.remove("loading");
+		},1800);
+	});
 });
