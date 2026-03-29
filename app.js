@@ -1571,6 +1571,8 @@ window.eliminaManutenzione=async function(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+	document.body.style.background="red";
+	
 	if(localStorage.getItem("darkMode")==="true"){
 		document.body.classList.add("dark");
 	}
@@ -1613,4 +1615,3 @@ document.addEventListener("DOMContentLoaded", () => {
 		render();
 	});
 });
-document.body.style.background="red";
