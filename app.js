@@ -457,6 +457,7 @@ function renderManut(appDiv){
 }
 
 function renderManutList(manutList, km){
+	let html="";
     manutList.forEach(item=>{
         let m=item.data;
         let id=item.id;
@@ -534,8 +535,11 @@ function renderManutList(manutList, km){
             document.getElementById("imminenti").innerHTML+=row;
 
         if(tab==="manut")
-            document.getElementById("lista").innerHTML+=row;
+            html += row;
     });
+	if(tab==="manut"){
+		document.getElementById("lista").innerHTML = html;
+	}
 }
 
 function renderDettaglio(appDiv, m, km){
@@ -1213,11 +1217,8 @@ function renderStats(appDiv, fuelList, stats){
 }
 
 async function render(){
-    if(rendering){
-        console.warn("Render bloccato, reset automatico");
-        rendering = false;
-    }
-    rendering = true;    
+    if(rendering) return;
+	rendering = true;
 	try{
         const appDiv=document.getElementById("app");
         appDiv.innerHTML = "";
@@ -1231,14 +1232,12 @@ async function render(){
         const stats = calcolaStatisticheFuel(fuelList);
 
         let km = 0;
-		if(!cacheConfig){
-			const conf = await getDocs(collection(db,"config"));
-			conf.forEach(d=>{
-				cacheConfig = d.data().km_attuali || 0;
-			});
+		if(cacheConfig===null){
+			const snap = await getDoc(doc(db,"config","auto"));
+			cacheConfig = snap.data()?.km_attuali || 0;
 		}
 
-km = cacheConfig;
+		km = cacheConfig;
         let manutList = [];
 		if(tab==="home" || tab==="manut" || tab==="dettaglio"){
 			if(!cacheManut){
@@ -1581,6 +1580,7 @@ document.addEventListener("DOMContentLoaded", () => {
 	if(localStorage.getItem("darkMode")==="true"){
 		document.body.classList.add("dark");
 	}
+	getFuelList();
 	render();
 
 	/* swipe menu */
