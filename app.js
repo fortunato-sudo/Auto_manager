@@ -1300,25 +1300,6 @@ async function render(){
             Apri la console (F12).
         </div>`;
     }
-    finally{
-		rendering = false;
-		const splash = document.getElementById("splash");
-		if(splash){
-			const elapsed = Date.now() - splashStart;
-
-			/* splash minimo 1.8s */
-			const remaining = Math.max(0, 2000 - elapsed);
-			setTimeout(()=>{
-    			splash.style.opacity="0";
-    			setTimeout(()=>{
-					if(splash){
-						splash.remove();
-					}
-    			},400);
-    			document.body.classList.remove("loading");
-			},remaining);
-		}
-	}
 }
 
 window.indietro=function(){
@@ -1615,6 +1596,17 @@ document.addEventListener("DOMContentLoaded", () => {
 			document.body.classList.add("dark");
 		}
 		render();
-		enableIndexedDbPersistence(db).catch(()=>{});
+
+		/* splash indipendente dal render */
+		setTimeout(()=>{
+			const splash=document.getElementById("splash");
+			if(splash){
+				splash.style.opacity="0";
+				setTimeout(()=>{
+					splash.remove();
+				},400);
+			}
+			document.body.classList.remove("loading");
+		},1800);
 	});
 });
