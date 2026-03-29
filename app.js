@@ -391,7 +391,8 @@ function renderHome(appDiv, km, manutList, stats){
         if(stato.stato==="urgente") urg++;
         if(stato.stato==="imminente") imm++;
     });
-  
+
+	appDiv.style.opacity = 0;
     appDiv.innerHTML+=`
         ${headerMenu('<img src="img/logo.png" class="appLogoLarge">')}
 		
@@ -434,6 +435,7 @@ function renderHome(appDiv, km, manutList, stats){
         <div class="section">Interventi imminenti o urgenti</div>
         <div id="imminenti"></div>
     `;
+	appDiv.style.opacity = 1;
 }
 
 function renderManut(appDiv){
@@ -1303,12 +1305,9 @@ km = cacheConfig;
 			const remaining = Math.max(0, 1800 - elapsed);
 			setTimeout(()=>{
 				splash.style.opacity="0";
-				setTimeout(()=>{
-					splash.style.display="none";
 
-					/* mostra app già pronta */
-					document.body.classList.remove("loading");
-				},600);
+				/* non rimuoviamo lo splash, lo lasciamo sopra invisibile */
+				document.body.classList.remove("loading");
 			},remaining);
 		}
 	}
