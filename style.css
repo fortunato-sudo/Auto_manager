@@ -1,4 +1,5 @@
 html,body{
+	height:100%;
 	background:#0b0f14;
 }
 
@@ -7,8 +8,9 @@ body{
 	-webkit-overflow-scrolling:touch;
     margin:0;
     font-family:-apple-system;
-	background:#0f0f12;
+	background:#f2f2f7;
     color:#1c1c1e;
+	min-height:100vh;
 }
 
 body.loading #app{
@@ -219,6 +221,7 @@ body:not(.loading) #app{
 	transition:opacity .35s;
 	padding-top:env(safe-area-inset-top);
 	padding-bottom:40px;
+	min-height:100vh;
 }
 
 .skeleton{
