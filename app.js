@@ -871,27 +871,27 @@ async function renderFuelAdd(appDiv){
         <div class="group">
             <div class="row">
                 <div>Prezzo totale</div>
-                <input id="totale" oninput="calcolaFuel('totale')">
+                <input id="totale" placeholder="€ tot" oninput="calcolaFuel('totale')">
             </div>
 
             <div class="row">
                 <div>Prezzo al litro</div>
-                <input id="litro" oninput="calcolaFuel('litro')">
+                <input id="litro" placeholder="€ al litro" oninput="calcolaFuel('litro')">
             </div>
 
             <div class="row">
                 <div>Litri</div>
-                <input id="litri" oninput="calcolaFuel('litri')">
+                <input id="litri" placeholder="litri" oninput="calcolaFuel('litri')">
             </div>
 
             <div class="row">
                 <div>Km auto</div>
-                <input id="kmFuel">
+                <input id="kmFuel" placeholder="km">
             </div>
 
             <div class="row">
                 <div>Distributore</div>
-                <input id="distributore">
+                <input id="distributore" placeholder="Distributore">
             </div>
 
             <div class="row">
