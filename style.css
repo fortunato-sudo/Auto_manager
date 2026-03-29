@@ -18,7 +18,6 @@ body{
     font-family:-apple-system;
     background:#f2f2f7;
     color:#1c1c1e;
-	padding-top:env(safe-area-inset-top);
 }
 
 body.loading #app{
