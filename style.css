@@ -47,7 +47,9 @@ body:not(.dark) .menuItem{
 	background:black;
 	z-index:9999;
 	opacity:1;
-	transition:opacity .4s ease;
+	transition:
+		opacity .4s ease,
+		transform .4s ease;
 	visibility:visible;
 	background:linear-gradient(
 		180deg,
