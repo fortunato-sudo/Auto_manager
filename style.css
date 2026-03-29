@@ -1,3 +1,7 @@
+html,body{
+	background:#0b0f14;
+}
+
 body{
 	overflow-y:auto;
 	-webkit-overflow-scrolling:touch;
@@ -213,6 +217,7 @@ body:not(.loading) #app{
 #app{
 	opacity:0;
 	transition:opacity .35s;
+	padding-top:env(safe-area-inset-top);
 	padding-bottom:40px;
 }
 
