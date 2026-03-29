@@ -6,10 +6,12 @@
 }
 
 body{
-    margin:0;
-    font-family:-apple-system;
-    background:#f2f2f7;
-    color:#1c1c1e;
+	margin:0;
+	font-family:-apple-system;
+	background:#f2f2f7;
+	color:#1c1c1e;
+	min-height:100vh;
+	padding-top:env(safe-area-inset-top);
 }
 
 body.loading #app{
