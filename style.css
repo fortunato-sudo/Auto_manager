@@ -1,5 +1,7 @@
 :root{
 	--safe-top: env(safe-area-inset-top);
+	--bg-light:#f2f2f7;
+	--bg-dark:#000;
 }
 
 #app{
@@ -7,17 +9,22 @@
 	transition:opacity .35s;
 	padding-bottom:40px;
 	min-height:100dvh;
-	background:inherit;
 	box-sizing:border-box;
+}
+
+html,body{
+	height:100%;
+	margin:0;
+	background:var(--bg-light);
 }
 
 body{
 	overflow-y:auto;
 	-webkit-overflow-scrolling:touch;
-    margin:0;
-    font-family:-apple-system;
-    background:#f2f2f7;
-    color:#1c1c1e;
+	font-family:-apple-system;
+	color:#1c1c1e;
+	min-height:100dvh;
+	background:var(--bg-light);
 }
 
 body.loading #app{
@@ -32,22 +39,19 @@ body:not(.loading) #app{
 #splash{
 	position:fixed;
 	inset:0;
-	background:#0f0f12;
-	flex-direction:column;
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	background:black;
 	z-index:9999;
-	opacity:1;
-	transition:opacity .4s ease;
-	visibility:visible;
+
 	background:linear-gradient(
 		180deg,
 		#0f1115,
 		#08090c
 	);
-	pointer-events:none;
+
+	opacity:1;
+	transition:opacity .4s ease;
 }
 
 .splashContent{
@@ -133,8 +137,8 @@ body:not(.loading) #app{
 /* DARK MODE */
 
 .dark{
-    background:#000;
-    color:white;
+	background:var(--bg-dark);
+	color:white;
 }
 
 .dark .widget,
@@ -182,6 +186,7 @@ body:not(.loading) #app{
 	align-items:center;
 	justify-content:space-between;
 	padding:16px 20px;
+	padding-top:calc(16px + env(safe-area-inset-top));
 	min-height:64px;
 }
 
@@ -535,6 +540,7 @@ button{
 
 body.menuOpen{
 	overflow:hidden;
+	height:100dvh;
 }
 
 .menuItem{
