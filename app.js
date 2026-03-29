@@ -22,7 +22,7 @@ const firebaseConfig={
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
 
-entry{
+try{
 	enableIndexedDbPersistence(db);
 }catch(err){
 	console.warn("Offline persistence non disponibile", err);
@@ -1300,6 +1300,9 @@ async function render(){
             Apri la console (F12).
         </div>`;
     }
+	finally{
+		rendering=false;
+	}
 }
 
 window.indietro=function(){
@@ -1562,12 +1565,23 @@ document.addEventListener("DOMContentLoaded", () => {
 	getFuelList();
 	render();
 
+	/* splash indipendente dal render */
+	setTimeout(()=>{
+		const splash=document.getElementById("splash");
+		if(splash){
+			splash.style.opacity="0";
+			setTimeout(()=>{
+				splash.remove();
+			},400);
+		}
+		document.body.classList.remove("loading");
+	},1800);
+
 	/* swipe menu */
 	let startX = 0;
 	document.addEventListener("touchstart",function(e){
 		startX = e.touches[0].clientX;
 	});
-
 	document.addEventListener("touchmove",function(e){
 		let currentX = e.touches[0].clientX;
 		let diff = currentX - startX;
@@ -1580,8 +1594,7 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 		}
 	});
-
-    const overlay = document.getElementById("menuOverlay");
+	const overlay = document.getElementById("menuOverlay");
 	if(overlay){
 		overlay.addEventListener("click",function(){
 			document.getElementById("menuDrawer")
@@ -1590,23 +1603,4 @@ document.addEventListener("DOMContentLoaded", () => {
 			document.body.classList.remove("menuOpen");
 		});
 	}
-
-	document.addEventListener("DOMContentLoaded", () => {
-		if(localStorage.getItem("darkMode")==="true"){
-			document.body.classList.add("dark");
-		}
-		render();
-
-		/* splash indipendente dal render */
-		setTimeout(()=>{
-			const splash=document.getElementById("splash");
-			if(splash){
-				splash.style.opacity="0";
-				setTimeout(()=>{
-					splash.remove();
-				},400);
-			}
-			document.body.classList.remove("loading");
-		},1800);
-	});
 });
