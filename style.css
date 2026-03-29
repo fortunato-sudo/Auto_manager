@@ -522,7 +522,7 @@ button{
 	top:0;
 	left:-260px;
 	width:240px;
-	height:100vh;
+	height:100%;
 	background:#1c1c1e;
 	padding-top:80px;
 	transition:0.25s;
