@@ -39,6 +39,12 @@ let cacheFuel=null;
 let cacheManut=null;
 let cacheConfig=null;
 let cacheRegistro=null;
+let dbCache={
+	fuel:null,
+	manut:null,
+	config:null,
+	registro:null
+};
 
 async function aggiornaKmAutoSeMaggiore(kmNuovi){
 	const conf=await getDocs(collection(db,"config"));
@@ -55,23 +61,40 @@ async function aggiornaKmAutoSeMaggiore(kmNuovi){
 }
 
 async function getFuelList(){
-	if(cacheFuel){
+	if(cacheFuel !== null){
 		return cacheFuel;
 	}
-
-	const fuelSnap = await getDocs(collection(db,"fuel"));
-	cacheFuel = [];
-	fuelSnap.forEach(docSnap=>{
-		cacheFuel.push({
-			id:docSnap.id,
-			data:docSnap.data()
-		});
-	});
-
+	const snap = await getDocs(collection(db,"fuel"));
+	cacheFuel = snap.docs.map(doc=>({
+		id:doc.id,
+		data:doc.data()
+	}));
 	cacheFuel.sort((a,b)=>{
 		return new Date(b.data.data) - new Date(a.data.data);
 	});
 	return cacheFuel;
+}
+
+async function preloadDB(){
+	/* fuel */
+	if(!cacheFuel){
+		cacheFuel = await getFuelList();
+	}
+
+	/* manutenzioni */
+	if(!cacheManut){
+		const snap = await getDocs(collection(db,"manutenzioni"));
+		cacheManut = snap.docs.map(doc=>({
+			id:doc.id,
+			data:doc.data()
+		}));
+	}
+
+	/* km auto */
+	if(cacheConfig===null){
+		const snap = await getDoc(doc(db,"config","auto"));
+		cacheConfig = snap.data()?.km_attuali || 0;
+	}
 }
 
 function formatKm(km){
@@ -705,13 +728,14 @@ async function renderRegistroAdd(appDiv){
         </div>
     `;
 
-    const manutSnap = await getDocs(collection(db,"manutenzioni"));
-    let lista=document.getElementById("listaManut");
-    manutSnap.forEach(doc=>{
-        let opt=document.createElement("option");
-        opt.value = doc.data().nome;
-        lista.appendChild(opt);
-    });
+    cacheManut.forEach(async m=>{
+		if(m.data.nome===nome){
+			await setDoc(doc(db,"manutenzioni",m.id),{
+				ultimo_km:Number(km),
+				ultima_data:data
+			},{merge:true});
+		}
+	});
 }
 
 function renderFuel(appDiv, fuelList, stats){
@@ -772,27 +796,6 @@ function renderFuel(appDiv, fuelList, stats){
     let countConsumi=0;
     let listaConsumi=[];
     let anomaliaConsumo=null;
-    if(countConsumi>2){
-        let media=consumoTot/countConsumi;
-        // consumo ultimo rifornimento
-        let ultimoConsumo=null;
-        
-        for(let i=0;i<fuelList.length;i++){
-
-            if(fuelList[i].data.consumo){
-                ultimoConsumo=fuelList[i].data.consumo;
-                break;
-            }
-        }
-
-        if(ultimoConsumo){
-            let diff=((media-ultimoConsumo)/media)*100;
-
-            if(diff>15){
-                anomaliaConsumo=Math.round(diff);
-            }
-        }
-    }
 
     if(anomaliaConsumo){
         let media = listaConsumi.reduce((a,b)=>a+b,0) / listaConsumi.length;
@@ -858,21 +861,6 @@ function renderFuel(appDiv, fuelList, stats){
             box.innerHTML += row;
         }
     });
-
-    if(listaConsumi.length >= 3){
-        let ultimoConsumo = listaConsumi[0];
-        let media = 0;
-
-        for(let i=1;i<listaConsumi.length;i++){
-            media += listaConsumi[i];
-        }
-        media = media/(listaConsumi.length-1);
-        let diff=((media-ultimoConsumo)/media)*100;
-
-        if(diff>15){
-            anomaliaConsumo=Math.round(diff);
-        }
-    }
 }
 
 async function renderFuelAdd(appDiv){
@@ -1379,15 +1367,14 @@ window.salvaRegistro = async function(){
     });
 
     /* aggiorna la manutenzione */
-    const manutSnap = await getDocs(collection(db,"manutenzioni"));
-    manutSnap.forEach(async docSnap=>{
-        if(docSnap.data().nome===nome){
-            await setDoc(doc(db,"manutenzioni",docSnap.id),{
-                ultimo_km:Number(km),
-                ultima_data:data
-            },{merge:true});
-        }
-    });
+    cacheManut.forEach(async m=>{
+		if(m.data.nome===nome){
+			await setDoc(doc(db,"manutenzioni",m.id),{
+				ultimo_km:Number(km),
+				ultima_data:data
+			},{merge:true});
+		}
+	});
     tab="registro";
     render();
 }
@@ -1429,16 +1416,15 @@ window.salvaFuel = async function(){
     let consumo = null;
 
     /* trova rifornimento precedente */
-    const fuelSnap = await getDocs(collection(db,"fuel"),{source:"cache"});
-    let ultimoKm = null;
-    fuelSnap.forEach(d=>{
-        let k = Number(d.data().km);
-        if(km > k){
-            if(ultimoKm === null || k > ultimoKm){
-                ultimoKm = k;
-            }
-        }
-    });
+    let ultimoKm=null;
+	cacheFuel.forEach(f=>{
+		let k=Number(f.data.km);
+		if(km > k){
+			if(ultimoKm===null || k>ultimoKm){
+				ultimoKm=k;
+			}
+		}
+	});
 
     /* calcola consumo */
     if(!saltoConsumo && ultimoKm !== null && litri){
@@ -1507,16 +1493,14 @@ window.saveKm=async function(){
     render();
 }
 
-window.apriDettaglio=async function(id){
-    const snap=await getDocs(collection(db,"manutenzioni"));
-    snap.forEach(docSnap=>{
-        if(docSnap.id===id){
-            dettaglioManut=docSnap.data();
-            dettaglioId=id;
-        }
-    });
-    tab="dettaglio";
-    render();
+window.apriDettaglio=function(id){
+	let item = cacheManut.find(m=>m.id===id);
+	if(item){
+		dettaglioManut=item.data;
+		dettaglioId=id;
+	}
+	tab="dettaglio";
+	render();
 }
 
 window.eliminaFuel = async function(id){
@@ -1567,10 +1551,16 @@ window.eliminaManutenzione=async function(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+	if("serviceWorker" in navigator){
+		navigator.serviceWorker.register("sw.js");
+	}
 	if(localStorage.getItem("darkMode")==="true"){
 		document.body.classList.add("dark");
 	}
-	render();
+	(async ()=>{
+		await preloadDB();
+		render();
+	})();
 	document.body.classList.remove("loading");
 
 	/* splash indipendente dal render */
