@@ -1,6 +1,6 @@
 {
   "name": "Garage Manager",
-  "short_name": "Garage",
+  "short_name": "Garage Manager",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#f2f2f7",
