@@ -1302,7 +1302,7 @@ km = cacheConfig;
 			const elapsed = Date.now() - splashStart;
 
 			/* splash minimo 1.8s */
-			const remaining = Math.max(0, 1800 - elapsed);
+			const remaining = Math.max(0, 2000 - elapsed);
 			setTimeout(()=>{
     			splash.style.opacity="0";
     			setTimeout(()=>{
