@@ -218,6 +218,7 @@ body:not(.loading) #app{
 	padding-bottom:40px;
 	min-height:100dvh;
 	background:inherit;
+	box-sizing:border-box;
 }
 
 .skeleton{
