@@ -2,6 +2,17 @@
 	--safe-top: env(safe-area-inset-top);
 }
 
+#app{
+	opacity:0;
+	transition:opacity .35s;
+	padding-bottom:40px;
+	min-height:100dvh;
+	background:inherit;
+	box-sizing:border-box;
+	position:relative;
+	z-index:1;
+}
+
 body{
 	overflow-y:auto;
 	-webkit-overflow-scrolling:touch;
@@ -30,7 +41,7 @@ body:not(.loading) #app{
 	align-items:center;
 	justify-content:center;
 	background:black;
-	z-index:9999;
+	z-index:0;
 	opacity:1;
 	transition:opacity .4s ease;
 	visibility:visible;
@@ -215,15 +226,6 @@ body:not(.loading) #app{
     display:flex;
     align-items:center;
     gap:10px;
-}
-
-#app{
-	opacity:0;
-	transition:opacity .35s;
-	padding-bottom:40px;
-	min-height:100dvh;
-	background:inherit;
-	box-sizing:border-box;
 }
 
 .skeleton{
