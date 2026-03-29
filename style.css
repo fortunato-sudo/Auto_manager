@@ -38,6 +38,7 @@ body:not(.loading) #app{
 		#0f1115,
 		#08090c
 	);
+	pointer-events:none;
 }
 
 .splashContent{
