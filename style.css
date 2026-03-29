@@ -1,18 +1,11 @@
-:root{
-	--safe-top: env(safe-area-inset-top);
-}
-
 #app{
 	opacity:0;
 	transition:opacity .35s;
 	padding-bottom:40px;
 	min-height:100vh;
-	box-sizing:border-box;
 }
 
 body{
-	overflow-y:auto;
-	-webkit-overflow-scrolling:touch;
     margin:0;
     font-family:-apple-system;
     background:#f2f2f7;
