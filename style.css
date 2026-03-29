@@ -19,12 +19,22 @@ body:not(.loading) #app{
 #splash{
 	position:fixed;
 	inset:0;
+	background:#0f0f12;
+	flex-direction:column;
 	display:flex;
 	align-items:center;
 	justify-content:center;
-	background:#0f0f12;
+	background:black;
 	z-index:9999;
+	opacity:1;
 	transition:opacity .4s ease;
+	visibility:visible;
+	background:linear-gradient(
+		180deg,
+		#0f1115,
+		#08090c
+	);
+	pointer-events:none;
 }
 
 .splashContent{
