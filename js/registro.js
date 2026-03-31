@@ -11,9 +11,17 @@ export async function renderRegistro(appDiv){
         </button>
         <div id="registro"></div>
     `;
-
-    const storico = await getDocs(collection(db,"registro"));
-    let storicoList=[];
+    
+    let storicoList = [];
+    if(!cacheRegistro){
+    	const snap = await getDocs(collection(db,"registro"));
+    	cacheRegistro = snap.docs.map(doc=>({
+	    	id:doc.id,
+	    	data:doc.data()
+	    }));
+    }
+    storicoList = cacheRegistro;
+    
     storico.forEach(docSnap=>{
         storicoList.push({
             id:docSnap.id,
