@@ -1,7 +1,7 @@
 import { db, collection, addDoc, setDoc, doc, deleteDoc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDate, formatKm } from "./utils.js";
-import { cacheManut } from "./state.js";
+import { tab, cacheManut, dettaglioManut, dettaglioId, setTab, setDettaglioManut, setDettaglioId, setCacheManut } from "./state.js";
 
 export function renderManut(appDiv){
     appDiv.innerHTML+=`
@@ -12,7 +12,17 @@ export function renderManut(appDiv){
 }
 
 export function renderManutList(manutList, km){
-	let htmlHome="";
+    manutList = [...manutList].sort((a,b)=>{
+        let statoA = calcolaStato(a.data,km);
+        let statoB = calcolaStato(b.data,km);
+        const ordine = {
+            urgente:0,
+            imminente:1,
+            ok:2
+        }
+        return ordine[statoA.stato] - ordine[statoB.stato];
+    });
+    let htmlHome="";
     let htmlManut="";
     manutList.forEach(item=>{
         let m=item.data;
@@ -93,14 +103,14 @@ export function renderManutList(manutList, km){
         if(tab==="manut")
             htmlManut += row;
     });
-	if(tab==="home"){
-	    let box=document.getElementById("imminenti");
-	    if(box) box.innerHTML = htmlHome;
+    if(tab==="home"){
+        let box=document.getElementById("imminenti");
+        if(box) box.innerHTML = htmlHome;
     }
 
     if(tab==="manut"){
-	    let box=document.getElementById("lista");
-	    if(box) box.innerHTML = htmlManut;
+        let box=document.getElementById("lista");
+        if(box) box.innerHTML = htmlManut;
     }
 }
 
@@ -174,8 +184,8 @@ window.salvaManutenzione = async function(){
         prodotto:prodotto,
         immagine:img
     });
-    cacheManut = null;
-    tab="manut";
+    setCacheManut(null);
+    setTab("manut");
     render();
 }
 
@@ -199,7 +209,7 @@ window.segnaFatto = async function(){
         ultimo_km:Number(km),
         ultima_data:data
     },{merge:true});
-    tab="home";
+    setTab("home");
     render();
 }
 
@@ -270,21 +280,21 @@ export function calcolaStato(m, kmAttuali){
 }
 
 window.apriDettaglio=function(id){
-	let item = cacheManut.find(m=>m.id===id);
-	if(item){
-		dettaglioManut=item.data;
-		dettaglioId=id;
-	}
-	tab="dettaglio";
-	render();
+    let item = cacheManut.find(m=>m.id===id);
+    if(item){
+        setDettaglioManut(item.data);
+        setDettaglioId(id);
+    }
+    setTab("dettaglio");
+    render();
 }
 
 export function renderDettaglio(appDiv, m, km){
     let stato=calcolaStato(m,km);
     appDiv.innerHTML+=`
         <div class="headerBar">
-            	<button class="headerBack" onclick="indietro()">←</button>
-            	<button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
+                <button class="headerBack" onclick="indietro()">←</button>
+                <button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
         </div>
 
         <div class="detailTop">
@@ -328,8 +338,8 @@ export function renderDettaglio(appDiv, m, km){
 window.eliminaManutenzione=async function(){
     if(confirm("Eliminare questa manutenzione?")){
         await deleteDoc(doc(db,"manutenzioni",dettaglioId));
-        cacheManut = null;
-        tab="manut";
+        setCacheManut(null);
+        setTab("manut");
         render();
     }
 }
