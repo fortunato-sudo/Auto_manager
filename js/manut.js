@@ -195,8 +195,9 @@ window.salvaManutenzione = async function(){
         immagine:img
     });
     setCacheManut(null);
-    render();
+    await render();
     setTab("manut");
+    await render();
 }
 
 window.segnaFatto = async function(){
@@ -351,6 +352,6 @@ window.eliminaManutenzione=async function(){
         await deleteDoc(doc(db,"manutenzioni",dettaglioId));
         setCacheManut(null);
         setTab("manut");
-        render();
+        await render();
     }
 }
