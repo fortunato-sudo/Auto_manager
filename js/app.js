@@ -65,8 +65,8 @@ async function preloadDB(){
     setRendering(true);
     try{
         const appDiv=document.getElementById("app");
-        appDiv.innerHTML = "";
         window.scrollTo(0,0);
+        appDiv.innerHTML = "";
 
         let fuelList = cacheFuel;
         if((tab==="home" || tab==="fuel" || tab==="stats") && !fuelList){
