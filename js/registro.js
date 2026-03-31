@@ -1,7 +1,7 @@
 import { db, collection, getDocs, addDoc, setDoc, deleteDoc, doc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDate, formatKm } from "./utils.js";
-import { cacheManut } from "./state.js";
+import { cacheManut, setTab } from "./state.js";
 
 export async function renderRegistro(appDiv){
     appDiv.innerHTML+=`
@@ -46,6 +46,16 @@ export async function renderRegistro(appDiv){
 }
 
 export async function renderRegistroAdd(appDiv){
+    let select=document.getElementById("nomeInt");
+    if(cacheManut){
+        cacheManut.forEach(m=>{
+            select.innerHTML += `
+                <option value="${m.data.nome}">
+                    ${m.data.nome}
+                </option>
+            `;
+        });
+    }      
     appDiv.innerHTML+=`
         ${headerBack("Nuovo intervento")}
 
@@ -96,14 +106,14 @@ window.salvaRegistro = async function(){
 
     /* aggiorna la manutenzione */
     cacheManut.forEach(async m=>{
-		if(m.data.nome===nome){
-			await setDoc(doc(db,"manutenzioni",m.id),{
-				ultimo_km:Number(km),
-				ultima_data:data
-			},{merge:true});
-		}
-	});
-    tab="registro";
+        if(m.data.nome===nome){
+            await setDoc(doc(db,"manutenzioni",m.id),{
+                ultimo_km:Number(km),
+                ultima_data:data
+            },{merge:true});
+        }
+    });
+    setTab("registro");
     render();
 }
 
