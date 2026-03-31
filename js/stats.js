@@ -1,176 +1,177 @@
+import { fuelChart, setFuelChart } from "./state.js";
 import { headerMenu } from "./ui.js";
 import { formatNumero } from "./utils.js";
 
 export function calcolaStatisticheFuel(fuelList){
-	let consumoTot=0;
-	let countConsumi=0;
+    let consumoTot=0;
+    let countConsumi=0;
 
-	let migliorConsumo=null;
-	let peggiorConsumo=null;
+    let migliorConsumo=null;
+    let peggiorConsumo=null;
 
-	let consumoEstate=0;
-	let consumoInverno=0;
-	let countEstate=0;
-	let countInverno=0;
+    let consumoEstate=0;
+    let consumoInverno=0;
+    let countEstate=0;
+    let countInverno=0;
 
-	let spesaTot=0;
-	let spesaMese=0;
-	let kmPercorsiTot=0;
+    let spesaTot=0;
+    let spesaMese=0;
+    let kmPercorsiTot=0;
 
-	let listaConsumi=[];
-	let listaPrezzi=[];
+    let listaConsumi=[];
+    let listaPrezzi=[];
 
-	let oggi=new Date();
-	let meseAttuale=oggi.getMonth();
-	let annoAttuale=oggi.getFullYear();
+    let oggi=new Date();
+    let meseAttuale=oggi.getMonth();
+    let annoAttuale=oggi.getFullYear();
 
-	fuelList.forEach(item=>{
+    fuelList.forEach(item=>{
 
-		let s=item.data;
-		/* consumo */
-		if(s.consumo){
+        let s=item.data;
+        /* consumo */
+        if(s.consumo){
 
-			consumoTot+=s.consumo;
-			countConsumi++;
-			listaConsumi.push(s.consumo);
+            consumoTot+=s.consumo;
+            countConsumi++;
+            listaConsumi.push(s.consumo);
 
-			if(migliorConsumo===null || s.consumo>migliorConsumo)
-				migliorConsumo=s.consumo;
+            if(migliorConsumo===null || s.consumo>migliorConsumo)
+                migliorConsumo=s.consumo;
 
-			if(peggiorConsumo===null || s.consumo<peggiorConsumo)
-				peggiorConsumo=s.consumo;
+            if(peggiorConsumo===null || s.consumo<peggiorConsumo)
+                peggiorConsumo=s.consumo;
 
-			if(s.litri)
-				kmPercorsiTot += s.litri * s.consumo;
+            if(s.litri)
+                kmPercorsiTot += s.litri * s.consumo;
 
-			if(s.data){
+            if(s.data){
 
-				let d=new Date(s.data);
-				let mese=d.getMonth()+1;
-				if(mese>=4 && mese<=9){
-					consumoEstate+=s.consumo;
-					countEstate++;
-				}else{
-					consumoInverno+=s.consumo;
-					countInverno++;
-				}
-			}
-		}
+                let d=new Date(s.data);
+                let mese=d.getMonth()+1;
+                if(mese>=4 && mese<=9){
+                    consumoEstate+=s.consumo;
+                    countEstate++;
+                }else{
+                    consumoInverno+=s.consumo;
+                    countInverno++;
+                }
+            }
+        }
 
-		/* prezzo */
-		if(s.litro)
-			listaPrezzi.push(s.litro);
+        /* prezzo */
+        if(s.litro)
+            listaPrezzi.push(s.litro);
 
-		/* spesa */
-		if(s.totale)
-			spesaTot+=s.totale;
+        /* spesa */
+        if(s.totale)
+            spesaTot+=s.totale;
 
-		/* spesa mese */
-		if(s.data){
-			let d=new Date(s.data);
-			if(d.getMonth()==meseAttuale && d.getFullYear()==annoAttuale)
-				spesaMese+=s.totale;
-		}
-	});
+        /* spesa mese */
+        if(s.data){
+            let d=new Date(s.data);
+            if(d.getMonth()==meseAttuale && d.getFullYear()==annoAttuale)
+                spesaMese+=s.totale;
+        }
+    });
 
-	let consumoMedio = countConsumi ? consumoTot/countConsumi : null;
-	let estateMedia = countEstate ? consumoEstate/countEstate : null;
-	let invernoMedia = countInverno ? consumoInverno/countInverno : null;
+    let consumoMedio = countConsumi ? consumoTot/countConsumi : null;
+    let estateMedia = countEstate ? consumoEstate/countEstate : null;
+    let invernoMedia = countInverno ? consumoInverno/countInverno : null;
 
-	let costoKm=null;
-	let costo100km=null;
-	if(spesaTot && kmPercorsiTot){
-		costoKm = spesaTot/kmPercorsiTot;
-		costo100km = costoKm*100;
-	}
+    let costoKm=null;
+    let costo100km=null;
+    if(spesaTot && kmPercorsiTot){
+        costoKm = spesaTot/kmPercorsiTot;
+        costo100km = costoKm*100;
+    }
 
-	/* autonomia */
-	let autonomia=null;
-	let ultimo=fuelList[0]?.data;
-	if(consumoMedio && ultimo?.litri)
-		autonomia = consumoMedio * ultimo.litri;
+    /* autonomia */
+    let autonomia=null;
+    let ultimo=fuelList[0]?.data;
+    if(consumoMedio && ultimo?.litri)
+        autonomia = consumoMedio * ultimo.litri;
 
-	/* anomalie consumo */
-	let anomaliaConsumo=null;
-	let miglioramentoConsumo=null;
-	if(listaConsumi.length>=3){
-		let ultimoConsumo=listaConsumi[0];
-		let somma=0;
-		for(let i=1;i<listaConsumi.length;i++)
-			somma+=listaConsumi[i];
+    /* anomalie consumo */
+    let anomaliaConsumo=null;
+    let miglioramentoConsumo=null;
+    if(listaConsumi.length>=3){
+        let ultimoConsumo=listaConsumi[0];
+        let somma=0;
+        for(let i=1;i<listaConsumi.length;i++)
+            somma+=listaConsumi[i];
 
-		let media=somma/(listaConsumi.length-1);
-		if(media>0){
-			let diff=((ultimoConsumo-media)/media)*100;
-			if(diff<-15)
-				anomaliaConsumo=Math.round(Math.abs(diff));
-			if(diff>10)
-				miglioramentoConsumo=Math.round(diff);
-		}
-	}
+        let media=somma/(listaConsumi.length-1);
+        if(media>0){
+            let diff=((ultimoConsumo-media)/media)*100;
+            if(diff<-15)
+                anomaliaConsumo=Math.round(Math.abs(diff));
+            if(diff>10)
+                miglioramentoConsumo=Math.round(diff);
+        }
+    }
 
-	/* anomalia prezzo */
-	let anomaliaPrezzo=null;
-	if(listaPrezzi.length>=5){
-		let ultimoPrezzo=listaPrezzi[0];
-		let somma=0;
-		for(let i=1;i<listaPrezzi.length;i++)
-			somma+=listaPrezzi[i];
+    /* anomalia prezzo */
+    let anomaliaPrezzo=null;
+    if(listaPrezzi.length>=5){
+        let ultimoPrezzo=listaPrezzi[0];
+        let somma=0;
+        for(let i=1;i<listaPrezzi.length;i++)
+            somma+=listaPrezzi[i];
 
-		let media=somma/(listaPrezzi.length-1);
-		let diff=((ultimoPrezzo-media)/media)*100;
-		if(diff>10)
-			anomaliaPrezzo=Math.round(diff);
-	}
+        let media=somma/(listaPrezzi.length-1);
+        let diff=((ultimoPrezzo-media)/media)*100;
+        if(diff>10)
+            anomaliaPrezzo=Math.round(diff);
+    }
 
-	return{
-		consumoMedio,
-		migliorConsumo,
-		peggiorConsumo,
+    return{
+        consumoMedio,
+        migliorConsumo,
+        peggiorConsumo,
 
-		estateMedia,
-		invernoMedia,
+        estateMedia,
+        invernoMedia,
 
-		spesaMese,
+        spesaMese,
 
-		costoKm,
-		costo100km,
+        costoKm,
+        costo100km,
 
-		autonomia,
+        autonomia,
 
-		anomaliaConsumo,
-		miglioramentoConsumo,
-		anomaliaPrezzo
-	};
+        anomaliaConsumo,
+        miglioramentoConsumo,
+        anomaliaPrezzo
+    };
 }
 
 function mediaMobileConsumi(listaConsumi, windowSize=5){
-	let result=[];
-	for(let i=0;i<listaConsumi.length;i++){
-		if(i < windowSize-1){
-			result.push(null);
-			continue;
-		}
+    let result=[];
+    for(let i=0;i<listaConsumi.length;i++){
+        if(i < windowSize-1){
+            result.push(null);
+            continue;
+        }
 
-		let somma=0;
-		let count=0;
-		for(let j=0;j<windowSize;j++){
-			let val = listaConsumi[i-j];
-			if(val!==null && val!==undefined){
-				somma += val;
-				count++;
-			}
-		}
+        let somma=0;
+        let count=0;
+        for(let j=0;j<windowSize;j++){
+            let val = listaConsumi[i-j];
+            if(val!==null && val!==undefined){
+                somma += val;
+                count++;
+            }
+        }
 
-		if(count>0){
-			result.push(
-				Number((somma/count).toFixed(2))
-			);
-		}else{
-			result.push(null);
-		}
-	}
-	return result;
+        if(count>0){
+            result.push(
+                Number((somma/count).toFixed(2))
+            );
+        }else{
+            result.push(null);
+        }
+    }
+    return result;
 }
 
 export function renderStats(appDiv, fuelList, stats){
@@ -309,9 +310,9 @@ export function renderStats(appDiv, fuelList, stats){
         if(s.data){
             let d = new Date(s.data);
             chartLabels.push(
-	            d.toLocaleDateString("it-IT",{day:"numeric",month:"short"}) +
-	            " " +
-	            d.toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})
+                d.toLocaleDateString("it-IT",{day:"numeric",month:"short"}) +
+                " " +
+                d.toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"})
             );
             chartData.push(
                 s.consumo ? Number(s.consumo.toFixed(2)) : null
@@ -341,7 +342,7 @@ export function renderStats(appDiv, fuelList, stats){
             }
         }
     }
-    
+   
     let estateMedia = countEstate ? consumoEstate/countEstate : null;
     let invernoMedia = countInverno ? consumoInverno/countInverno : null;
     if(stats.autonomia){
@@ -352,11 +353,11 @@ export function renderStats(appDiv, fuelList, stats){
     if(chartData.length > 0 && typeof Chart !== "undefined"){
         const ctx = document.getElementById("fuelChart");
         if(ctx){
-            if(fuelChart){
+            if(fuelChart && typeof fuelChart.destroy === "function"){
                 fuelChart.destroy();
             }
 
-            fuelChart = new Chart(ctx,{
+            setFuelChart(new Chart(ctx,{
                 type:"line",
 
                 data:{
@@ -418,11 +419,11 @@ export function renderStats(appDiv, fuelList, stats){
                     },
                     scales:{
                         y1:{
-	                        position:"left",
-	                        beginAtZero:false,
-	                        ticks:{
-		                        maxTicksLimit:6
-	                            }
+                            position:"left",
+                            beginAtZero:false,
+                            ticks:{
+                                maxTicksLimit:6
+                                }
                         },
                         y2:{
                             position:"right",
@@ -433,7 +434,7 @@ export function renderStats(appDiv, fuelList, stats){
                         }
                     }
                 }
-            });
+            }));
         }
     }
 
