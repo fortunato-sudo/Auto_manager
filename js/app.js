@@ -172,11 +172,17 @@ async function preloadDB(){
         setRendering(false);
         const splash = document.getElementById("splash");
         if(splash){
-            splash.style.transform="scale(1.12)";
-            splash.style.opacity="0";
+            const elapsed = Date.now() - splashStart;
+            const delay = Math.max(2000 - elapsed, 0);
+            
             setTimeout(()=>{
-                splash.remove();
-            },400);
+                splash.style.transform="scale(1.12)";
+                splash.style.opacity="0";
+        
+                setTimeout(()=>{
+                    splash.remove();
+                },400);
+            }, delay);
         }
     }
 }
