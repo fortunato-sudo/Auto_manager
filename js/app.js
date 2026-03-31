@@ -86,18 +86,15 @@ async function preloadDB(){
         }
 
         let manutList = cacheManut || [];
-        if((tab==="home" || tab==="manut" || tab==="dettaglio") && !manutList){
-            const manut = await getDocs(collection(db,"manutenzioni"));
-            let tempManut = [];
-            manut.forEach(docSnap=>{
-                tempManut.push({
-                    id:docSnap.id,
-                    data:docSnap.data()
-                });
-            });
-            setCacheManut(tempManut);
-            manutList = tempManut;
-
+        if(tab==="home" || tab==="manut" || tab==="dettaglio"){
+            if(!manutList){
+                const snap = await getDocs(collection(db,"manutenzioni"));
+                manutList = snap.docs.map(doc=>({
+                    id:doc.id,
+                    data:doc.data()
+                }));
+                setCacheManut(manutList);
+            }
             /* sort solo una volta */
             tempManut.sort((a,b)=>{
                 let statoA = calcolaStato(a.data, cacheConfig);
