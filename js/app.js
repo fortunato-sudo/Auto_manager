@@ -116,6 +116,10 @@ async function preloadDB(){
         }
 
         switch(tab){
+            default:
+                renderHome(appDiv, km, manutList, stats);
+            break;
+                
             case "home":
                 renderHome(appDiv, km, manutList, stats);
             break;
