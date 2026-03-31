@@ -196,6 +196,7 @@ window.salvaManutenzione = async function(){
     });
     setCacheManut(null);
     setTab("manut");
+    render();
 }
 
 window.segnaFatto = async function(){
