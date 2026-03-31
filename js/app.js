@@ -60,7 +60,7 @@ async function preloadDB(){
     }
 }
 
-async function render(){
+ function render(){
     if(rendering) return;
     setRendering(true);
     try{
@@ -85,7 +85,7 @@ async function render(){
             setCacheConfig(km);
         }
 
-        let manutList = cacheManut;
+        let manutList = cacheManut || [];
         if((tab==="home" || tab==="manut" || tab==="dettaglio") && !manutList){
             const manut = await getDocs(collection(db,"manutenzioni"));
             let tempManut = [];
@@ -185,8 +185,11 @@ document.addEventListener("DOMContentLoaded", () => {
     (async ()=>{
         try{
             await preloadDB();
+            if(!cacheManut) setCacheManut([]);
+            if(!cacheFuel) setCacheFuel([]);
+            if(cacheConfig===null) setCacheConfig(0);
         }catch(e){
-            console.warn("Preload fallito, continuo comunque", e);
+            console.warn("Preload fallito", e);
         }
         render();
     })();
