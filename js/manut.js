@@ -287,6 +287,7 @@ export function calcolaStato(m, kmAttuali){
 }
 
 window.apriDettaglio=function(id){
+    setTabPrecedente(tab);
     let item = cacheManut.find(m=>m.id===id);
     if(item){
         setDettaglioManut(item.data);
