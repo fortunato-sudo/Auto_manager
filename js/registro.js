@@ -14,12 +14,13 @@ export async function renderRegistro(appDiv){
     
     let storicoList = [];
     if(!cacheRegistro){
-    	const snap = await getDocs(collection(db,"registro"));
-    	cacheRegistro = snap.docs.map(doc=>({
-	    	id:doc.id,
-	    	data:doc.data()
-	    }));
-    }
+		const snap = await getDocs(collection(db,"registro"));
+		const temp = snap.docs.map(doc=>({
+			id:doc.id,
+			data:doc.data()
+		}));
+	setCacheRegistro(temp);
+	}
     storicoList = cacheRegistro;
     
     storico.forEach(docSnap=>{
