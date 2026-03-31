@@ -1,6 +1,6 @@
 import { db, collection, getDocs, addDoc, setDoc, deleteDoc, doc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
-import { formatDate, formatKm } from "./utils.js";
+import { formatDateOnly, formatKm } from "./utils.js";
 import { cacheManut, cacheRegistro, setCacheRegistro ,setTab } from "./state.js";
 
 export async function renderRegistro(appDiv){
@@ -36,7 +36,7 @@ export async function renderRegistro(appDiv){
                     </div>
 
                     <div class="manutFreq">
-                            ${formatDate(s.data.data)} | ${formatKm(s.data.km)} km
+                            ${formatDateOnly(s.data.data)} | ${formatKm(s.data.km)} km
                     </div>
                     ${s.data.officina ? `<div class="manutFreq">Officina: ${s.data.officina}</div>` : ""}
                     ${s.data.note ? `<div class="manutFreq">Note: ${s.data.note}</div>` : ""}
