@@ -351,5 +351,6 @@ window.eliminaManutenzione=async function(){
         await deleteDoc(doc(db,"manutenzioni",dettaglioId));
         setCacheManut(null);
         setTab("manut");
+        render();
     }
 }
