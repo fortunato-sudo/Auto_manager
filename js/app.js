@@ -170,6 +170,7 @@ async function preloadDB(){
     }
     finally{
         setRendering(false);
+        if(!document.getElementById("app")) return;
         const splash = document.getElementById("splash");
         if(splash){
             const elapsed = Date.now() - splashStart;
