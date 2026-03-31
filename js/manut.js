@@ -15,18 +15,20 @@ export function renderManutList(manutList, km){
     manutList = [...manutList].sort((a,b)=>{
         let statoA = calcolaStato(a.data,km);
         let statoB = calcolaStato(b.data,km);
+        
         const ordine = {
             urgente:0,
             imminente:1,
             ok:2
         };
-            
+        
         if(ordine[statoA.stato] !== ordine[statoB.stato]){
             return ordine[statoA.stato] - ordine[statoB.stato];
         }
-        let kmA = statoA.nextKm ?? Infinity;
-        let kmB = statoB.nextKm ?? Infinity;
-        return kmA - kmB;
+        
+        let scadA = statoA.nextKm ?? Infinity;
+        let scadB = statoB.nextKm ?? Infinity;
+        return scadA - scadB;
     });
     
     let htmlHome="";
