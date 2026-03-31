@@ -98,6 +98,7 @@ window.salvaRegistro = async function(){
 
     /* salva nel registro */
     await addDoc(collection(db,"registro"),{
+        vehicleId:"default",
         manutenzione:nome,
         km:Number(km),
         data:data,
