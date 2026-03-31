@@ -170,6 +170,7 @@ window.aggiungiManutenzione=function(){
     let prodotto=parts[3];
 
     addDoc(collection(db,"manutenzioni"),{
+        vehicleId:"default",
         nome:nomeMan,
         frequenza_km:Number(km),
         frequenza_mesi:Number(mesi),
