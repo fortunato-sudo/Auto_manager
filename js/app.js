@@ -170,6 +170,14 @@ async function preloadDB(){
     }
     finally{
         setRendering(false);
+        const splash = document.getElementById("splash");
+        if(splash){
+            splash.style.transform="scale(1.12)";
+            splash.style.opacity="0";
+            setTimeout(()=>{
+                splash.remove();
+            },400);
+        }
     }
 }
 
@@ -194,20 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
         render();
     })();
     document.body.classList.remove("loading");
-
-    /* splash indipendente dal render */
-    setTimeout(()=>{
-        const splash=document.getElementById("splash");
-        if(splash){
-            /* animazione stile Tesla */
-            splash.style.transform="scale(1.05)";
-            splash.style.opacity="0";
-            setTimeout(()=>{
-                splash.remove();
-            },400);
-        }
-        document.body.classList.remove("loading");
-    },1800);
 
     /* swipe menu */
     let startX = 0;
