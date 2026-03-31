@@ -7,17 +7,18 @@ export async function getFuelList(){
     if(cacheFuel !== null){
         return cacheFuel;
     }
+
     const snap = await getDocs(collection(db,"fuel"));
-    setCacheFuel(
-        snap.docs.map(doc=>({
-            id:doc.id,
-            data:doc.data()
-        }))
-    );
-    cacheFuel.sort((a,b)=>{
+    let list = snap.docs.map(doc=>({
+        id:doc.id,
+        data:doc.data()
+    }));
+
+    list.sort((a,b)=>{
         return new Date(b.data.data) - new Date(a.data.data);
     });
-    return cacheFuel;
+    setCacheFuel(list);
+    return list;
 }
 
 window.calcolaFuel = function(campo){
