@@ -107,7 +107,7 @@ window.salvaFuel = async function(){
 
 window.modificaFuel = function(id){
     fuelEditId = id;
-    tab = "fuelAdd";
+    setTab("fuelAdd");
     render();
 }
 
