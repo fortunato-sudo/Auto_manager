@@ -195,8 +195,8 @@ window.salvaManutenzione = async function(){
         immagine:img
     });
     setCacheManut(null);
-    setTab("manut");
     render();
+    setTab("manut");
 }
 
 window.segnaFatto = async function(){
