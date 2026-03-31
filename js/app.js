@@ -173,7 +173,7 @@ async function preloadDB(){
         const splash = document.getElementById("splash");
         if(splash){
             const elapsed = Date.now() - splashStart;
-            const delay = Math.max(2000 - elapsed, 0);
+            const delay = Math.max(1800 - elapsed, 0);
             
             setTimeout(()=>{
                 splash.style.transform="scale(1.12)";
