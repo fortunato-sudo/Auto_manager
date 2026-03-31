@@ -87,16 +87,17 @@ async function preloadDB(){
 
         let manutList = cacheManut;
         if((tab==="home" || tab==="manut" || tab==="dettaglio") && cacheManut===null){
-            if(!manutList){
-                const snap = await getDocs(collection(db,"manutenzioni"));
-                manutList = snap.docs.map(doc=>({
-                    id:doc.id,
-                    data:doc.data()
-                }));
-                setCacheManut(manutList);
-            }
-            /* sort solo una volta */
-            tempManut.sort((a,b)=>{
+            const snap = await getDocs(collection(db,"manutenzioni"));
+            manutList = snap.docs.map(doc=>({
+                id:doc.id,
+                data:doc.data()
+            }));
+            setCacheManut(manutList);
+        }
+
+        /* sort */
+        if(manutList){
+            manutList.sort((a,b)=>{
                 let statoA = calcolaStato(a.data, cacheConfig);
                 let statoB = calcolaStato(b.data, cacheConfig);
                 const ordine = {
