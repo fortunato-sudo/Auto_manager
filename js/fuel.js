@@ -90,6 +90,7 @@ window.salvaFuel = async function(){
         fuelEditId=null;
     }else{
         await addDoc(collection(db,"fuel"),{
+			vehicleId:"default",
             totale,
             litro,
             litri,
