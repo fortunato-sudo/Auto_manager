@@ -22,13 +22,6 @@ export async function renderRegistro(appDiv){
 	setCacheRegistro(temp);
 	}
     storicoList = cacheRegistro;
-    
-    storico.forEach(docSnap=>{
-        storicoList.push({
-            id:docSnap.id,
-            data:docSnap.data()
-        });
-    });
 
     storicoList.sort((a,b)=>{
         return new Date(b.data.data) - new Date(a.data.data);
