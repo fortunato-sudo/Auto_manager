@@ -1,7 +1,7 @@
 import { db, collection, getDocs, addDoc, setDoc, deleteDoc, doc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDateOnly, formatKm } from "./utils.js";
-import { cacheManut, cacheRegistro, setCacheRegistro ,setTab } from "./state.js";
+import { cacheManut, setCacheManut, cacheRegistro, setCacheRegistro ,setTab } from "./state.js";
 
 export async function renderRegistro(appDiv){
     appDiv.innerHTML+=`
