@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { 
 	getFirestore,
 	initializeFirestore,
-	memoryLocalCache,
+	persistentLocalCache,
 	collection,
 	getDocs,
 	getDoc,
@@ -22,7 +22,7 @@ const app = initializeApp(firebaseConfig);
 
 /* Firestore molto più veloce su mobile */
 const db = initializeFirestore(app,{
-	localCache: memoryLocalCache()
+	localCache: persistentLocalCache()
 });
 
 export {
