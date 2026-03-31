@@ -106,19 +106,7 @@ window.salvaRegistro = async function(){
         data:data,
         officina:officina,
         note:note
-    });
-
-	if(cacheRegistro){
-    	cacheRegistro.unshift({
-        	data:{
-	            manutenzione:nome,
-	            km:Number(km),
-	            data:data,
-	            officina:officina,
-	            note:note
-	        }
-    	});
-	}
+    })
 
     /* aggiorna la manutenzione */
     cacheManut.forEach(async m=>{
@@ -131,7 +119,7 @@ window.salvaRegistro = async function(){
     });
     setCacheManut(null);
     setTab("registro");
-    render();
+    await render();
 }
 
 window.apriRegistro = async function(id){
