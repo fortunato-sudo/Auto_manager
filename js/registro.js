@@ -108,6 +108,18 @@ window.salvaRegistro = async function(){
         note:note
     });
 
+	if(cacheRegistro){
+    	cacheRegistro.unshift({
+        	data:{
+	            manutenzione:nome,
+	            km:Number(km),
+	            data:data,
+	            officina:officina,
+	            note:note
+	        }
+    	});
+	}
+
     /* aggiorna la manutenzione */
     cacheManut.forEach(async m=>{
         if(m.data.nome===nome){
