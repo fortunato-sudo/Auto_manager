@@ -190,12 +190,9 @@ document.addEventListener("DOMContentLoaded", () => {
     if(localStorage.getItem("darkMode")==="true"){
         document.body.classList.add("dark");
     }
-    (async ()=>{
+    (async function(){
         try{
             await preloadDB();
-            if(!cacheManut) setCacheManut([]);
-            if(!cacheFuel) setCacheFuel([]);
-            if(cacheConfig===null) setCacheConfig(0);
         }catch(e){
             console.warn("Preload fallito", e);
         }
