@@ -114,6 +114,7 @@ window.salvaRegistro = async function(){
             },{merge:true});
         }
     });
+    setCacheManut(null);
     setTab("registro");
     render();
 }
