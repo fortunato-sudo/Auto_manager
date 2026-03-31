@@ -48,7 +48,7 @@ export function renderManutList(manutList, km){
             m.frequenza_mesi > 0
         ){
             scadenzaTesto =
-            `${formatDate(stato.nextDate)} | ${formatKm(kmMancanti)} km rimasti`;
+            `${formatDateOnly(stato.nextDate)} | ${formatKm(kmMancanti)} km rimasti`;
 
         }
 
@@ -65,7 +65,7 @@ export function renderManutList(manutList, km){
             m.frequenza_mesi > 0
         ){
             scadenzaTesto =
-            formatDate(stato.nextDate);
+            formatDateOnly(stato.nextDate);
         }
 
         let periodicita = "";
@@ -318,11 +318,11 @@ export function renderDettaglio(appDiv, m, km){
         <div class="group">
             <div class="row">
                 <div>Ultimo intervento</div>
-                <div>${formatDate(m.ultima_data)} | ${formatKm(m.ultimo_km)} km</div>
+                <div>${formatDateOnly(m.ultima_data)} | ${formatKm(m.ultimo_km)} km</div>
             </div>
             <div class="row">
                 <div>Prossimo intervento</div>
-                <div>${formatDate(stato.nextDate)} | ${formatKm(stato.nextKm)} km</div>
+                <div>${formatDateOnly(stato.nextDate)} | ${formatKm(stato.nextKm)} km</div>
             </div>
             <div class="row productLabel">
                 <div>Prodotto:</div>
