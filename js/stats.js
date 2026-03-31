@@ -350,7 +350,7 @@ export function renderStats(appDiv, fuelList, stats){
         formatNumero(stats.autonomia,0)+" km";
     }
 
-    if(chartData.length > 0 && typeof Chart !== "undefined"){
+    if(chartData.length > 0 && window.Chart){
         const ctx = document.getElementById("fuelChart");
         if(ctx){
             if(fuelChart && typeof fuelChart.destroy === "function"){
