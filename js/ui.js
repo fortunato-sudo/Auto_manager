@@ -47,16 +47,13 @@ window.nav=function(t){
         setTabPrecedente(tab);
     }
     setTab(t);
-   
+
     const menu = document.getElementById("menuDrawer");
     const overlay = document.getElementById("menuOverlay");
-    if(menu){
-        menu.classList.remove("menuOpen");
-    }
+    if(menu) menu.classList.remove("menuOpen");
+    if(overlay) overlay.classList.remove("menuOverlayOpen");
 
-    if(overlay){
-        overlay.classList.remove("menuOverlayOpen");
-    }
     document.body.classList.remove("menuOpen");
+
     render();
 }
