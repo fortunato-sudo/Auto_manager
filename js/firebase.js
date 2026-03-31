@@ -1,7 +1,8 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
 	getFirestore,
-	enableIndexedDbPersistence,
+	initializeFirestore,
+	memoryLocalCache,
 	collection,
 	getDocs,
 	getDoc,
@@ -17,14 +18,12 @@ const firebaseConfig={
     projectId:"auto-manutenzione"
 };
 
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+const app = initializeApp(firebaseConfig);
 
-try{
-	enableIndexedDbPersistence(db).catch(()=>{});
-}catch(err){
-	console.warn("Offline persistence non disponibile", err);
-}
+/* Firestore molto più veloce su mobile */
+const db = initializeFirestore(app,{
+	localCache: memoryLocalCache()
+});
 
 export {
 	db,
