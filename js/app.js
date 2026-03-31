@@ -60,7 +60,7 @@ async function preloadDB(){
     }
 }
 
- function render(){
+ async function render(){
     if(rendering) return;
     setRendering(true);
     try{
