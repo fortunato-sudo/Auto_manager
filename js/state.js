@@ -1,8 +1,8 @@
 export let dbCache={
-	fuel:null,
-	manut:null,
-	config:null,
-	registro:null
+    fuel:null,
+    manut:null,
+    config:null,
+    registro:null
 };
 
 export let tab="home";
@@ -20,6 +20,10 @@ export let cacheRegistro=null;
 
 /* setter */
 
+export function setFuelChart(v){
+    fuelChart = v;
+}
+
 export function setCacheFuel(v){
     cacheFuel = v;
 }
@@ -34,4 +38,20 @@ export function setCacheConfig(v){
 
 export function setTab(v){
     tab = v;
+}
+
+export function setTabPrecedente(v){
+    tabPrecedente = v;
+}
+
+export function setDettaglioManut(v){
+    dettaglioManut = v;
+}
+
+export function setDettaglioId(v){
+    dettaglioId = v;
+}
+
+export function setRendering(v){
+    rendering = v;
 }
