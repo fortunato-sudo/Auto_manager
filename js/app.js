@@ -101,8 +101,19 @@ async function render(){
             tempManut.sort((a,b)=>{
                 let statoA = calcolaStato(a.data, cacheConfig);
                 let statoB = calcolaStato(b.data, cacheConfig);
-                let score = { urgente:0, imminenti:1, ok:2};
-                return score[statoA.stato] - score[statoB.stato];
+                const ordine = {
+                    urgente:0,
+                    imminente:1,
+                    ok:2
+                };
+
+                if(ordine[statoA.stato] !== ordine[statoB.stato]){
+                    return ordine[statoA.stato] - ordine[statoB.stato];
+                }
+
+                let kmA = statoA.nextKm ?? Infinity;
+                let kmB = statoB.nextKm ?? Infinity;
+                return kmA - kmB;
             });
         }
 
