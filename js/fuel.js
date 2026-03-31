@@ -1,23 +1,23 @@
 import { db, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatNumero, formatDate, formatKm, parseNumero, getConsumoClasse } from "./utils.js";
-import { cacheFuel, fuelEditId, setCacheFuel } from "./state.js";
+import { cacheFuel, fuelEditId, setCacheFuel, setTab } from "./state.js";
 
 export async function getFuelList(){
-	if(cacheFuel !== null){
-		return cacheFuel;
-	}
-	const snap = await getDocs(collection(db,"fuel"));
-	setCacheFuel(
+    if(cacheFuel !== null){
+        return cacheFuel;
+    }
+    const snap = await getDocs(collection(db,"fuel"));
+    setCacheFuel(
         snap.docs.map(doc=>({
-		    id:doc.id,
-		    data:doc.data()
-	    }))
+            id:doc.id,
+            data:doc.data()
+        }))
     );
-	cacheFuel.sort((a,b)=>{
-		return new Date(b.data.data) - new Date(a.data.data);
-	});
-	return cacheFuel;
+    cacheFuel.sort((a,b)=>{
+        return new Date(b.data.data) - new Date(a.data.data);
+    });
+    return cacheFuel;
 }
 
 window.calcolaFuel = function(campo){
@@ -58,14 +58,14 @@ window.salvaFuel = async function(){
 
     /* trova rifornimento precedente */
     let ultimoKm=null;
-	cacheFuel.forEach(f=>{
-		let k=Number(f.data.km);
-		if(km > k){
-			if(ultimoKm===null || k>ultimoKm){
-				ultimoKm=k;
-			}
-		}
-	});
+    cacheFuel.forEach(f=>{
+        let k=Number(f.data.km);
+        if(km > k){
+            if(ultimoKm===null || k>ultimoKm){
+                ultimoKm=k;
+            }
+        }
+    });
 
     /* calcola consumo */
     if(!saltoConsumo && ultimoKm !== null && litri){
@@ -112,7 +112,7 @@ window.modificaFuel = function(id){
 window.eliminaFuel = async function(id){
     if(confirm("Eliminare questo rifornimento?")){
         await deleteDoc(doc(db,"fuel",id));
-        cacheFuel=null;
+        setCacheFuel(null);
         render();
     }
 }
@@ -199,9 +199,9 @@ export function renderFuel(appDiv, fuelList, stats){
                         <div class="fuelInfo">
                             🚗 ${formatKm(s.km)} km
                         </div>
-                        ${s.consumo ? 
-                            `<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>` 
-                            : 
+                        ${s.consumo ?
+                            `<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>`
+                            :
                             `<div class="fuelNoConsumo">⚠️ Consumo non calcolato</div>`
                         }
                     </div>
@@ -226,7 +226,7 @@ export function renderFuel(appDiv, fuelList, stats){
 export async function renderFuelAdd(appDiv){
     let titoloFuel = fuelEditId ? "Modifica rifornimento" : "Nuovo rifornimento";
     appDiv.innerHTML+=`
-    	${headerBack(titoloFuel)}
+        ${headerBack(titoloFuel)}
 
         <div class="group">
             <div class="row">
@@ -269,11 +269,12 @@ export async function renderFuelAdd(appDiv){
 
     if(fuelEditId){
         const snap = await getDoc(doc(db,"fuel",fuelEditId));
-        let f = snap.data();
-        document.getElementById("totale").value = f.totale || "";
-        document.getElementById("litro").value = f.litro || "";
-        document.getElementById("litri").value = f.litri || "";
-        document.getElementById("kmFuel").value = f.km || "";
-        document.getElementById("distributore").value = f.distributore || "";
-    }
+
+		let f = snap.data();
+	        document.getElementById("totale").value = f.totale || "";
+	        document.getElementById("litro").value = f.litro || "";
+	        document.getElementById("litri").value = f.litri || "";
+	        document.getElementById("kmFuel").value = f.km || "";
+	        document.getElementById("distributore").value = f.distributore || "";
+	}
 }
