@@ -5,7 +5,6 @@
 	min-height:100vh;
 	padding-top:env(safe-area-inset-top);
 	padding-bottom:env(safe-area-inset-bottom);
-	min-height:100vh;
 }
 
 html,body{
@@ -47,6 +46,7 @@ body:not(.dark) .menuItem{
 	background:black;
 	z-index:9999;
 	opacity:1;
+	will-change:opacity,transform;
 	transition:
 		opacity .4s ease,
 		transform .4s ease;
@@ -117,27 +117,6 @@ body:not(.dark) .menuItem{
 	to{
 		opacity:1;
 		transform:translateY(0);
-	}
-}
-
-.skeleton{
-	background:linear-gradient(
-		90deg,
-		#1b1f26 25%,
-		#242a33 50%,
-		#1b1f26 75%
-	);
-	background-size:200% 100%;
-	animation:skeletonLoading 1.4s infinite;
-	border-radius:12px;
-}
-
-@keyframes skeletonLoading{
-	0%{
-		background-position:200% 0;
-	}
-	100%{
-		background-position:-200% 0;
 	}
 }
 
@@ -233,25 +212,6 @@ body:not(.dark) .menuItem{
     display:flex;
     align-items:center;
     gap:10px;
-}
-
-.skeleton{
-	height:70px;
-	border-radius:14px;
-	background:linear-gradient(
-		90deg,
-		#e5e5ea 25%,
-		#f2f2f7 50%,
-		#e5e5ea 75%
-	);
-	background-size:200% 100%;
-	animation:skeleton 1.4s infinite;
-	margin-bottom:12px;
-}
-
-@keyframes skeleton{
-	0%{background-position:200% 0;}
-	100%{background-position:-200% 0;}
 }
 
 /* DARK BUTTON */
@@ -374,7 +334,6 @@ button{
 
 .progressBar{
     width:50%;
-    max-width:200px;
     height:6px;
     background:#e5e5ea;
     border-radius:6px;
@@ -529,7 +488,7 @@ button{
 .menuDrawer{
 	position:fixed;
 	top:0;
-	left:-260px;
+	transform:translateX(-260px);
 	width:240px;
 	height:100%;
 	background:#1c1c1e;
@@ -540,7 +499,7 @@ button{
 }
 
 .menuOpen{
-	left:0;
+	transform:translateX(0);
 }
 
 body.menuOpen{
