@@ -19,6 +19,10 @@ export function formatDate(d){
         day:"numeric",
         month:"short",
         year:"numeric"
+    }); + " " +
+    date.toLocaleTimeString("it-IT",{
+        hour:"2-digit",
+        minute:"2-digit"
     });
 }
 
