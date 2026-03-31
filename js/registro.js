@@ -46,16 +46,6 @@ export async function renderRegistro(appDiv){
 }
 
 export async function renderRegistroAdd(appDiv){
-    let select=document.getElementById("nomeInt");
-    if(cacheManut){
-        cacheManut.forEach(m=>{
-            select.innerHTML += `
-                <option value="${m.data.nome}">
-                    ${m.data.nome}
-                </option>
-            `;
-        });
-    }      
     appDiv.innerHTML+=`
         ${headerBack("Nuovo intervento")}
 
@@ -85,6 +75,17 @@ export async function renderRegistroAdd(appDiv){
             </div>
         </div>
     `;
+
+    let select=document.getElementById("nomeInt");
+    if(cacheManut){
+        cacheManut.forEach(m=>{
+            select.innerHTML += `
+                <option value="${m.data.nome}">
+                    ${m.data.nome}
+                </option>
+            `;
+        });
+    }      
 }
 
 window.salvaRegistro = async function(){
