@@ -59,7 +59,7 @@ window.salvaFuel = async function(){
 
     /* trova rifornimento precedente */
     let ultimoKm=null;
-    cacheFuel.forEach(f=>{
+    (cacheFuel || []).forEach(f=>{
         let k=Number(f.data.km);
         if(km > k){
             if(ultimoKm===null || k>ultimoKm){
@@ -175,8 +175,9 @@ export function renderFuel(appDiv, fuelList, stats){
             </div>` + fuelBox.innerHTML;
         }
     }
-
+	
     fuelList.forEach(item=>{
+		let html="";
         let s=item.data;
         let id=item.id;
 
@@ -220,8 +221,9 @@ export function renderFuel(appDiv, fuelList, stats){
         `;
         let box = document.getElementById("fuelList");
         if(box){
-            box.innerHTML += row;
+            html += row;
         }
+		box.innerHTML = html;
     });
 }
 
