@@ -118,6 +118,7 @@ window.salvaRegistro = async function(){
         }
     });
     setCacheManut(null);
+	setCacheRegistro(null);
     setTab("registro");
     await render();
 }
@@ -130,7 +131,7 @@ window.apriRegistro = async function(id){
     if(scelta=="2"){
         if(confirm("Eliminare intervento?")){
             await deleteDoc(doc(db,"registro",id));
-            render();
+            await render();
         }
     }
 
@@ -140,6 +141,6 @@ window.apriRegistro = async function(id){
         await setDoc(doc(db,"registro",id),{
             km:Number(nuovoKm)
         },{merge:true});
-        render();
+        await render();
     }
 }
