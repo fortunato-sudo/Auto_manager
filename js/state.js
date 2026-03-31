@@ -36,6 +36,10 @@ export function setCacheConfig(v){
     cacheConfig = v;
 }
 
+export function setCacheRegistro(v){
+	cacheRegistro = v;
+}
+
 export function setTab(v){
     tab = v;
 }
