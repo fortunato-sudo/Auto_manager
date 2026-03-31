@@ -19,9 +19,16 @@ export function renderManutList(manutList, km){
             urgente:0,
             imminente:1,
             ok:2
+        };
+            
+        if(ordine[statoA.stato] !== ordine[statoB.stato]){
+            return ordine[statoA.stato] - ordine[statoB.stato];
         }
-        return ordine[statoA.stato] - ordine[statoB.stato];
+        let kmA = statoA.nextKm ?? Infinity;
+        let kmB = statoB.nextKm ?? Infinity;
+        return kmA - kmB;
     });
+    
     let htmlHome="";
     let htmlManut="";
     manutList.forEach(item=>{
