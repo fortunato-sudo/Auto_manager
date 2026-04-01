@@ -55,14 +55,13 @@ async function preloadDB(){
         );
     }
 
-    if(!cacheRegistro){
+    if(cacheRegistro===null){
         const snap = await getDocs(collection(db,"registro"));
-        setCacheRegistro(
-            snap.docs.map(doc=>({
-                id:doc.id,
-                data:doc.data()
-            }))
-        );
+        const registroList = snap.docs.map(doc=>({
+            id:doc.id,
+            data:doc.data()
+        }));
+        setCacheRegistro(registroList);
     }
 
     /* km auto */
@@ -107,7 +106,7 @@ async function preloadDB(){
             setCacheManut(manutList);
         }
 
-        let registroList = cacheRegistro;
+        let registroList = cacheRegistro || [];
         if(!registroList){
             const snap = await getDocs(collection(db,"registro"));
             registroList = snap.docs.map(doc=>({
