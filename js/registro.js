@@ -98,7 +98,7 @@ window.salvaRegistro = async function(){
 
     let officina = document.getElementById("officinaInt").value;
     let note = document.getElementById("noteInt").value;
-    let data = new Date().toISOString().split("T")[0];
+    let data = new Date().toISOString();
 
     /* salva nel registro */
     await addDoc(collection(db,"registro"),{
