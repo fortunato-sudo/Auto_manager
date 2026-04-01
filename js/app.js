@@ -105,6 +105,32 @@ async function preloadDB(){
             setCacheManut(manutList);
         }
 
+        let registroList = cacheRegistro;
+        if(!registroList){
+            const snap = await getDocs(collection(db,"registro"));
+            registroList = snap.docs.map(doc=>({
+                id:doc.id,
+                data:doc.data()
+            }));
+            setCacheRegistro(registroList);
+        }
+
+        manutList.forEach(m=>{
+            let ultimoKm = 0;
+            let ultimaData = null;
+            
+            registroList.forEach(r=>{
+                if(r.data.manutenzione === m.data.nome){
+                    if(r.data.km > ultimoKm){
+                        ultimoKm = r.data.km;
+                        ultimaData = r.data.data;
+                    }
+                }
+            });
+            m.data.ultimo_km = ultimoKm;
+            m.data.ultima_data = ultimaData;
+        });
+
         /* sort */
         if(manutList){
             manutList.sort((a,b)=>{
