@@ -20,10 +20,6 @@ export async function getFuelList(){
         id:doc.id,
         data:doc.data()
     }));
-
-    list.sort((a,b)=>{
-        return new Date(b.data.data) - new Date(a.data.data);
-    });
     setCacheFuel(list);
     return list;
 }
