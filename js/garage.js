@@ -17,7 +17,9 @@ function getVehicleIcon(nome){
 
 export async function renderGarage(appDiv){
   appDiv.innerHTML = `
-    ${headerMenu("Garage")}
+    <div class="garageHeader">
+      Garage
+    </div>
     <div id="garageList"></div>
   `;
   
@@ -37,6 +39,7 @@ export async function renderGarage(appDiv){
     let urgenti = 0;
     let imminenti = 0;
     let prossimoKm = Infinity;
+    let totaleAlert = urgenti + imminenti;
     manutList.forEach(m=>{
       const stato = calcolaStato(m.data, km);
       if(stato.stato === "urgente") urgenti++;
@@ -80,7 +83,16 @@ export async function renderGarage(appDiv){
       <div class="vehicleCard" onclick="entraVeicolo('${id}')">
 
         <div class="vehicleTitle">
-          ${getVehicleIcon(v.nome)} ${v.nome}
+          <span class="vehicleIcon">
+            ${getVehicleIcon(v.nome)}
+          </span>
+
+          ${v.nome}
+          ${
+            totaleAlert > 0
+            ? `<span class="vehicleBadge">${totaleAlert}</span>`
+            : ""
+          }
         </div>
 
         <div class="vehicleKm">
