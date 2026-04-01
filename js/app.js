@@ -118,22 +118,23 @@ async function preloadDB(){
         }
         registroList = registroList || [];
 
-        manutList.forEach(m=>{
-            let ultimoKm = 0;
-            let ultimaData = null;
-            
-            registroList.forEach(r=>{
-                if(r.data.manutenzione === m.data.nome){
-                    if(r.data.km > ultimoKm){
-                        ultimoKm = r.data.km;
-                        ultimaData = r.data.data;
-                    }
-                }
-            });
-            m.data.ultimo_km = ultimoKm;
-            m.data.ultima_data = ultimaData;
+        const lastManut = {};
+        registroList.forEach(r=>{
+            const nome = r.data.manutenzione;
+            if(!lastManut[nome] || r.data.km > lastManut[nome].km){
+                lastManut[nome] = {
+                    km:r.data.km,
+                    data:r.data.data
+                };
+            }
         });
 
+        manutList.forEach(m=>{
+            const last = lastManut[m.data.nome];
+            m.data.ultimo_km = last?.km || 0;
+            m.data.ultima_data = last?.data || null;
+        });
+        
         /* sort */
         if(manutList){
             manutList.sort((a,b)=>{
@@ -211,6 +212,7 @@ async function preloadDB(){
     }
     finally{
         setRendering(false);
+        document.body.classList.remove("loading");
         if(!document.getElementById("app")) return;
         const splash = document.getElementById("splash");
         if(splash){
@@ -246,7 +248,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         render();
     })();
-    document.body.classList.remove("loading");
 
     /* swipe menu */
     let startX = 0;
