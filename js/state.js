@@ -18,6 +18,8 @@ export let cacheManut=null;
 export let cacheConfig=null;
 export let cacheRegistro=null;
 
+export let vehicleId = "qashqai";
+
 /* setter */
 
 export function setFuelChart(v){
@@ -58,4 +60,8 @@ export function setDettaglioId(v){
 
 export function setRendering(v){
     rendering = v;
+}
+
+export function setVehicleId(v){
+	vehicleId = v;
 }
