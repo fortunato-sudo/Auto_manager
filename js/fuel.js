@@ -1,4 +1,4 @@
-import { db, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc } from "./firebase.js";
+import { db, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc, query, orderBy, limit } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatNumero, formatDate, formatKm, parseNumero, getConsumoClasse } from "./utils.js";
 import { cacheFuel, fuelEditId, setCacheFuel, setTab } from "./state.js";
@@ -8,7 +8,14 @@ export async function getFuelList(){
         return cacheFuel;
     }
 
-    const snap = await getDocs(collection(db,"fuel"));
+    const snap = await getDocs(
+	    query(
+	        collection(db,"fuel"),
+	        orderBy("data","desc"),
+	        limit(200)
+	    )
+	);
+	
     let list = snap.docs.map(doc=>({
         id:doc.id,
         data:doc.data()
