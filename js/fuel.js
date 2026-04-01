@@ -10,7 +10,7 @@ export async function getFuelList(){
 
     const snap = await getDocs(
 	    query(
-	        collection(db,"fuel"),
+	        collection(db,"vehicles",vehicleId,"fuel"),
 	        orderBy("data","desc"),
 	        limit(200)
 	    )
@@ -92,7 +92,7 @@ window.salvaFuel = async function(){
         },{merge:true});
         fuelEditId=null;
     }else{
-        await addDoc(collection(db,"fuel"),{
+        await addDoc(collection(db,"vehicles",vehicleId,"fuel"),{
 			vehicleId:"default",
             totale,
             litro,
