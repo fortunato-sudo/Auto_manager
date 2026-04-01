@@ -229,27 +229,23 @@ body:not(.dark) .menuItem{
 
 /* VEICOLI */
 .vehicleCard{
-	background:#fff;
-	border-radius:14px;
-	padding:16px;
+	background:var(--card);
+	border-radius:16px;
+	padding:18px;
 	margin:12px 16px;
-	box-shadow:0 2px 6px rgba(0,0,0,0.08);
-}
-
-.dark .vehicleCard{
-	background:#1c1c1e;
+	box-shadow:0 6px 18px rgba(0,0,0,0.08);
 }
 
 .vehicleTitle{
-	font-size:18px;
+	font-size:19px;
 	font-weight:600;
-	margin-bottom:4px;
+	margin-bottom:6px;
 }
 
 .vehicleKm{
 	font-size:15px;
-	opacity:0.8;
-	margin-bottom:6px;
+	opacity:0.7;
+	margin-bottom:8px;
 }
 
 .vehicleTagliando{
@@ -259,6 +255,33 @@ body:not(.dark) .menuItem{
 
 .vehicleInterventi{
 	font-size:14px;
+	display:flex;
+	gap:8px;
+	margin-top:4px;
+}
+
+.badgeUrgente{
+	background:#ff3b30;
+	color:white;
+	padding:4px 8px;
+	border-radius:8px;
+	font-size:13px;
+	font-weight:600;
+}
+
+.badgeImminente{
+	background:#ff9500;
+	color:white;
+	padding:4px 8px;
+	border-radius:8px;
+	font-size:13px;
+	font-weight:600;
+}
+
+.badgeOk{
+	color:#34c759;
+	font-size:14px;
+	font-weight:500;
 }
 
 /* WIDGETS */
