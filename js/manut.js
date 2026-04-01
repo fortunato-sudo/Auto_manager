@@ -1,7 +1,18 @@
 import { db, collection, addDoc, setDoc, doc, deleteDoc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDate, formatDateOnly, formatKm } from "./utils.js";
-import { tab, cacheManut, dettaglioManut, dettaglioId, setTab, setDettaglioManut, setDettaglioId, setCacheManut, setTabPrecedente } from "./state.js";
+import { 
+    tab, 
+    cacheManut, 
+    dettaglioManut, 
+    dettaglioId, 
+    setTab, 
+    setDettaglioManut, 
+    setDettaglioId, 
+    setCacheManut, 
+    setTabPrecedente, 
+    vehicleId 
+} from "./state.js";
 
 export function renderManut(appDiv){
     appDiv.innerHTML+=`
