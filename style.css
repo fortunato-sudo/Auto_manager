@@ -208,6 +208,12 @@ body:not(.dark) .menuItem{
 	border-radius:12px;
 }
 
+.garageHeader{
+	font-size:26px;
+	font-weight:700;
+	padding:20px 20px 10px;
+}
+
 .title{
     display:flex;
     align-items:center;
@@ -229,17 +235,34 @@ body:not(.dark) .menuItem{
 
 /* VEICOLI */
 .vehicleCard{
-	background:var(--card);
+	background:#ffffff;
 	border-radius:16px;
 	padding:18px;
 	margin:12px 16px;
 	box-shadow:0 6px 18px rgba(0,0,0,0.08);
+	transition:background .2s;
 }
 
 .vehicleTitle{
-	font-size:19px;
+	display:flex;
+	align-items:center;
+	gap:8px;
+	font-size:18px;
 	font-weight:600;
 	margin-bottom:6px;
+}
+
+.vehicleIcon{
+font-size:20px;
+}
+
+.vehicleBadge{
+	background:#ff3b30;
+	color:white;
+	font-size:12px;
+	font-weight:600;
+	padding:2px 7px;
+	border-radius:10px;
 }
 
 .vehicleKm{
@@ -258,6 +281,25 @@ body:not(.dark) .menuItem{
 	display:flex;
 	gap:8px;
 	margin-top:4px;
+}
+
+
+.dark .vehicleCard{
+	background:#1c1c1e;
+	box-shadow:none;
+	border:1px solid #2c2c2e;
+}
+
+.dark .vehicleKm{
+	color:#b0b0b5;
+}
+
+.dark .vehicleTagliando{
+	color:#e0e0e0;
+}
+
+.dark .vehicleInterventi{
+	color:#e0e0e0;
 }
 
 .badgeUrgente{
@@ -590,6 +632,22 @@ body.menuOpen{
 .menuOverlayOpen{
 	opacity:1;
 	pointer-events:auto;
+}
+
+.menuGarage{
+	font-weight:600;
+	font-size:17px;
+	padding:14px 16px;
+}
+
+.menuDivider{
+	height:1px;
+	background:#e5e5ea;
+	margin:6px 0 10px;
+}
+
+.dark .menuDivider{
+	background:#2c2c2e;
 }
 
 /* NAV BAR */
