@@ -1,4 +1,4 @@
-import { db, collection, getDocs, doc, setDoc } from "./firebase.js";
+import { db, collection, getDocs, doc, setDoc } from "./js/firebase.js";
 
 async function migrateCollection(oldName, newPath){
 
