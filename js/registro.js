@@ -15,7 +15,7 @@ export async function renderRegistro(appDiv){
     let storicoList = cacheRegistro;
 
 	if(!storicoList){
-    	const snap = await getDocs(collection(db,"registro"));
+    	const snap = await getDocs(collection(db,"vehicles",vehicleId,"registro"));
     	storicoList = snap.docs.map(doc=>({
         	id:doc.id,
         	data:doc.data()
@@ -101,7 +101,7 @@ window.salvaRegistro = async function(){
     let data = new Date().toISOString();
 
     /* salva nel registro */
-    await addDoc(collection(db,"registro"),{
+    await addDoc(collection(db,"vehicles",vehicleId,"registro"),{
         vehicleId:"default",
         manutenzione:nome,
         km:Number(km),
@@ -138,7 +138,7 @@ window.apriRegistro = async function(id){
 			await deleteDoc(doc(db,"registro",id));
 
 		    /* trova ultimo intervento rimasto */
-		    const storico = await getDocs(collection(db,"registro"));
+		    const storico = await getDocs(collection(db,"vehicles",vehicleId,"registro"));
 		    let ultimoKm = 0;
 		    let ultimaData = null;
 		    storico.forEach(d=>{
