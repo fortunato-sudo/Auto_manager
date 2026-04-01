@@ -12,16 +12,16 @@ export async function renderRegistro(appDiv){
         <div id="registro"></div>
     `;
     
-    let storicoList = [];
-    if(!cacheRegistro){
-		const snap = await getDocs(collection(db,"registro"));
-		const temp = snap.docs.map(doc=>({
-			id:doc.id,
-			data:doc.data()
-		}));
-	setCacheRegistro(temp);
+    let storicoList = cacheRegistro;
+
+	if(!storicoList){
+    	const snap = await getDocs(collection(db,"registro"));
+    	storicoList = snap.docs.map(doc=>({
+        	id:doc.id,
+        	data:doc.data()
+    	}));
+    	setCacheRegistro(storicoList);
 	}
-    storicoList = cacheRegistro;
 
     storicoList.sort((a,b)=>{
         return new Date(b.data.data) - new Date(a.data.data);
@@ -91,12 +91,14 @@ export async function renderRegistroAdd(appDiv){
 }
 
 window.salvaRegistro = async function(){
-    let nome=document.getElementById("nomeInt").value;
-    let km=document.getElementById("kmInt").value;
+    let nome = document.getElementById("nomeInt").value;
+    let km = document.getElementById("kmInt").value;
+
     await aggiornaKmAutoSeMaggiore(km);
-    let officina=document.getElementById("officinaInt").value;
-    let note=document.getElementById("noteInt").value;
-    let data=new Date().toISOString().split("T")[0];
+
+    let officina = document.getElementById("officinaInt").value;
+    let note = document.getElementById("noteInt").value;
+    let data = new Date().toISOString().split("T")[0];
 
     /* salva nel registro */
     await addDoc(collection(db,"registro"),{
@@ -106,23 +108,27 @@ window.salvaRegistro = async function(){
         data:data,
         officina:officina,
         note:note
-    })
+    });
+    /* svuota cache registro */
+    setCacheRegistro(null);
 
-    /* aggiorna la manutenzione */
-    cacheManut.forEach(async m=>{
-        if(m.data.nome===nome){
+    /* aggiorna manutenzione */
+    for(const m of cacheManut){
+        if(m.data.nome === nome){
             await setDoc(doc(db,"manutenzioni",m.id),{
                 ultimo_km:Number(km),
                 ultima_data:data
             },{merge:true});
+			
+            /* aggiorna anche cache locale */
+            m.data.ultimo_km = Number(km);
+            m.data.ultima_data = data;
         }
-    });
-    setCacheManut(null);
-	setCacheRegistro(null);
+    }
+    setCacheManut(cacheManut);
     setTab("registro");
     await render();
 }
-
 window.apriRegistro = async function(id){
     let scelta = prompt(
         "1 = Modifica\n2 = Elimina"
