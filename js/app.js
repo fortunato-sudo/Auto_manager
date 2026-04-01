@@ -20,7 +20,8 @@ import {
     setCacheRegistro,
     setCacheConfig,
     setRendering,
-    setTab
+    setTab,
+    vehicleId
 } from "./state.js";
 import "./config.js";
 
@@ -46,7 +47,7 @@ async function preloadDB(){
 
     /* manutenzioni */
     if(!cacheManut){
-        const snap = await getDocs(collection(db,"manutenzioni"));
+        const snap = await getDocs(collection(db,"vehicles",vehicleId,"fuel"));
         setCacheManut(
             snap.docs.map(doc=>({
                 id:doc.id,
@@ -56,7 +57,7 @@ async function preloadDB(){
     }
 
     if(cacheRegistro===null){
-        const snap = await getDocs(collection(db,"registro"));
+        const snap = await getDocs(collection(db,"vehicles",vehicleId,"registro"));
         const registroList = snap.docs.map(doc=>({
             id:doc.id,
             data:doc.data()
@@ -98,7 +99,7 @@ async function preloadDB(){
 
         let manutList = cacheManut;
         if((tab==="home" || tab==="manut" || tab==="dettaglio") && manutList===null){
-            const snap = await getDocs(collection(db,"manutenzioni"));
+            const snap = await getDocs(collection(db,"vehicles",vehicleId,"manutenzioni"));
             manutList = snap.docs.map(doc=>({
                 id:doc.id,
                 data:doc.data()
@@ -109,7 +110,7 @@ async function preloadDB(){
 
         let registroList = cacheRegistro;
         if(registroList===null){
-            const snap = await getDocs(collection(db,"registro"));
+            const snap = await getDocs(collection(db,"vehicles",vehicleId,"registro"));
             registroList = snap.docs.map(doc=>({
                 id:doc.id,
                 data:doc.data()
