@@ -1,7 +1,7 @@
 import { db, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc, query, orderBy, limit } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatNumero, formatDate, formatKm, parseNumero, getConsumoClasse } from "./utils.js";
-import { cacheFuel, fuelEditId, setCacheFuel, setTab } from "./state.js";
+import { cacheFuel, fuelEditId, setCacheFuel, setTab, vehicleId } from "./state.js";
 
 export async function getFuelList(){
     if(cacheFuel !== null){
