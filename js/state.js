@@ -5,7 +5,7 @@ export let dbCache={
     registro:null
 };
 
-export let tab="home";
+export let tab="garage";
 export let dettaglioManut=null;
 export let dettaglioId=null;
 export let tabPrecedente = "home";
