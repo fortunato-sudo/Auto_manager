@@ -13,9 +13,11 @@ import {
     rendering,
     cacheFuel,
     cacheManut,
+    cacheRegistro,
     cacheConfig,
     setCacheFuel,
     setCacheManut,
+    setCacheRegistro,
     setCacheConfig,
     setRendering,
     setTab
