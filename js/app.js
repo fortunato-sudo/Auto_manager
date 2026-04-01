@@ -212,7 +212,6 @@ async function preloadDB(){
     }
     finally{
         setRendering(false);
-        document.body.classList.remove("loading");
         if(!document.getElementById("app")) return;
         const splash = document.getElementById("splash");
         if(splash){
@@ -225,6 +224,7 @@ async function preloadDB(){
         
                 setTimeout(()=>{
                     splash.remove();
+                    document.body.classList.remove("loading");
                 },400);
             }, delay);
         }
