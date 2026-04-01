@@ -81,7 +81,7 @@ window.salvaFuel = async function(){
 
     /* salva */
     if(fuelEditId){
-        await setDoc(doc(db,"fuel",fuelEditId),{
+        await setDoc(doc(db,"vehicles",vehicleId,"fuel",fuelEditId),{
             totale,
             litro,
             litri,
@@ -116,7 +116,7 @@ window.modificaFuel = function(id){
 
 window.eliminaFuel = async function(id){
     if(confirm("Eliminare questo rifornimento?")){
-        await deleteDoc(doc(db,"fuel",id));
+        await deleteDoc(doc(db,"vehicles",vehicleId,"fuel",id));
         setCacheFuel(null);
         render();
     }
@@ -274,7 +274,7 @@ export async function renderFuelAdd(appDiv){
     `;
 
     if(fuelEditId){
-        const snap = await getDoc(doc(db,"fuel",fuelEditId));
+        const snap = await getDoc(doc(db,"vehicles",vehicleId,"fuel",fuelEditId));
 
 		let f = snap.data();
 	        document.getElementById("totale").value = f.totale || "";
