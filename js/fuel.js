@@ -176,55 +176,54 @@ export function renderFuel(appDiv, fuelList, stats){
         }
     }
 	
-    fuelList.forEach(item=>{
-		let html="";
-        let s=item.data;
-        let id=item.id;
-
-        if(s.consumo){
-        listaConsumi.push(s.consumo);
-        }
-
-        let row = `
-            <div class="manutRow">
-                <div class="manutInfo">
-                    <div class="fuelTitle">
-                        ${formatDate(s.data)} • ${formatNumero(s.totale,2)} €
-                    </div>
-                    ${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
-                    <div class="fuelGrid">
-                        <div class="fuelInfo">
-                            💧 ${formatNumero(s.litro,3)} €/L
-                        </div>
-                        <div class="fuelInfo">
-                            ⛽ ${formatNumero(s.litri,2)} L
-                        </div>
-                        <div class="fuelInfo">
-                            🚗 ${formatKm(s.km)} km
-                        </div>
-                        ${s.consumo ?
-                            `<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>`
-                            :
-                            `<div class="fuelNoConsumo">⚠️ Consumo non calcolato</div>`
-                        }
-                    </div>
-                    <div class="fuelActions">
-                        <button class="btnEdit" onclick="modificaFuel('${id}')">
-                            ✏️ Modifica
-                        </button>
-                        <button class="btnDelete" onclick="eliminaFuel('${id}')">
-                            🗑 Elimina
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        let box = document.getElementById("fuelList");
-        if(box){
-            html += row;
-        }
-		box.innerHTML = html;
-    });
+	let html = "";
+	fuelList.forEach(item=>{
+	    let s=item.data;
+	    let id=item.id;	
+	    if(s.consumo){
+	        listaConsumi.push(s.consumo);
+	    }
+	
+	    let row = `
+	        <div class="manutRow">
+	            <div class="manutInfo">
+	                <div class="fuelTitle">
+	                    ${formatDate(s.data)} • ${formatNumero(s.totale,2)} €
+	                </div>
+	                ${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
+	                <div class="fuelGrid">
+	                    <div class="fuelInfo">
+	                        💧 ${formatNumero(s.litro,3)} €/L
+	                    </div>
+	                    <div class="fuelInfo">
+	                        ⛽ ${formatNumero(s.litri,2)} L
+	                    </div>
+	                    <div class="fuelInfo">
+	                        🚗 ${formatKm(s.km)} km
+	                    </div>
+	                    ${s.consumo ?
+	                        `<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>`
+	                        :
+	                        `<div class="fuelNoConsumo">⚠️ Consumo non calcolato</div>`
+	                    }
+	                </div>
+	                <div class="fuelActions">
+	                    <button class="btnEdit" onclick="modificaFuel('${id}')">
+	                        ✏️ Modifica
+	                    </button>
+	                    <button class="btnDelete" onclick="eliminaFuel('${id}')">
+	                        🗑 Elimina
+	                    </button>
+	                </div>
+	            </div>
+	        </div>
+	    `;
+	    html += row;
+	});
+	let box = document.getElementById("fuelList");
+	if(box){
+	    box.innerHTML = html;
+	}
 }
 
 export async function renderFuelAdd(appDiv){
