@@ -183,7 +183,7 @@ window.aggiungiManutenzione=function(){
     let prodotto=parts[3];
 
     addDoc(collection(db,"vehicles",vehicleId,"manutenzioni"),{
-        vehicleId:"default",
+        vehicleId:vehicleId,
         nome:nomeMan,
         frequenza_km:Number(km),
         frequenza_mesi:Number(mesi),
@@ -199,6 +199,7 @@ window.salvaManutenzione = async function(){
     let img = document.getElementById("imgMan").value;
 
     await addDoc(collection(db,"vehicles",vehicleId,"manutenzioni"),{
+        vehicleId: vehicleId,
         nome:nome,
         frequenza_km:Number(km),
         frequenza_mesi:Number(mesi),
