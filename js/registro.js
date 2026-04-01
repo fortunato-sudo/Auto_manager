@@ -1,4 +1,4 @@
-import { db, collection, getDocs, addDoc, setDoc, deleteDoc, doc } from "./firebase.js";
+import { db, collection, getDocs, getDoc, addDoc, setDoc, deleteDoc, doc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDateOnly, formatKm } from "./utils.js";
 import { cacheManut, setCacheManut, cacheRegistro, setCacheRegistro ,setTab } from "./state.js";
