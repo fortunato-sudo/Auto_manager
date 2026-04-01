@@ -53,6 +53,16 @@ async function preloadDB(){
         );
     }
 
+    if(!cacheRegistro){
+        const snap = await getDocs(collection(db,"registro"));
+        setCacheRegistro(
+            snap.docs.map(doc=>({
+                id:doc.id,
+                data:doc.data()
+            }))
+        );
+    }
+
     /* km auto */
     if(cacheConfig===null){
         const snap = await getDoc(doc(db,"config","auto"));
