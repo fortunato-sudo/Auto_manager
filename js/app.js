@@ -28,10 +28,10 @@ import "./config.js";
 const splashStart = Date.now();
 
 window.aggiornaKmAutoSeMaggiore = async function(kmNuovi){
-    const snap=await getDoc(doc(db,"config","auto"));
+    const snap=await getDoc(doc(db,"vehicles",vehicleId,"config","auto"));
     let kmAttuali=snap.data()?.km_attuali || 0;
     if(kmNuovi > kmAttuali){
-        await setDoc(doc(db,"config","auto"),{
+        await setDoc(doc(db,"vehicles",vehicleId,"config","auto"),{
             km_attuali:Number(kmNuovi)
         });
         /* aggiorna cache */
@@ -67,7 +67,7 @@ async function preloadDB(){
 
     /* km auto */
     if(cacheConfig===null){
-        const snap = await getDoc(doc(db,"config","auto"));
+        const snap = await getDoc(doc(db,"vehicles",vehicleId,"config","auto"));
         setCacheConfig(snap.data()?.km_attuali || 0);
     }
 }
@@ -92,7 +92,7 @@ async function preloadDB(){
 
         let km = cacheConfig;
         if(km===null){
-            const snap = await getDoc(doc(db,"config","auto"));
+            const snap = await getDoc(doc(db,"vehicles",vehicleId,"config","auto"));
             km = snap.data()?.km_attuali || 0;
             setCacheConfig(km);
         }
