@@ -138,6 +138,7 @@ window.apriRegistro = async function(id){
         if(confirm("Eliminare intervento?")){
             await deleteDoc(doc(db,"registro",id));
 			setCacheRegistro(null);
+			setCacheManut(cacheManut);
             await render();
         }
     }
@@ -149,6 +150,7 @@ window.apriRegistro = async function(id){
             km:Number(nuovoKm)
         },{merge:true});
 		setCacheRegistro(null);
+		setCacheManut(cacheManut);
         await render();
     }
 }
