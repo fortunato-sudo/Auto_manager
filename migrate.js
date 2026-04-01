@@ -34,6 +34,11 @@ await migrateCollection(
 ["vehicles","qashqai","manutenzioni"]
 );
 
+await migrateCollection(
+"config",
+["vehicles","qashqai","config"]
+);
+
 console.log("Migrazione completata");
 
 }
