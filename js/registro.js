@@ -132,14 +132,39 @@ window.salvaRegistro = async function(){
 window.apriRegistro = async function(id){
     let scelta = prompt("1 = Modifica\n2 = Elimina");
     if(scelta=="2"){
-        if(confirm("Eliminare intervento?")){
-            await deleteDoc(doc(db,"registro",id));
-            setCacheRegistro(null);
-            setCacheManut(null);
-            setTab("registro");
-            await render();
-        }
-    }
+	    if(confirm("Eliminare intervento?")){
+	        const snap = await getDoc(doc(db,"registro",id));
+	        const nomeManut = snap.data().manutenzione;
+	        await deleteDoc(doc(db,"registro",id));
+	
+	        /* trova ultimo intervento rimasto */
+	        const storico = await getDocs(collection(db,"registro"));
+	        let ultimoKm = 0;
+	        let ultimaData = null;
+	        storico.forEach(d=>{
+	            let r = d.data();
+	            if(r.manutenzione === nomeManut){
+	                if(r.km > ultimoKm){
+	                    ultimoKm = r.km;
+	                    ultimaData = r.data;
+	                }
+	            }
+	        });
+	
+	        /* aggiorna manutenzione */
+	        cacheManut.forEach(async m=>{
+	            if(m.data.nome === nomeManut){
+	                await setDoc(doc(db,"manutenzioni",m.id),{
+	                    ultimo_km: ultimoKm,
+	                    ultima_data: ultimaData
+	                },{merge:true});
+	            }
+	        });
+	        setCacheRegistro(null);
+	        setCacheManut(null);
+	        await render();
+	    }
+	}
 
     if(scelta=="1"){
         let nuovoKm = prompt("Nuovi KM");
