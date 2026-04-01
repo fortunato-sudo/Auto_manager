@@ -115,7 +115,7 @@ window.salvaRegistro = async function(){
     /* aggiorna manutenzione */
     for(const m of cacheManut){
         if(m.data.nome === nome){
-            await setDoc(doc(db,"manutenzioni",m.id),{
+            await setDoc(doc(db,"vehicles",vehicleId,"manutenzioni",m.id),{
                 ultimo_km:Number(km),
                 ultima_data:data
             },{merge:true});
@@ -133,9 +133,9 @@ window.apriRegistro = async function(id){
     let scelta = prompt("1 = Modifica\n2 = Elimina");
     if(scelta=="2"){
         if(confirm("Eliminare intervento?")){
-    		const snap = await getDoc(doc(db,"registro",id));
+    		const snap = await getDoc(doc(db,"vehicles",vehicleId,"registro",id));
     		const nomeManut = snap.data().manutenzione;
-			await deleteDoc(doc(db,"registro",id));
+			await deleteDoc(doc(db,"vehicles",vehicleId,"registro",id));
 
 		    /* trova ultimo intervento rimasto */
 		    const storico = await getDocs(collection(db,"vehicles",vehicleId,"registro"));
@@ -154,7 +154,7 @@ window.apriRegistro = async function(id){
 		    /* aggiorna manutenzione */
 		    cacheManut.forEach(async m=>{
 		        if(m.data.nome === nomeManut){
-		            await setDoc(doc(db,"manutenzioni",m.id),{
+		            await setDoc(doc(db,"vehicles",vehicleId,"manutenzioni",m.id),{
 		                ultimo_km: ultimoKm,
 		                ultima_data: ultimaData
 		            },{merge:true});
@@ -169,7 +169,7 @@ window.apriRegistro = async function(id){
     if(scelta=="1"){
         let nuovoKm = prompt("Nuovi KM");
         if(!nuovoKm) return;
-        await setDoc(doc(db,"registro",id),{
+        await setDoc(doc(db,"vehicles",vehicleId,"registro",id),{
             km:Number(nuovoKm)
         },{merge:true});
         setCacheRegistro(null);
