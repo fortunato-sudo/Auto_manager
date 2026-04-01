@@ -1,4 +1,5 @@
 import { renderHome } from "./home.js";
+import { renderGarage } from "./garage.js";
 import { renderManut, renderManutAdd, renderManutList, renderDettaglio, calcolaStato } from "./manut.js";
 import { renderFuel, renderFuelAdd } from "./fuel.js";
 import { renderStats, calcolaStatisticheFuel } from "./stats.js";
@@ -153,7 +154,11 @@ async function preloadDB(){
 
         switch(tab){
             default:
-                renderHome(appDiv, km, manutList, stats);
+                renderGarage(appDiv);
+            break;
+
+            case "garage":
+                renderGarage(appDiv);
             break;
                 
             case "home":
