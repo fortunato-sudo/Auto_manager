@@ -130,16 +130,13 @@ window.salvaRegistro = async function(){
     await render();
 }
 window.apriRegistro = async function(id){
-    let scelta = prompt(
-        "1 = Modifica\n2 = Elimina"
-    );
-
+    let scelta = prompt("1 = Modifica\n2 = Elimina");
     if(scelta=="2"){
         if(confirm("Eliminare intervento?")){
             await deleteDoc(doc(db,"registro",id));
-			setCacheRegistro(null);
-			setCacheManut(null);
-			await preloadDB();
+            setCacheRegistro(null);
+            setCacheManut(null);
+            setTab("registro");
             await render();
         }
     }
@@ -150,9 +147,9 @@ window.apriRegistro = async function(id){
         await setDoc(doc(db,"registro",id),{
             km:Number(nuovoKm)
         },{merge:true});
-		setCacheRegistro(null);
-		setCacheManut(null);
-		await preloadDB();
+        setCacheRegistro(null);
+        setCacheManut(null);
+        setTab("registro");
         await render();
     }
 }
