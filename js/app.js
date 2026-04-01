@@ -129,12 +129,6 @@ async function preloadDB(){
                 };
             }
         });
-
-        manutList.forEach(m=>{
-            const last = lastManut[m.data.nome];
-            m.data.ultimo_km = last?.km || 0;
-            m.data.ultima_data = last?.data || null;
-        });
         
         /* sort */
         if(manutList){
