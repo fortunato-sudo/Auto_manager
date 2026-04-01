@@ -3,6 +3,18 @@ import { setVehicleId, setTab } from "./state.js";
 import { headerMenu } from "./ui.js";
 import { calcolaStato } from "./manut.js";
 
+function getVehicleIcon(nome){
+  const n = nome.toLowerCase();
+  if(n.includes("cbr") || n.includes("moto") || n.includes("yamaha") || n.includes("ducati")){
+    return "🏍";
+  }
+
+  if(n.includes("van") || n.includes("furgone") || n.includes("ducato")){
+    return "🚚";
+  }
+  return "🚗";
+}
+
 export async function renderGarage(appDiv){
   appDiv.innerHTML = `
     ${headerMenu("Garage")}
@@ -50,17 +62,25 @@ export async function renderGarage(appDiv){
     }
 
     if(urgenti === 0 && imminenti === 0){
-      interventiText = "✅ Interventi ok";
+      interventiText = `<span class="badgeOk">Interventi ok</span>`;
     }
     else{
-      interventiText = `⚠️ Interventi: ${urgenti} urgenti - ${imminenti} imminenti`;
+      let badge = "";
+      if(urgenti > 0){
+        badge += `<span class="badgeUrgente">🔴 ${urgenti}</span>`;
+      }
+    
+      if(imminenti > 0){
+        badge += `<span class="badgeImminente">🟠 ${imminenti}</span>`;
+      }
+      interventiText = badge;
     }
 
     html += `
       <div class="vehicleCard" onclick="entraVeicolo('${id}')">
 
         <div class="vehicleTitle">
-          ${v.icona || "🚗"} ${v.nome}
+          ${getVehicleIcon(v.nome)} ${v.nome}
         </div>
 
         <div class="vehicleKm">
