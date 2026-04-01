@@ -227,6 +227,40 @@ body:not(.dark) .menuItem{
     border-radius:14px;
 }
 
+/* VEICOLI */
+.vehicleCard{
+	background:#fff;
+	border-radius:14px;
+	padding:16px;
+	margin:12px 16px;
+	box-shadow:0 2px 6px rgba(0,0,0,0.08);
+}
+
+.dark .vehicleCard{
+	background:#1c1c1e;
+}
+
+.vehicleTitle{
+	font-size:18px;
+	font-weight:600;
+	margin-bottom:4px;
+}
+
+.vehicleKm{
+	font-size:15px;
+	opacity:0.8;
+	margin-bottom:6px;
+}
+
+.vehicleTagliando{
+	font-size:14px;
+	margin-bottom:4px;
+}
+
+.vehicleInterventi{
+	font-size:14px;
+}
+
 /* WIDGETS */
 
 .widgets{
