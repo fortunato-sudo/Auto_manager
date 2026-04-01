@@ -96,8 +96,8 @@ async function preloadDB(){
             setCacheConfig(km);
         }
 
-        let manutList = cacheManut || [];
-        if((tab==="home" || tab==="manut" || tab==="dettaglio") && !manutList){
+        let manutList = cacheManut;
+        if((tab==="home" || tab==="manut" || tab==="dettaglio") && manutList===null){
             const snap = await getDocs(collection(db,"manutenzioni"));
             manutList = snap.docs.map(doc=>({
                 id:doc.id,
@@ -105,9 +105,10 @@ async function preloadDB(){
             }));
             setCacheManut(manutList);
         }
+        manutList = manutList || [];
 
-        let registroList = cacheRegistro || [];
-        if(!registroList){
+        let registroList = cacheRegistro;
+        if(registroList===null){
             const snap = await getDocs(collection(db,"registro"));
             registroList = snap.docs.map(doc=>({
                 id:doc.id,
@@ -115,6 +116,7 @@ async function preloadDB(){
             }));
             setCacheRegistro(registroList);
         }
+        registroList = registroList || [];
 
         manutList.forEach(m=>{
             let ultimoKm = 0;
