@@ -139,6 +139,7 @@ window.apriRegistro = async function(id){
             await deleteDoc(doc(db,"registro",id));
 			setCacheRegistro(null);
 			setCacheManut(null);
+			await preloadDB();
             await render();
         }
     }
@@ -151,6 +152,7 @@ window.apriRegistro = async function(id){
         },{merge:true});
 		setCacheRegistro(null);
 		setCacheManut(null);
+		await preloadDB();
         await render();
     }
 }
