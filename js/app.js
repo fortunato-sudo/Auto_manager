@@ -96,7 +96,7 @@ async function preloadDB(){
             setCacheConfig(km);
         }
 
-        let manutList = cacheManut;
+        let manutList = cacheManut || [];
         if((tab==="home" || tab==="manut" || tab==="dettaglio") && !manutList){
             const snap = await getDocs(collection(db,"manutenzioni"));
             manutList = snap.docs.map(doc=>({
