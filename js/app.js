@@ -46,8 +46,8 @@ async function preloadDB(){
     }
 
     /* manutenzioni */
-    if(!cacheManut){
-        const snap = await getDocs(collection(db,"vehicles",vehicleId,"fuel"));
+    if(cacheManut === null){
+        const snap = await getDocs(collection(db,"vehicles",vehicleId,"manutenzioni"));
         setCacheManut(
             snap.docs.map(doc=>({
                 id:doc.id,
