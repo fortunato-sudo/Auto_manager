@@ -215,7 +215,7 @@ window.segnaFatto = async function(){
         note: note || ""
     });
 
-    await setDoc(doc(db,"manutenzioni",dettaglioId),{
+    await setDoc(doc(db,"vehicles",vehicleId,"manutenzioni",dettaglioId),{
         ultimo_km:Number(km),
         ultima_data:data
     },{merge:true});
@@ -348,7 +348,7 @@ export function renderDettaglio(appDiv, m, km){
 
 window.eliminaManutenzione=async function(){
     if(confirm("Eliminare questa manutenzione?")){
-        await deleteDoc(doc(db,"manutenzioni",dettaglioId));
+        await deleteDoc(doc(db,"vehicles",vehicleId,"manutenzioni",dettaglioId));
         setCacheManut(null);
         setTab("manut");
         render();
