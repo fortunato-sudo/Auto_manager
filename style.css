@@ -1,10 +1,12 @@
 #app{
 	opacity:0;
+	visibility:hidden;
 	transition:opacity .35s;
 	padding-bottom:40px;
 	min-height:100vh;
 	padding-top:env(safe-area-inset-top);
 	padding-bottom:env(safe-area-inset-bottom);
+	background:var(--bg);
 }
 
 html,body{
@@ -24,6 +26,7 @@ body.loading #app{
 
 body:not(.loading) #app{
 	opacity:1;
+	visibility:visible;
 	transition:opacity .35s;
 }
 
@@ -240,7 +243,27 @@ body:not(.dark) .menuItem{
 	padding:18px;
 	margin:12px 16px;
 	box-shadow:0 6px 18px rgba(0,0,0,0.08);
-	transition:background .2s;
+	transition:transform .25s, box-shadow .25s;
+	position:relative;
+}
+
+.vehicleCard:active{
+    transform:scale(.97);
+}
+
+.vehicleEnter{
+    animation:vehicleEnter .35s ease;
+}
+
+@keyframes vehicleEnter{
+    from{
+        transform:scale(.96);
+        opacity:.6;
+    }
+    to{
+        transform:scale(1);
+        opacity:1;
+    }
 }
 
 .vehicleTitle{
@@ -268,12 +291,13 @@ font-size:20px;
 .vehicleKm{
 	font-size:15px;
 	opacity:0.7;
-	margin-bottom:8px;
+	margin-bottom:4px;
 }
 
 .vehicleTagliando{
 	font-size:14px;
-	margin-bottom:4px;
+	margin-top:4px;
+	margin-bottom:6px;
 }
 
 .vehicleInterventi{
@@ -283,6 +307,10 @@ font-size:20px;
 	margin-top:4px;
 }
 
+.interventiText{
+    font-size:14px;
+    font-weight:500;
+}
 
 .dark .vehicleCard{
 	background:#1c1c1e;
@@ -300,6 +328,23 @@ font-size:20px;
 
 .dark .vehicleInterventi{
 	color:#e0e0e0;
+}
+
+.vehiclePlate{
+	display:inline-block;
+	margin-top:2px;
+	margin-bottom:6px;
+	padding:2px 8px;
+	background:white;
+	border:1px solid #ccc;
+	border-radius:4px;
+	font-size:14px;
+	letter-spacing:1px;
+}
+
+.dark .vehiclePlate{
+	background:#111;
+	border-color:#444;
 }
 
 .badgeUrgente{
@@ -324,6 +369,109 @@ font-size:20px;
 	color:#34c759;
 	font-size:14px;
 	font-weight:500;
+}
+
+.vehicleRow{
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	flex-direction:column;
+	align-items:flex-start;
+}
+
+.vehicleTop{
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+}
+
+.vehicleArrow{
+	position:absolute;
+	right:16px;
+	top:50%;
+	transform:translateY(-50%);
+	font-size:22px;
+	opacity:.4;
+}
+
+.addVehicleBtn{
+	margin:12px 16px;
+	padding:10px;
+	border-radius:10px;
+	background:#007aff;
+	color:white;
+	border:none;
+	font-size:15px;
+}
+
+.plateITA{
+    display:inline-block;
+    margin:4px 0 6px 0;
+    padding:3px 10px;
+    background:white;
+    border:1px solid #ccc;
+    border-radius:6px;
+    font-size:15px;
+    letter-spacing:2px;
+    font-weight:600;
+    position:relative;
+}
+
+.plateITA::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:0;
+    bottom:0;
+    width:8px;
+    background:#003399;
+}
+
+.plateITA::after{
+    content:"";
+    position:absolute;
+    right:0;
+    top:0;
+    bottom:0;
+    width:8px;
+    background:#003399;
+}
+
+.dark .plateITA{
+    background:#111;
+    border-color:#444;
+}
+
+.interventiUrgenti{
+    color:#ff3b30;
+    font-weight:600;
+}
+
+.interventiImminenti{
+    color:#ff9500;
+    font-weight:600;
+}
+
+.interventiOk{
+    color:#34c759;
+    font-weight:600;
+}
+
+.vehicleAdditivo{
+	margin-top:4px;
+	margin-bottom:6px;
+}
+
+.additivoWarning{
+	color:#ff9500;
+	font-weight:600;
+	font-size:14px;
+}
+
+.additivoUrgente{
+	color:#ff3b30;
+	font-weight:600;
+	font-size:14px;
 }
 
 /* WIDGETS */
@@ -585,16 +733,33 @@ button{
 }
 
 .menuDrawer{
-	position:fixed;
-	top:0;
-	transform:translateX(-260px);
-	width:240px;
-	height:100%;
-	background:#1c1c1e;
-	padding-top:80px;
-	transition:0.25s;
-	z-index:1000;
+    position:fixed;
+    top:0;
+    left:0;
+    transform:translateX(-260px);
+    width:240px;
+    height:100%;
+    background:#1c1c1e;
+    padding-top:80px;
+    transition:0.25s;
+    z-index:1000;
     overflow-y:auto;
+}
+
+.menuBottom{
+    margin-top:auto;
+    padding:16px;
+    border-top:1px solid #2c2c2e;
+}
+
+#darkToggleItem{
+    text-align:center;
+    border-radius:10px;
+    background:#f2f2f7;
+}
+
+.dark #darkToggleItem{
+    background:#2c2c2e;
 }
 
 .menuOpen{
@@ -657,6 +822,72 @@ body.menuOpen{
 
 .dark .menuGarage{
 	background:#2c2c2e;
+}
+
+.menuVehicle{
+	background:#f2f2f7;
+	margin:10px;
+	padding:14px;
+	border-radius:12px;
+}
+
+.dark .menuVehicle{
+	background:#2c2c2e;
+}
+
+.menuVehicleName{
+	font-weight:600;
+	font-size:16px;
+}
+
+.menuVehicleKm{
+	font-size:13px;
+	opacity:.7;
+	margin-top:2px;
+}
+
+.menuDarkRow{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px;
+    border-radius:10px;
+    background:#f2f2f7;
+    cursor:pointer;
+}
+
+.dark .menuDarkRow{
+    background:#2c2c2e;
+}
+
+/* SWITCH */
+
+.switch{
+    width:46px;
+    height:26px;
+    background:#d1d1d6;
+    border-radius:20px;
+    position:relative;
+    transition:.25s;
+}
+
+.switchKnob{
+    width:22px;
+    height:22px;
+    background:white;
+    border-radius:50%;
+    position:absolute;
+    top:2px;
+    left:2px;
+    transition:.25s;
+}
+
+.switchActive{
+    background:#34c759;
+}
+
+.switchActive .switchKnob{
+    left:22px;
 }
 
 /* NAV BAR */
@@ -831,4 +1062,45 @@ body.menuOpen{
 	font-size:36px;
 	font-weight:700;
 	margin-top:10px;
+}
+
+.fuelToggleRow{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+}
+
+.fuelToggleLabel{
+    font-size:16px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.fuelToggleBtn{
+    padding:8px 16px;
+    border-radius:12px;
+    border:none;
+    background:#e5e5ea;
+    font-weight:600;
+    min-width:70px;
+}
+
+.fuelToggleActive{
+    background:#ff9500;
+    color:white;
+}
+
+.fuelToggleBtn{
+    padding:8px 14px;
+    border-radius:10px;
+    border:none;
+    background:#e5e5ea;
+    font-weight:600;
+}
+
+.fuelToggleActive{
+    background:#34c759;
+    color:white;
 }

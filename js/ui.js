@@ -5,7 +5,6 @@ export function headerMenu(titolo){
         <div class="headerBar">
             <button class="menuButton" onclick="toggleMenu()">☰</button>
             <div class="appTitle">${titolo}</div>
-            <button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
         </div>
     `;
 }
@@ -15,9 +14,19 @@ export function headerBack(titolo){
         <div class="headerBar">
             <button class="headerBack" onclick="indietro()">←</button>
             <div class="appTitle">${titolo}</div>
-            <button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
         </div>
     `;
+}
+
+export function updateDarkLabel(){
+    const el = document.getElementById("darkLabel");
+    if(!el) return;
+
+    if(document.body.classList.contains("dark")){
+        el.textContent="☀️ Light mode";
+    }else{
+        el.textContent="🌙 Dark mode";
+    }
 }
 
 window.toggleMenu=function(){
@@ -26,6 +35,7 @@ window.toggleMenu=function(){
     menu.classList.toggle("menuOpen");
     overlay.classList.toggle("menuOverlayOpen");
     document.body.classList.toggle("menuOpen");
+    updateDarkLabel();
 
     /* FIX status bar iOS */
     setTimeout(()=>{
@@ -38,8 +48,13 @@ window.toggleMenu=function(){
 
 window.toggleDark=function(){
     document.body.classList.toggle("dark");
-    const dark=document.body.classList.contains("dark");
-    localStorage.setItem("darkMode",dark);
+    localStorage.setItem(
+        "darkMode",
+        document.body.classList.contains("dark")
+    );
+    document.getElementById("darkSwitch")
+    ?.classList.toggle("switchActive");
+    updateDarkLabel();
 }
 
 window.nav=function(t){

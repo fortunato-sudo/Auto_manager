@@ -1,10 +1,9 @@
 import { renderHome } from "./home.js";
 import { renderGarage } from "./garage.js";
 import { renderManut, renderManutAdd, renderManutList, renderDettaglio, calcolaStato } from "./manut.js";
-import { renderFuel, renderFuelAdd } from "./fuel.js";
+import { renderFuel, renderFuelAdd, getFuelList } from "./fuel.js";
 import { renderStats, calcolaStatisticheFuel } from "./stats.js";
 import { renderRegistro, renderRegistroAdd } from "./registro.js";
-import { getFuelList } from "./fuel.js";
 import { db, collection, getDocs, getDoc, doc, setDoc } from "./firebase.js";
 import {
     tab,
@@ -24,18 +23,21 @@ import {
     setTab,
     vehicleId
 } from "./state.js";
+import { updateDarkLabel } from "./ui.js";
 import "./config.js";
 
 const splashStart = Date.now();
 
 window.aggiornaKmAutoSeMaggiore = async function(kmNuovi){
-    const snap=await getDoc(doc(db,"vehicles",vehicleId,"config","auto"));
-    let kmAttuali=snap.data()?.km_attuali || 0;
+    const snap = await getDoc(doc(db,"vehicles",vehicleId));
+    let kmAttuali = snap.data()?.km_attuali || 0;
+
     if(kmNuovi > kmAttuali){
-        await setDoc(doc(db,"vehicles",vehicleId,"config","auto"),{
-            km_attuali:Number(kmNuovi)
-        });
-        /* aggiorna cache */
+        await setDoc(
+            doc(db,"vehicles",vehicleId),
+            { km_attuali:Number(kmNuovi) },
+            { merge:true }
+        );
         setCacheConfig(Number(kmNuovi));
     }
 }
@@ -68,7 +70,7 @@ async function preloadDB(){
 
     /* km auto */
     if(cacheConfig===null){
-        const snap = await getDoc(doc(db,"vehicles",vehicleId,"config","auto"));
+        const snap = await getDoc(doc(db,"vehicles",vehicleId));
         setCacheConfig(snap.data()?.km_attuali || 0);
     }
 }
@@ -79,7 +81,7 @@ async function preloadDB(){
     try{
         const appDiv=document.getElementById("app");
         window.scrollTo(0,0);
-        appDiv.innerHTML = "";
+        appDiv.innerHTML = ""
 
         let fuelList = cacheFuel;
         if((tab==="home" || tab==="fuel" || tab==="stats") && !fuelList){
@@ -91,11 +93,25 @@ async function preloadDB(){
             stats = calcolaStatisticheFuel(fuelList);
         }
 
+        const vehicleSnap = await getDoc(doc(db,"vehicles",vehicleId));
+        const currentVehicle = vehicleSnap.data();
+
         let km = cacheConfig;
         if(km===null){
             const snap = await getDoc(doc(db,"vehicles",vehicleId,"config","auto"));
             km = snap.data()?.km_attuali || 0;
             setCacheConfig(km);
+        }
+
+        const vehicleNameBox = document.getElementById("menuVehicleName");
+        const vehicleKmBox = document.getElementById("menuVehicleKm");
+
+        if(vehicleNameBox){
+            vehicleNameBox.textContent = currentVehicle?.nome || "";
+        }
+
+        if(vehicleKmBox){
+            vehicleKmBox.textContent = km ? km.toLocaleString()+" km" : "";
         }
 
         let manutList = cacheManut;
@@ -130,6 +146,72 @@ async function preloadDB(){
                 };
             }
         });
+
+        let urgenti=0;
+        let imminenti=0;
+        let prossimoKm = Infinity;
+
+        manutList.forEach(m=>{
+            const stato = calcolaStato(m.data, km);
+
+            if(stato.stato==="urgente") urgenti++;
+            if(stato.stato==="imminente") imminenti++;
+
+            if(stato.nextKm && stato.nextKm < prossimoKm){
+                prossimoKm = stato.nextKm;
+            }
+        });
+
+        const fuelSnap = await getDocs(
+            collection(db,"vehicles",vehicleId,"fuel")
+        );
+
+        let pieniSenzaAdditivo = 0;
+        fuelSnap.docs
+            .sort((a,b)=>b.data().km - a.data().km)
+            .forEach(f=>{
+                if(f.data().additivo){
+                    pieniSenzaAdditivo = 0;
+                }else{
+                    pieniSenzaAdditivo++;
+                }
+            });
+
+        let statoAdditivo="ok";
+        if(pieniSenzaAdditivo === 2){
+            statoAdditivo="attenzione";
+        }
+
+        if(pieniSenzaAdditivo >=3){
+            statoAdditivo="urgente";
+        }
+
+        let tagliandoStato="ok";
+        let tagliandoKm=null;
+
+        if(prossimoKm !== Infinity){
+            let diff = prossimoKm - km;
+
+            if(diff <= 0){
+                tagliandoStato="urgente";
+            }
+            else if(diff < 8000){
+                tagliandoStato="imminente";
+                tagliandoKm=diff;
+            }
+        }
+        await setDoc(
+            doc(db,"vehicles",vehicleId),
+            {
+                urgenti,
+                imminenti,
+                tagliando_km: tagliandoKm,
+                tagliando_stato: tagliandoStato,
+                pieni_senza_additivo:pieniSenzaAdditivo,
+                stato_additivo:statoAdditivo
+            },
+            {merge:true}
+        );
         
         /* sort */
         if(manutList){
@@ -159,6 +241,10 @@ async function preloadDB(){
 
             case "garage":
                 renderGarage(appDiv);
+            break;
+
+            case "vehicleAdd":
+                renderVehicleAdd(appDiv);
             break;
                 
             case "home":
@@ -229,6 +315,7 @@ async function preloadDB(){
             }, delay);
         }
     }
+    updateDarkLabel();
 }
 
 window.indietro=function(){
@@ -237,6 +324,7 @@ window.indietro=function(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    updateDarkLabel();
     if(localStorage.getItem("darkMode")==="true"){
         document.body.classList.add("dark");
     }

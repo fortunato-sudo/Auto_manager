@@ -18,8 +18,11 @@ function getVehicleIcon(nome){
 export async function renderGarage(appDiv){
   appDiv.innerHTML = `
     <div class="garageHeader">
-      Garage
+      🚘 Garage
     </div>
+    <button class="addVehicleBtn" onclick="nav('vehicleAdd')">
+      + Aggiungi veicolo
+    </button>
     <div id="garageList"></div>
   `;
   
@@ -29,74 +32,76 @@ export async function renderGarage(appDiv){
   for(const vDoc of vehiclesSnap.docs){
     const v = vDoc.data();
     const id = vDoc.id;
-    const manutSnap = await getDocs(collection(db,"vehicles",id,"manutenzioni"));
-    const manutList = manutSnap.docs.map(d=>({
-      id:d.id,
-      data:d.data()
-    }));
+    const urgenti = v.urgenti || 0;
+    const imminenti = v.imminenti || 0;
+    const tagliandoKm = v.tagliando_km || null;
+    const tagliandoStato = v.tagliando_stato || "ok";
+    const statoAdditivo = v.stato_additivo || "ok";
+
     let km = v.km_attuali || 0;
-
-    let urgenti = 0;
-    let imminenti = 0;
-    let prossimoKm = Infinity;
-    let totaleAlert = urgenti + imminenti;
-    manutList.forEach(m=>{
-      const stato = calcolaStato(m.data, km);
-      if(stato.stato === "urgente") urgenti++;
-      if(stato.stato === "imminente") imminenti++;
-      if(stato.nextKm && stato.nextKm < prossimoKm){
-        prossimoKm = stato.nextKm;
-      }
-    });
-
     let tagliandoText;
     let interventiText;
-    if(prossimoKm !== Infinity){
-      let diff = prossimoKm - km;
-      if(diff <= 0){
-        tagliandoText = "⚠️ Tagliando urgente";
-      }
-      else{
-        tagliandoText = `⚠️ Tagliando tra ${diff.toLocaleString()} km`;
-      }
+    if(tagliandoStato === "urgente"){
+      tagliandoText = `<span class="tagliandoUrgente">⚠️ Tagliando urgente</span>`;
     }
+
+    else if(tagliandoStato === "imminente"){
+      tagliandoText = `<span class="tagliandoImminente">⚠️ Tagliando tra ${tagliandoKm.toLocaleString()} km</span>`;
+    }
+
     else{
-      tagliandoText = "✅ Tagliando ok";
+      tagliandoText = `<span class="tagliandoOk">✅ Tagliando ok</span>`;
+    }
+
+    let additivoText="";
+    if(statoAdditivo==="attenzione"){
+      additivoText=`<span class="additivoWarning">⚠️ Prossimo pieno con additivo</span>`;
+    }
+
+    if(statoAdditivo==="urgente"){
+      additivoText=`<span class="additivoUrgente">🧴 Additivo diesel da usare</span>`;
     }
 
     if(urgenti === 0 && imminenti === 0){
-      interventiText = `<span class="badgeOk">Interventi ok</span>`;
+      interventiText = `<span class="interventiOk">🔧 Interventi ok</span>`;
     }
     else{
-      let badge = "";
+      let parts = [];
+
       if(urgenti > 0){
-        badge += `<span class="badgeUrgente">🔴 ${urgenti}</span>`;
+        parts.push(
+          `<span class="interventiUrgenti">${urgenti === 1 ? "1 urgente" : urgenti + " urgenti"}</span>`
+        );
       }
-    
+
       if(imminenti > 0){
-        badge += `<span class="badgeImminente">🟠 ${imminenti}</span>`;
+        parts.push(
+          `<span class="interventiImminenti">${imminenti === 1 ? "1 imminente" : imminenti + " imminenti"}</span>`
+        );
       }
-      interventiText = badge;
+
+      interventiText = `
+        <span class="interventiText">
+          🔧 ${parts.join(" • ")}
+        </span>
+      `;
     }
 
     html += `
-      <div class="vehicleCard" onclick="entraVeicolo('${id}')">
-
+      <div class="vehicleCard vehicleEnter" onclick="entraVeicolo('${id}')">
+        <div class="vehicleArrow">›</div>
         <div class="vehicleTitle">
-          <span class="vehicleIcon">
-            ${getVehicleIcon(v.nome)}
-          </span>
-
-          ${v.nome}
-          ${
-            totaleAlert > 0
-            ? `<span class="vehicleBadge">${totaleAlert}</span>`
-            : ""
-          }
+          ${getVehicleIcon(v.nome)} ${v.nome}
         </div>
 
+        ${v.targa ? `<div class="plateITA">${v.targa}</div>` : ""}
+        
         <div class="vehicleKm">
           ${km.toLocaleString()} km
+        </div>
+
+        <div class="vehicleAdditivo">
+          ${additivoText}
         </div>
 
         <div class="vehicleTagliando">
@@ -110,6 +115,20 @@ export async function renderGarage(appDiv){
     `;
   }
   document.getElementById("garageList").innerHTML = html;
+
+  requestAnimationFrame(()=>{
+    document.querySelectorAll(".vehicleCard")
+    .forEach((el,i)=>{
+        el.style.opacity="0";
+        el.style.transform="translateY(20px)";
+        
+        setTimeout(()=>{
+            el.style.transition="all .35s ease";
+            el.style.opacity="1";
+            el.style.transform="translateY(0)";
+        }, i*60);
+    });
+  });
 }
 
 window.entraVeicolo=function(id){

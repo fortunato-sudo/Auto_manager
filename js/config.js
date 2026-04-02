@@ -3,9 +3,13 @@ import { setCacheConfig, vehicleId } from "./state.js";
 
 window.saveKm=async function(){
     let km=document.getElementById("km").value;
-    await setDoc(doc(db,"vehicles",vehicleId,"config","auto"),{
-        km_attuali:Number(km)
-    });
+    await setDoc(
+        doc(db,"vehicles",vehicleId),
+        {
+            km_attuali:Number(km)
+        },
+        {merge:true}
+    );
     setCacheConfig(Number(km));
     render();
 }

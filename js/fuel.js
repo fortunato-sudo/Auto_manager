@@ -58,6 +58,9 @@ window.salvaFuel = async function(){
     let distributore = document.getElementById("distributore").value;
     await aggiornaKmAutoSeMaggiore(km);
     let saltoConsumo = document.getElementById("saltaConsumo")?.checked;
+    let additivo = document
+        .getElementById("switchAdditivo")
+        .classList.contains("switchActive");
     let consumo = null;
 
     /* trova rifornimento precedente */
@@ -99,6 +102,8 @@ window.salvaFuel = async function(){
             litri,
             km,
             distributore,
+            additivo:additivo,
+            pieno_perso:pienoPerso,
             consumo,
             data:new Date().toISOString()
         });
@@ -120,6 +125,21 @@ window.eliminaFuel = async function(id){
         setCacheFuel(null);
         render();
     }
+}
+
+let pienoPerso=false;
+let additivoDiesel=false;
+
+window.togglePienoPerso=function(){
+    const sw=document.getElementById("switchPienoPerso");
+    pienoPerso=!pienoPerso;
+    sw.classList.toggle("switchActive");
+}
+
+window.toggleAdditivo=function(){
+    const sw=document.getElementById("switchAdditivo");
+    additivoDiesel=!additivoDiesel;
+    sw.classList.toggle("switchActive");
 }
 
 export function renderFuel(appDiv, fuelList, stats){
@@ -261,10 +281,21 @@ export async function renderFuelAdd(appDiv){
             </div>
 
             <div class="row">
-                <label style="display:flex; gap:8px; align-items:center;">
-                    <input type="checkbox" id="saltaConsumo">
-                    Rifornimento precedente perso
-                </label>
+                    <div class="fuelToggleRow">
+                        <span class="fuelToggleLabel">⛽ Precedente rifornimento perso</span>
+                        <div class="switch" onclick="togglePienoPerso()" id="switchPienoPerso">
+                            <div class="switchKnob"></div>
+                        </div>
+                    </div>
+            </div>
+
+            <div class="row">
+                    <div class="fuelToggleRow">
+                        <span class="fuelToggleLabel">🧴 Additivo diesel</span>
+                        <div class="switch" onclick="toggleAdditivo()" id="switchAdditivo">
+                            <div class="switchKnob"></div>
+                        </div>
+                    </div>
             </div>
 
             <div class="row center">

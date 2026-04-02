@@ -31,16 +31,30 @@
         <div id="app"></div>
         
         <div id="menuDrawer" class="menuDrawer">
-    		<div class="menuGarage" onclick="nav('garage')">
-        		🏠 Garage
-    		</div>
+			<div class="menuVehicle">
+				<div id="menuVehicleName"></div>
+				<div id="menuVehicleKm"></div>
+			</div>
 
-		    <div class="menuDivider"></div>
-		    <div class="menuItem" onclick="nav('home')">🏠 Home</div>
-		    <div class="menuItem" onclick="nav('manut')">🔧 Manutenzioni</div>
-		    <div class="menuItem" onclick="nav('registro')">📋 Registro</div>
-		    <div class="menuItem" onclick="nav('fuel')">⛽ Rifornimenti</div>
-		    <div class="menuItem" onclick="nav('stats')">📊 Statistiche</div>
+			<div class="menuDivider"></div>
+			<div class="menuGarage" onclick="nav('garage')">🚘 Garage</div>
+			<div class="menuDivider"></div>
+			<div class="menuItem" onclick="nav('home')">🏠 Home</div>
+			<div class="menuItem" onclick="nav('manut')">🔧 Manutenzioni</div>
+			<div class="menuItem" onclick="nav('registro')">📋 Registro</div>
+			<div class="menuItem" onclick="nav('fuel')">⛽ Rifornimenti</div>
+			<div class="menuItem" onclick="nav('stats')">📊 Statistiche</div>
+
+			<div class="menuBottom">
+				<div class="menuDarkRow" onclick="toggleDark()">
+					<span id="darkLabel">🌙 Dark mode</span>
+
+					<div class="switch switchActive" id="darkSwitch">
+						<div class="switchKnob"></div>
+					</div>
+
+				</div>
+			</div>
 		</div>
 		<div id="menuOverlay" class="menuOverlay"></div>
 	</body>
