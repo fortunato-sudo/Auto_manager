@@ -8,11 +8,11 @@ export let dbCache={
 export let tab="garage";
 export let dettaglioManut=null;
 export let dettaglioId=null;
-export let tabPrecedente = "home";
+export let tabPrecedente = null;
 export let fuelEditId = null;
 export let fuelChart = null;
 export let rendering = false;
-
+export let registroEditId = null;
 export let cacheFuel=null;
 export let cacheManut=null;
 export let cacheConfig=null;
@@ -30,6 +30,14 @@ export function setCacheFuel(v){
     cacheFuel = v;
 }
 
+export function setFuelEditId(id){
+    fuelEditId = id;
+}
+
+export function setRegistroEditId(id){
+    registroEditId = id;
+}
+
 export function setCacheManut(v){
     cacheManut = v;
 }
@@ -42,8 +50,13 @@ export function setCacheRegistro(v){
 	cacheRegistro = v;
 }
 
-export function setTab(v){
-    tab = v;
+export function setTab(t, from=null){
+    if(from){
+        tabPrecedente = from;
+    }else{
+        tabPrecedente = tab;
+    }
+    tab = t;
 }
 
 export function setTabPrecedente(v){

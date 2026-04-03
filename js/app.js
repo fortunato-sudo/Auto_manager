@@ -24,6 +24,7 @@ import {
     vehicleId
 } from "./state.js";
 import { updateDarkLabel } from "./ui.js";
+import { renderVehicleAdd } from "./vehicleAdd.js";
 import "./config.js";
 
 const splashStart = Date.now();
@@ -91,6 +92,10 @@ async function preloadDB(){
         let stats=null;
         if(tab==="home" || tab==="fuel" || tab==="stats"){
             stats = calcolaStatisticheFuel(fuelList);
+        }
+
+        if(tab === "vehicleAdd"){
+            renderVehicleAdd(appDiv);
         }
 
         const vehicleSnap = await getDoc(doc(db,"vehicles",vehicleId));
@@ -162,30 +167,6 @@ async function preloadDB(){
             }
         });
 
-        const fuelSnap = await getDocs(
-            collection(db,"vehicles",vehicleId,"fuel")
-        );
-
-        let pieniSenzaAdditivo = 0;
-        fuelSnap.docs
-            .sort((a,b)=>b.data().km - a.data().km)
-            .forEach(f=>{
-                if(f.data().additivo){
-                    pieniSenzaAdditivo = 0;
-                }else{
-                    pieniSenzaAdditivo++;
-                }
-            });
-
-        let statoAdditivo="ok";
-        if(pieniSenzaAdditivo === 2){
-            statoAdditivo="attenzione";
-        }
-
-        if(pieniSenzaAdditivo >=3){
-            statoAdditivo="urgente";
-        }
-
         let tagliandoStato="ok";
         let tagliandoKm=null;
 
@@ -206,9 +187,7 @@ async function preloadDB(){
                 urgenti,
                 imminenti,
                 tagliando_km: tagliandoKm,
-                tagliando_stato: tagliandoStato,
-                pieni_senza_additivo:pieniSenzaAdditivo,
-                stato_additivo:statoAdditivo
+                tagliando_stato: tagliandoStato
             },
             {merge:true}
         );
@@ -319,7 +298,11 @@ async function preloadDB(){
 }
 
 window.indietro=function(){
-    setTab(tabPrecedente);
+    if(tabPrecedente){
+        setTab(tabPrecedente);
+    }else{
+        setTab("home");
+    }
     render();
 }
 

@@ -1,7 +1,7 @@
 import { db, collection, getDocs, getDoc, addDoc, setDoc, deleteDoc, doc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDateOnly, formatKm } from "./utils.js";
-import { cacheManut, setCacheManut, cacheRegistro, setCacheRegistro ,setTab, vehicleId } from "./state.js";
+import { cacheManut, setCacheManut, cacheRegistro, setCacheRegistro ,setTab, vehicleId, registroEditId, setRegistroEditId } from "./state.js";
 
 export async function renderRegistro(appDiv){
     appDiv.innerHTML+=`
@@ -29,21 +29,33 @@ export async function renderRegistro(appDiv){
 
     storicoList.forEach(s=>{
         let row = `
-            <div class="manutRow" onclick="apriRegistro('${s.id}')">
+            <div class="manutRow">
                 <div class="manutInfo">
+
                     <div class="manutTitle">
                         ${s.data.manutenzione}
                     </div>
 
                     <div class="manutFreq">
-                            ${formatDateOnly(s.data.data)} | ${formatKm(s.data.km)} km
+                        ${formatDateOnly(s.data.data)} | ${formatKm(s.data.km)} km
                     </div>
+
                     ${s.data.officina ? `<div class="manutFreq">Officina: ${s.data.officina}</div>` : ""}
                     ${s.data.note ? `<div class="manutFreq">Note: ${s.data.note}</div>` : ""}
+
+                    <div class="fuelActions">
+                        <button class="btnEdit" onclick="modificaRegistro('${s.id}')">
+                            ✏️ Modifica
+                        </button>
+
+                        <button class="btnDelete" onclick="eliminaRegistro('${s.id}')">
+                            🗑 Elimina
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
-    document.getElementById("registro").innerHTML+=row;
+        document.getElementById("registro").innerHTML+=row;
     });
 }
 
@@ -54,7 +66,7 @@ export async function renderRegistroAdd(appDiv){
         <div class="group">
             <div class="row">
                 <div>Intervento</div>
-                <select id="nomeInt"></select>
+                <select id="nomeInt" class="selectIntervento"></select>
             </div>
 
             <div class="row">
@@ -80,100 +92,128 @@ export async function renderRegistroAdd(appDiv){
 
     let select=document.getElementById("nomeInt");
     if(cacheManut){
-        cacheManut.forEach(m=>{
+        const lista = [...cacheManut].sort((a,b)=>
+            a.data.nome.localeCompare(b.data.nome)
+        );
+        lista.forEach(m=>{
             select.innerHTML += `
                 <option value="${m.data.nome}">
                     ${m.data.nome}
                 </option>
             `;
         });
-    }      
+    }   
+
+    if(registroEditId){
+        const snap = await getDoc(
+            doc(db,"vehicles",vehicleId,"registro",registroEditId)
+        );
+
+        const r = snap.data();
+
+        document.getElementById("nomeInt").value = r.manutenzione || "";
+        document.getElementById("kmInt").value = r.km || "";
+        document.getElementById("officinaInt").value = r.officina || "";
+        document.getElementById("noteInt").value = r.note || "";
+    }
 }
 
 window.salvaRegistro = async function(){
     let nome = document.getElementById("nomeInt").value;
     let km = document.getElementById("kmInt").value;
-
-    await aggiornaKmAutoSeMaggiore(km);
-
     let officina = document.getElementById("officinaInt").value;
     let note = document.getElementById("noteInt").value;
     let data = new Date().toISOString();
 
-    /* salva nel registro */
-    await addDoc(collection(db,"vehicles",vehicleId,"registro"),{
-        vehicleId:"default",
-        manutenzione:nome,
-        km:Number(km),
-        data:data,
-        officina:officina,
-        note:note
-    });
-    /* svuota cache registro */
-    setCacheRegistro(null);
+    await aggiornaKmAutoSeMaggiore(km);
 
-    /* aggiorna manutenzione */
-    for(const m of cacheManut){
-        if(m.data.nome === nome){
-            await setDoc(doc(db,"vehicles",vehicleId,"manutenzioni",m.id),{
-                ultimo_km:Number(km),
-                ultima_data:data
-            },{merge:true});
-			
-            /* aggiorna anche cache locale */
-            m.data.ultimo_km = Number(km);
-            m.data.ultima_data = data;
-        }
+    const vehicleRef = doc(db,"vehicles",vehicleId);
+    const snap = await getDoc(vehicleRef);
+    const v = snap.data();
+    const nuovoStato = calcolaTagliando(km, v.tagliando_km);
+    await setDoc(vehicleRef,{
+        tagliando_stato: nuovoStato
+    },{merge:true});
+
+    if(registroEditId){
+        await setDoc(
+            doc(db,"vehicles",vehicleId,"registro",registroEditId),
+            {
+                manutenzione:nome,
+                km:Number(km),
+                officina,
+                note,
+                data
+            },
+            { merge:true }
+        );
+        setRegistroEditId(null);
+    }else{
+        await addDoc(
+            collection(db,"vehicles",vehicleId,"registro"),
+            {
+                vehicleId:"default",
+                manutenzione:nome,
+                km:Number(km),
+                data,
+                officina,
+                note
+            }
+        );
     }
-    setCacheManut(cacheManut);
+    setCacheRegistro(null);
     setTab("registro");
     await render();
 }
-window.apriRegistro = async function(id){
-    let scelta = prompt("1 = Modifica\n2 = Elimina");
-    if(scelta=="2"){
-        if(confirm("Eliminare intervento?")){
-    		const snap = await getDoc(doc(db,"vehicles",vehicleId,"registro",id));
-    		const nomeManut = snap.data().manutenzione;
-			await deleteDoc(doc(db,"vehicles",vehicleId,"registro",id));
 
-		    /* trova ultimo intervento rimasto */
-		    const storico = await getDocs(collection(db,"vehicles",vehicleId,"registro"));
-		    let ultimoKm = 0;
-		    let ultimaData = null;
-		    storico.forEach(d=>{
-		        const r = d.data();
-		        if(r.manutenzione === nomeManut){
-		            if(r.km > ultimoKm){
-		                ultimoKm = r.km;
-		                ultimaData = r.data;
-		            }
-		        }
-		    });
-		
-		    /* aggiorna manutenzione */
-		    cacheManut.forEach(async m=>{
-		        if(m.data.nome === nomeManut){
-		            await setDoc(doc(db,"vehicles",vehicleId,"manutenzioni",m.id),{
-		                ultimo_km: ultimoKm,
-		                ultima_data: ultimaData
-		            },{merge:true});
-		        }
-		    });
-    		setCacheRegistro(null);
-    		setCacheManut(null);
-    		await render();
-		}
-    }
+window.modificaRegistro = function(id){
+    setRegistroEditId(id);
+    setTab("registroAdd","registro");
+    render();
+}
 
-    if(scelta=="1"){
-        let nuovoKm = prompt("Nuovi KM");
-        if(!nuovoKm) return;
-        await setDoc(doc(db,"vehicles",vehicleId,"registro",id),{
-            km:Number(nuovoKm)
-        },{merge:true});
-        setCacheRegistro(null);
-        setCacheManut(null);
-        await render();
-    }
+window.eliminaRegistro = async function(id){
+    if(!confirm("Eliminare intervento?")) return;
+    const snap = await getDoc(
+        doc(db,"vehicles",vehicleId,"registro",id)
+    );
+
+    const nomeManut = snap.data().manutenzione;
+    await deleteDoc(
+        doc(db,"vehicles",vehicleId,"registro",id)
+    );
+
+    /* trova ultimo intervento rimasto */
+    const storico = await getDocs(
+        collection(db,"vehicles",vehicleId,"registro")
+    );
+
+    let ultimoKm = 0;
+    let ultimaData = null;
+    storico.forEach(d=>{
+        const r = d.data();
+        if(r.manutenzione === nomeManut){
+            if(r.km > ultimoKm){
+                ultimoKm = r.km;
+                ultimaData = r.data;
+            }
+        }
+    });
+
+    /* aggiorna manutenzione */
+    cacheManut.forEach(async m=>{
+        if(m.data.nome === nomeManut){
+            await setDoc(
+                doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
+                {
+                    ultimo_km: ultimoKm,
+                    ultima_data: ultimaData
+                },
+                { merge:true }
+            );
+        }
+    });
+    setCacheRegistro(null);
+    setCacheManut(null);
+    await render();
 }

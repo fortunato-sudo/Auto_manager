@@ -3,15 +3,10 @@ import { setVehicleId, setTab } from "./state.js";
 import { headerMenu } from "./ui.js";
 import { calcolaStato } from "./manut.js";
 
-function getVehicleIcon(nome){
-  const n = nome.toLowerCase();
-  if(n.includes("cbr") || n.includes("moto") || n.includes("yamaha") || n.includes("ducati")){
-    return "🏍";
-  }
 
-  if(n.includes("van") || n.includes("furgone") || n.includes("ducato")){
-    return "🚚";
-  }
+function getVehicleIcon(v){
+  if(v.tipo === "moto") return "🏍";
+  if(v.tipo === "van") return "🚚";
   return "🚗";
 }
 
@@ -42,47 +37,59 @@ export async function renderGarage(appDiv){
     let tagliandoText;
     let interventiText;
     if(tagliandoStato === "urgente"){
-      tagliandoText = `<span class="tagliandoUrgente">⚠️ Tagliando urgente</span>`;
+      tagliandoText = `<span class="tagliandoUrgente">🔴 Tagliando urgente</span>`;
     }
 
     else if(tagliandoStato === "imminente"){
-      tagliandoText = `<span class="tagliandoImminente">⚠️ Tagliando tra ${tagliandoKm.toLocaleString()} km</span>`;
+      tagliandoText = `<span class="tagliandoImminente">🟠 Tagliando tra ${(tagliandoKm - km).toLocaleString()} km</span>`;
     }
 
     else{
-      tagliandoText = `<span class="tagliandoOk">✅ Tagliando ok</span>`;
+      tagliandoText = `<span class="tagliandoOk">🟢 Tagliando ok</span>`;
     }
 
-    let additivoText="";
-    if(statoAdditivo==="attenzione"){
-      additivoText=`<span class="additivoWarning">⚠️ Prossimo pieno con additivo</span>`;
+    let additivoText = "";
+    if(statoAdditivo === "warning"){
+        additivoText = `
+            <div class="vehicleAdditivo">
+                <span class="additivoWarning">
+                    🧴 Additivo tra 1 pieno
+                </span>
+            </div>
+        `;
     }
 
-    if(statoAdditivo==="urgente"){
-      additivoText=`<span class="additivoUrgente">🧴 Additivo diesel da usare</span>`;
+    if(statoAdditivo === "urgente"){
+        additivoText = `
+            <div class="vehicleAdditivo">
+                <span class="additivoUrgente">
+                    ⚠️ Prossimo pieno con additivo
+                </span>
+            </div>
+        `;
     }
 
     if(urgenti === 0 && imminenti === 0){
-      interventiText = `<span class="interventiOk">🔧 Interventi ok</span>`;
+      interventiText = `<span class="interventiOk">🟢 Interventi ok</span>`;
     }
     else{
       let parts = [];
 
       if(urgenti > 0){
         parts.push(
-          `<span class="interventiUrgenti">${urgenti === 1 ? "1 urgente" : urgenti + " urgenti"}</span>`
+          `<span class="interventiUrgenti">🔴 ${urgenti === 1 ? "1 intervento urgente" : urgenti + " interventi urgenti"}</span>`
         );
       }
 
       if(imminenti > 0){
         parts.push(
-          `<span class="interventiImminenti">${imminenti === 1 ? "1 imminente" : imminenti + " imminenti"}</span>`
+          `<span class="interventiImminenti">🟠 ${imminenti === 1 ? "1 intervento imminente" : imminenti + " interventi imminenti"}</span>`
         );
       }
 
       interventiText = `
         <span class="interventiText">
-          🔧 ${parts.join(" • ")}
+          ${parts.join('<span class="interventiDivider">•</span>')}
         </span>
       `;
     }
@@ -91,25 +98,38 @@ export async function renderGarage(appDiv){
       <div class="vehicleCard vehicleEnter" onclick="entraVeicolo('${id}')">
         <div class="vehicleArrow">›</div>
         <div class="vehicleTitle">
-          ${getVehicleIcon(v.nome)} ${v.nome}
+          ${getVehicleIcon(v)} ${v.marca || ""} ${v.modello || v.nome || ""}
+          ${v.motore ? `
+          <div class="vehicleSubtitle">
+            ${v.motore}
+          </div>
+        ` : ""}
+        </div>
+        
+        <div class="vehicleMeta">
+          ${v.targa ? `
+            <span class="plateITA">${v.targa}</span>
+          ` : ""}
+
+          <span class="vehicleKm">
+            ${km.toLocaleString()} km
+          </span>
         </div>
 
-        ${v.targa ? `<div class="plateITA">${v.targa}</div>` : ""}
-        
-        <div class="vehicleKm">
-          ${km.toLocaleString()} km
+        <div class="vehicleAlerts">
+          <div class="vehicleTagliando">
+            ${tagliandoText}
+          </div>
+
+          ${(tagliandoText && interventiText) ? `<span class="vehicleDivider">│</span>` : ""}
+
+          <div class="vehicleInterventi">
+            ${interventiText}
+          </div>
         </div>
 
         <div class="vehicleAdditivo">
           ${additivoText}
-        </div>
-
-        <div class="vehicleTagliando">
-          ${tagliandoText}
-        </div>
-
-        <div class="vehicleInterventi">
-          ${interventiText}
         </div>
       </div>
     `;
@@ -133,6 +153,6 @@ export async function renderGarage(appDiv){
 
 window.entraVeicolo=function(id){
   setVehicleId(id);
-  setTab("home");
+  setTab("home","garage");
   render();
 }

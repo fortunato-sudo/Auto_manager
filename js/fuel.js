@@ -1,7 +1,7 @@
 import { db, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc, query, orderBy, limit } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatNumero, formatDate, formatKm, parseNumero, getConsumoClasse } from "./utils.js";
-import { cacheFuel, fuelEditId, setCacheFuel, setTab, vehicleId } from "./state.js";
+import { cacheFuel, setCacheFuel, fuelEditId, setFuelEditId, setTab, vehicleId } from "./state.js";
 
 export async function getFuelList(){
     if(cacheFuel !== null){
@@ -56,26 +56,46 @@ window.salvaFuel = async function(){
     let litri = parseNumero(document.getElementById("litri").value);
     let km = Number(document.getElementById("kmFuel").value);
     let distributore = document.getElementById("distributore").value;
-    await aggiornaKmAutoSeMaggiore(km);
-    let saltoConsumo = document.getElementById("saltaConsumo")?.checked;
     let additivo = document
         .getElementById("switchAdditivo")
         .classList.contains("switchActive");
+    let pienoPerso = document
+        .getElementById("switchPienoPerso")
+        .classList.contains("switchActive");
+    await aggiornaKmAutoSeMaggiore(km);
+    let saltoConsumo = document.getElementById("saltaConsumo")?.checked;
     let consumo = null;
 
+    const vehicleRef = doc(db,"vehicles",vehicleId);
+    const snap = await getDoc(vehicleRef);
+    const v = snap.data();
+    const nuovoStato = calcolaTagliando(km, v.tagliando_km);
+    await setDoc(vehicleRef,{
+        tagliando_stato: nuovoStato
+    },{merge:true});   
+
     /* trova rifornimento precedente */
-    let ultimoKm=null;
-    (cacheFuel || []).forEach(f=>{
-        let k=Number(f.data.km);
-        if(km > k){
-            if(ultimoKm===null || k>ultimoKm){
-                ultimoKm=k;
-            }
+    /* trova rifornimento precedente valido */
+    let ultimoKm = null;
+
+    const listaFuel = (cacheFuel || [])
+        .map(f => f.data)
+        .sort((a,b)=> b.km - a.km);
+
+    for(const f of listaFuel){
+
+        if(f.pieno_perso){
+            break;
         }
-    });
+
+        if(f.km < km){
+            ultimoKm = f.km;
+            break;
+        }
+    }
 
     /* calcola consumo */
-    if(!saltoConsumo && ultimoKm !== null && litri){
+    if(!saltoConsumo && !pienoPerso && ultimoKm !== null && litri){
         let kmPercorsi = km - ultimoKm;
         if(kmPercorsi>0){
             consumo = kmPercorsi / litri;
@@ -90,10 +110,12 @@ window.salvaFuel = async function(){
             litri,
             km,
             distributore,
+            additivo:additivo,
+            pieno_perso:pienoPerso,
             consumo,
             data:new Date().toISOString()
         },{merge:true});
-        fuelEditId=null;
+        setFuelEditId(null);
     }else{
         await addDoc(collection(db,"vehicles",vehicleId,"fuel"),{
 			vehicleId:"default",
@@ -108,27 +130,136 @@ window.salvaFuel = async function(){
             data:new Date().toISOString()
         });
     }
+
+    const fuelSnapList = await getDocs(
+            collection(db,"vehicles",vehicleId,"fuel")
+        );
+
+    const lista = fuelSnapList.docs
+        .map(d => d.data())
+        .sort((a,b)=> new Date(b.data) - new Date(a.data))
+
+    let pieniSenzaAdditivo = 0;
+    for(const f of lista){
+        if(f.additivo === true){
+            break;
+        }
+        pieniSenzaAdditivo++;
+    }
+
+    let statoAdditivo="ok";
+
+    if(pieniSenzaAdditivo === 2){
+        statoAdditivo="warning";
+    }
+
+    if(pieniSenzaAdditivo >= 3){
+        statoAdditivo="urgente";
+    }
+
+    await setDoc(
+        doc(db,"vehicles",vehicleId),
+        {
+            pieni_senza_additivo: pieniSenzaAdditivo,
+            stato_additivo: statoAdditivo
+        },
+        {merge:true}
+    );
+
+    /* RICALCOLO CONSUMI DOPO MODIFICA */
+    const fuelSnap = await getDocs(
+        collection(db,"vehicles",vehicleId,"fuel")
+    );
+
+    let fuelList = fuelSnap.docs
+        .map(d => ({
+            id:d.id,
+            data:d.data()
+        }))
+        .sort((a,b)=> a.data.km - b.data.km);
+
+    for(let i=1;i<fuelList.length;i++){
+        let prev = fuelList[i-1];
+        let curr = fuelList[i];
+        let consumo = null;
+        if(
+            !prev.data.pieno_perso &&
+            !curr.data.pieno_perso &&
+            prev.data.km &&
+            curr.data.km &&
+            curr.data.litri
+        ){
+            let kmPercorsi = curr.data.km - prev.data.km;
+            if(kmPercorsi > 0){
+                consumo = kmPercorsi / curr.data.litri;
+            }
+        }
+
+        await setDoc(
+            doc(db,"vehicles",vehicleId,"fuel",curr.id),
+            { consumo },
+            { merge:true }
+        );
+    }
+
     setCacheFuel(null);
+    await getFuelList();
     setTab("fuel");
     render();
 }
 
 window.modificaFuel = function(id){
-    fuelEditId = id;
-    setTab("fuelAdd");
+    setFuelEditId(id);
+    setTab("fuelAdd","fuel");
     render();
 }
 
 window.eliminaFuel = async function(id){
     if(confirm("Eliminare questo rifornimento?")){
         await deleteDoc(doc(db,"vehicles",vehicleId,"fuel",id));
+        const fuelSnapList = await getDocs(
+            collection(db,"vehicles",vehicleId,"fuel")
+        );
+
+        const lista = fuelSnapList.docs
+            .map(d => d.data())
+            .sort((a,b)=> new Date(b.data) - new Date(a.data));
+
+        let pieniSenzaAdditivo = 0;
+
+        for(const f of lista){
+            if(f.additivo === true){
+                break;
+            }
+            pieniSenzaAdditivo++;
+        }
+
+        let statoAdditivo="ok";
+
+        if(pieniSenzaAdditivo === 2){
+            statoAdditivo="warning";
+        }
+
+        if(pieniSenzaAdditivo >= 3){
+            statoAdditivo="urgente";
+        }
+
+        await setDoc(
+            doc(db,"vehicles",vehicleId),
+            {
+                pieni_senza_additivo: pieniSenzaAdditivo,
+                stato_additivo: statoAdditivo
+            },
+            {merge:true}
+        );
         setCacheFuel(null);
         render();
     }
 }
 
 let pienoPerso=false;
-let additivoDiesel=false;
+let additivo=false;
+
 
 window.togglePienoPerso=function(){
     const sw=document.getElementById("switchPienoPerso");
@@ -138,14 +269,24 @@ window.togglePienoPerso=function(){
 
 window.toggleAdditivo=function(){
     const sw=document.getElementById("switchAdditivo");
-    additivoDiesel=!additivoDiesel;
-    sw.classList.toggle("switchActive");
+    additivo = !additivo;
+    if(additivo){
+        sw.classList.add("switchActive");
+    }else{
+        sw.classList.remove("switchActive");
+    }
+}
+
+window.nuovoFuel=function(){
+    setFuelEditId(null);
+    setTab("fuelAdd","fuel");
+    render();
 }
 
 export function renderFuel(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
         ${headerMenu("Rifornimenti")}
-        <button onclick="nav('fuelAdd')" class="mainBtn">
+        <button onclick="nuovoFuel()" class="mainBtn">
             + Nuovo rifornimento
         </button>
         <div class="section">Ultimi rifornimenti</div>
@@ -303,15 +444,34 @@ export async function renderFuelAdd(appDiv){
             </div>
         </div>
     `;
+    additivo = false;
+    pienoPerso = false;
 
     if(fuelEditId){
         const snap = await getDoc(doc(db,"vehicles",vehicleId,"fuel",fuelEditId));
 
-		let f = snap.data();
-	        document.getElementById("totale").value = f.totale || "";
-	        document.getElementById("litro").value = f.litro || "";
-	        document.getElementById("litri").value = f.litri || "";
-	        document.getElementById("kmFuel").value = f.km || "";
-	        document.getElementById("distributore").value = f.distributore || "";
-	}
+        let f = snap.data();
+
+        document.getElementById("totale").value = f.totale || "";
+        document.getElementById("litro").value = f.litro || "";
+        document.getElementById("litri").value = f.litri || "";
+        document.getElementById("kmFuel").value = f.km || "";
+        document.getElementById("distributore").value = f.distributore || "";
+
+        /* stato pieno perso */
+        if(f.pieno_perso){
+            pienoPerso = true;
+            document
+                .getElementById("switchPienoPerso")
+                .classList.add("switchActive");
+        }
+
+        /* stato additivo */
+        if(f.additivo){
+            additivo = true;
+            document
+                .getElementById("switchAdditivo")
+                .classList.add("switchActive");
+        }
+    }
 }

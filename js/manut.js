@@ -173,6 +173,20 @@ export function renderManutAdd(appDiv){
     }
 }
 
+export function calcolaTagliando(kmAttuali, kmTagliando){
+    if(!kmTagliando) return "ok";
+    const diff = kmTagliando - kmAttuali;
+
+    if(diff <= 0){
+        return "urgente";
+    }
+
+    if(diff <= 1500){
+        return "imminente";
+    }
+    return "ok";
+}
+
 window.aggiungiManutenzione=function(){
     let nome=prompt("Nome manutenzione | Frequenza km | Frequenza mesi | Prodotto\n\nEsempio:\nOlio motore, 15000, 12, Motul");
     if(!nome) return;
@@ -218,6 +232,14 @@ window.segnaFatto = async function(){
     let officina = prompt("Officina (facoltativo)");
     let note = prompt("Note (facoltativo)");
     let data = new Date().toISOString().split("T")[0];
+
+    const vehicleRef = doc(db,"vehicles",vehicleId);
+    const snap = await getDoc(vehicleRef);
+    const v = snap.data();
+    const nuovoStato = calcolaTagliando(km, v.tagliando_km);
+    await setDoc(vehicleRef,{
+        tagliando_stato: nuovoStato
+    },{merge:true});
 
     await addDoc(collection(db,"vehicles",vehicleId,"registro"),{
         manutenzione: dettaglioManut.nome,
