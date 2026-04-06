@@ -308,16 +308,21 @@ body:not(.dark) .menuItem{
 
 .vehicleAlerts{
     display:flex;
-    align-items:center;
-    gap:10px;
-    margin-top:6px;
-    flex-wrap:wrap;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:4px;
 }
 
 .vehicleKm{
     font-size:13px;
     opacity:0.8;
     font-weight:600;
+}
+
+.vehicleTagliando,
+.vehicleInterventi,
+.vehicleAdditivo{
+    display:block;
 }
 
 .vehicleTagliando{
@@ -525,6 +530,32 @@ body:not(.dark) .menuItem{
 	color:#ff3b30;
 	font-weight:600;
 	font-size:14px;
+}
+
+.fuelQuickAdd{
+    cursor:pointer;
+    transition:transform .15s ease;
+}
+
+.fuelQuickAdd:active{
+    transform:scale(0.97);
+}
+
+.vehicleKmBox{
+    display:flex;
+    flex-direction:column;
+}
+
+.vehicleFuelQuick{
+    font-size:15px;
+    color:#4da3ff;
+    margin-top:4px;
+    cursor:pointer;
+    font-weight:600;
+}
+
+.vehicleFuelQuick:active{
+    opacity:0.7;
 }
 
 /* WIDGETS */
@@ -1189,4 +1220,47 @@ select{
 
 .row select{
     flex:1;
+}
+
+/* DASHBOARD */
+.statoCard{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.statoIcon{
+    font-size:28px;
+}
+
+.statoText{
+    font-size:18px;
+    font-weight:600;
+}
+
+.statoWidget{
+    text-align:left;
+}
+
+.statoValue{
+    font-size:18px;
+    font-weight:600;
+}
+
+.tagliandoBar{
+    width: 60%;
+    height: 6px;
+    margin: 10px auto 0 auto;
+    background: rgba(255,255,255,0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.tagliandoBar .progressFill{
+    height: 100%;
+    border-radius: 6px;
+}
+
+.progressFill{
+    transition: width 0.6s ease;
 }

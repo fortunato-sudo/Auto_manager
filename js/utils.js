@@ -1,13 +1,18 @@
 export function formatKm(km){
     if(km === null || km === undefined) return "-";
-    return Number(km).toLocaleString("it-IT");
+    const n = Number(km);
+    if(isNaN(n)) return "-";
+    return n.toLocaleString("it-IT");
 }
 
 export function formatNumero(num, decimali){
-    if(num===null || num===undefined) return "";
-    return Number(num)
-    .toFixed(decimali)
-    .replace(".",",");
+    if(num === null || num === undefined) return "";
+    const n = Number(num);
+    if(isNaN(n)) return "";
+    return n.toLocaleString("it-IT",{
+        minimumFractionDigits: decimali,
+        maximumFractionDigits: decimali
+    });
 }
 
 export function formatDate(d){

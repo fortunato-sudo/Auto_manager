@@ -1,4 +1,4 @@
-import { db, collection, addDoc, setDoc, doc, deleteDoc } from "./firebase.js";
+import { db, collection, addDoc, setDoc, getDoc, doc, deleteDoc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDate, formatDateOnly, formatKm } from "./utils.js";
 import { 
@@ -51,18 +51,25 @@ export function renderManutList(manutList, km){
         let scadenzaTesto = "";
         let kmMancanti = null;
 
-        if(stato.nextKm !== null){
+        if(m.ultimo_km !== undefined && stato.nextKm !== null){
             kmMancanti = stato.nextKm - km;
         }
 
-        // caso: km + mesi
+        if(!m.ultimo_km && !m.ultima_data){
+            scadenzaTesto = "Mai effettuato";
+        }
+
         if(
             m.frequenza_km > 0 &&
             m.frequenza_mesi > 0
         ){
-            scadenzaTesto =
-            `${formatDateOnly(stato.nextDate)} | ${formatKm(kmMancanti)} km rimasti`;
-
+            if(stato.nextDate){
+                scadenzaTesto =
+                `${formatDateOnly(stato.nextDate)} | ${formatScadenza(kmMancanti)}`;
+            }else{
+                scadenzaTesto =
+                formatScadenza(kmMancanti);
+            }
         }
 
         // caso: solo km
@@ -70,7 +77,7 @@ export function renderManutList(manutList, km){
             m.frequenza_km > 0
         ){
             scadenzaTesto =
-            `${formatKm(kmMancanti)} km rimasti`;
+            formatScadenza(kmMancanti);
         }
 
         // caso: solo mesi
@@ -102,7 +109,7 @@ export function renderManutList(manutList, km){
                 <img class="manutImg" src="img/${m.nome}.JPG">
                 <div class="manutInfo">
                     <div class="manutNext">
-                        Scadenza: ${scadenzaTesto}
+                        ${scadenzaTesto}
                     </div>
                     <div class="manutTitle">
                         ${m.nome}
@@ -173,6 +180,19 @@ export function renderManutAdd(appDiv){
     }
 }
 
+export function formatScadenza(kmRestanti){
+    if(kmRestanti === null) return "-";
+
+    if(kmRestanti < 0){
+        return `Scaduto da ${formatKm(Math.abs(kmRestanti))} km`;
+    }
+
+    if(kmRestanti === 0){
+        return "Scade ora";
+    }
+    return `Tra ${formatKm(kmRestanti)} km`;
+}
+
 export function calcolaTagliando(kmAttuali, kmTagliando){
     if(!kmTagliando) return "ok";
     const diff = kmTagliando - kmAttuali;
@@ -236,8 +256,17 @@ window.segnaFatto = async function(){
     const vehicleRef = doc(db,"vehicles",vehicleId);
     const snap = await getDoc(vehicleRef);
     const v = snap.data();
-    const nuovoStato = calcolaTagliando(km, v.tagliando_km);
+
+    let nuovoTagliandoKm = v.tagliando_km || null;
+    if(nome === "TAGLIANDO_COMPLETO"){
+        const intervallo = v.tagliando_intervallo || 15000;
+        nuovoTagliandoKm = Number(km) + intervallo;
+    }
+    
+    const nuovoStato = calcolaTagliando(Number(km), nuovoTagliandoKm);
+
     await setDoc(vehicleRef,{
+        tagliando_km: nuovoTagliandoKm,
         tagliando_stato: nuovoStato
     },{merge:true});
 
@@ -253,6 +282,7 @@ window.segnaFatto = async function(){
         ultimo_km:Number(km),
         ultima_data:data
     },{merge:true});
+    setCacheManut(null);
     setTab("home");
     render();
 }

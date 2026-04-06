@@ -185,9 +185,7 @@ async function preloadDB(){
             doc(db,"vehicles",vehicleId),
             {
                 urgenti,
-                imminenti,
-                tagliando_km: tagliandoKm,
-                tagliando_stato: tagliandoStato
+                imminenti
             },
             {merge:true}
         );
@@ -227,7 +225,11 @@ async function preloadDB(){
             break;
                 
             case "home":
-                renderHome(appDiv, km, manutList, stats);
+                const vehicleSnap = await getDoc(
+                    doc(db,"vehicles",vehicleId)
+                );
+                const vehicle = vehicleSnap.data();
+                renderHome(appDiv, km, manutList, stats, vehicle);
             break;
 
             case "manut":

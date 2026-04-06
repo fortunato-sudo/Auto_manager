@@ -2,6 +2,7 @@ import { db, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc, query,
 import { headerMenu, headerBack } from "./ui.js";
 import { formatNumero, formatDate, formatKm, parseNumero, getConsumoClasse } from "./utils.js";
 import { cacheFuel, setCacheFuel, fuelEditId, setFuelEditId, setTab, vehicleId } from "./state.js";
+import { calcolaTagliando } from "./manut.js";
 
 export async function getFuelList(){
     if(cacheFuel !== null){
@@ -63,6 +64,7 @@ window.salvaFuel = async function(){
         .getElementById("switchPienoPerso")
         .classList.contains("switchActive");
     await aggiornaKmAutoSeMaggiore(km);
+    await getFuelList();
     let saltoConsumo = document.getElementById("saltaConsumo")?.checked;
     let consumo = null;
 

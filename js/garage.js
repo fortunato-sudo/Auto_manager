@@ -121,15 +121,15 @@ export async function renderGarage(appDiv){
             ${tagliandoText}
           </div>
 
-          ${(tagliandoText && interventiText) ? `<span class="vehicleDivider">│</span>` : ""}
-
           <div class="vehicleInterventi">
             ${interventiText}
           </div>
-        </div>
 
-        <div class="vehicleAdditivo">
           ${additivoText}
+
+          <span class="vehicleFuelQuick" onclick="event.stopPropagation(); nav('fuelAdd')">
+            ⛽ Inserisci rifornimento
+          </span>
         </div>
       </div>
     `;

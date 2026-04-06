@@ -1,8 +1,43 @@
 import { headerMenu } from "./ui.js";
 import { calcolaStato } from "./manut.js";
-import { formatNumero } from "./utils.js";
+import { formatNumero, formatKm } from "./utils.js";
 
-export function renderHome(appDiv, km, manutList, stats){
+export function statoVeicolo(urgenti, imminenti, tagliando){
+    if(urgenti > 0){
+        return {
+            icon:"🔴",
+            text:`${urgenti} interventi urgenti`
+        };
+    }
+
+    if(tagliando === "urgente"){
+        return {
+            icon:"🔴",
+            text:"Tagliando urgente"
+        };
+    }
+
+    if(imminenti > 0){
+        return {
+            icon:"🟡",
+            text:`${imminenti} interventi imminenti`
+        };
+    }
+
+    if(tagliando === "imminente"){
+        return {
+            icon:"🟡",
+            text:"Tagliando in arrivo"
+        };
+    }
+
+    return {
+        icon:"🟢",
+        text:"Tutto ok"
+    };
+}
+
+export function renderHome(appDiv, km, manutList, stats, vehicle){
     let urg=0;
     let imm=0;
 
@@ -12,23 +47,55 @@ export function renderHome(appDiv, km, manutList, stats){
         if(stato.stato==="imminente") imm++;
     });
 
+    let tagliandoKm = vehicle?.tagliando_km || null;
+    let tagliandoStato = vehicle?.tagliando_stato || "ok";
+    let tagliandoText = "-";
+    if(vehicle.tagliando_km){
+        let diff = vehicle.tagliando_km - km;
+
+        if(diff <= 0){
+            tagliandoText = "⚠️ Tagliando urgente";
+        }else{
+            tagliandoText = `Tra ${formatKm(diff)} km`;
+        }
+    }
+
+    let tagliandoProgress = 0;
+    if(vehicle.tagliando_km){
+        const intervallo = vehicle.tagliando_intervallo || 15000;
+        const fatto = intervallo - (vehicle.tagliando_km - km);
+        tagliandoProgress = Math.max(0, Math.min(100, (fatto / intervallo) * 100));
+    }
+
 	appDiv.style.opacity = 0;
+    const stato = statoVeicolo(urg, imm, null);
     appDiv.innerHTML+=`
-        ${headerMenu('<img src="img/logo.png" class="appLogoLarge">')}
+        ${headerMenu("Dashboard")}
+
+        <div class="widgets">
+            <div class="widget statoWidget">
+                <div class="wTitle">🚗 Stato veicolo</div>
+                <div class="wValue statoValue">
+                    ${stato.icon} ${stato.text}
+                </div>
+            </div>
+        </div>
 		
         <div class="widgets">
             <div class="widget kmWidget">
-                <div class="wTitle">Km auto</div>
+                <div class="wTitle">🚗 Chilometraggio</div>
+                <div class="wValue">${Number(km).toLocaleString("it-IT")} km</div>
+
                 <div class="kmBox">
-                    <input id="km" value="${km}">
-                    <button onclick="saveKm()">Aggiorna</button>
+                    <input id="km" value="${Number(km).toLocaleString('it-IT')}">
+                    <button onclick="saveKm()">Aggiorna km</button>
                 </div>
             </div>
         </div>
 
         <div class="widgets">
             <div class="widget">
-                <div class="wTitle">📉 Consumo medio</div>
+                <div class="wTitle">⛽ Consumo medio</div>
                 <div class="wValue">
                     ${stats.consumoMedio ? formatNumero(stats.consumoMedio,2)+" km/l" : "-"}
                 </div>
@@ -52,7 +119,19 @@ export function renderHome(appDiv, km, manutList, stats){
             </div>
         </div>
 
-        <div class="section">Interventi imminenti o urgenti</div>
+        <div class="widgets">
+            <div class="widget">
+                <div class="wTitle">🔧 Tagliando</div>
+                <div class="wValue">${tagliandoText}</div>
+                <div class="progressBar tagliandoBar">
+                    <div class="progressFill"
+                        style="width:${tagliandoProgress}%; background:#ff9f0a">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">⚠️ Interventi da controllare</div>
         <div id="imminenti"></div>
     `;
 	appDiv.style.opacity = 1;

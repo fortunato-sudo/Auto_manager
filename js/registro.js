@@ -2,11 +2,47 @@ import { db, collection, getDocs, getDoc, addDoc, setDoc, deleteDoc, doc } from 
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDateOnly, formatKm } from "./utils.js";
 import { cacheManut, setCacheManut, cacheRegistro, setCacheRegistro ,setTab, vehicleId, registroEditId, setRegistroEditId } from "./state.js";
+import { calcolaTagliando } from "./manut.js";
+
+async function ricalcolaManutenzioni(){
+    const storicoSnap = await getDocs(
+        collection(db,"vehicles",vehicleId,"registro")
+    );
+
+    const storico = storicoSnap.docs.map(d=>d.data());
+    if(!cacheManut) return;
+
+    for(const m of cacheManut){
+        let ultimoKm = 0;
+        let ultimaData = null;
+
+        storico.forEach(r=>{
+            if(
+                r.manutenzione === m.data.nome ||
+                (r.correlate && r.correlate.includes(m.id))
+            ){
+                if(r.km > ultimoKm){
+                    ultimoKm = r.km;
+                    ultimaData = r.data;
+                }
+            }
+        });
+
+        await setDoc(
+            doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
+            {
+                ultimo_km: ultimoKm,
+                ultima_data: ultimaData
+            },
+            {merge:true}
+        );
+    }
+}
 
 export async function renderRegistro(appDiv){
     appDiv.innerHTML+=`
         ${headerMenu("Registro")}
-        <button class="mainBtn" onclick="nav('registroAdd')">
+        <button class="mainBtn" onclick="nuovoRegistro()">
             + Nuovo intervento
         </button>
         <div id="registro"></div>
@@ -84,17 +120,43 @@ export async function renderRegistroAdd(appDiv){
                 <input id="noteInt" placeholder="Note (facoltative)">
             </div>
 
+            <div id="manutCorrelate"></div>
+
             <div class="row center">
                 <button onclick="salvaRegistro()">Salva</button>
             </div>
         </div>
     `;
 
-    let select=document.getElementById("nomeInt");
+    let select = document.getElementById("nomeInt");
+    let lista = cacheManut;
+    if(!lista){
+        const snap = await getDocs(
+            collection(db,"vehicles",vehicleId,"manutenzioni")
+        );
+
+        lista = snap.docs.map(d=>({
+            id:d.id,
+            data:d.data()
+        }));
+        setCacheManut(lista);
+    }
+
+    const listaOrdinata = [...lista].sort((a,b)=>
+        a.data.nome.localeCompare(b.data.nome)
+    );
+
+    select.innerHTML += `
+        <option value="Tagliando completo">
+            Tagliando completo
+        </option>
+    `;
+
     if(cacheManut){
         const lista = [...cacheManut].sort((a,b)=>
             a.data.nome.localeCompare(b.data.nome)
         );
+
         lista.forEach(m=>{
             select.innerHTML += `
                 <option value="${m.data.nome}">
@@ -102,7 +164,11 @@ export async function renderRegistroAdd(appDiv){
                 </option>
             `;
         });
-    }   
+    }
+    document
+    .getElementById("nomeInt")
+    .addEventListener("change", aggiornaCorrelate);
+    aggiornaCorrelate();
 
     if(registroEditId){
         const snap = await getDoc(
@@ -110,12 +176,38 @@ export async function renderRegistroAdd(appDiv){
         );
 
         const r = snap.data();
+        if(r){
+            document.getElementById("nomeInt").value = r.manutenzione || "";
+            document.getElementById("kmInt").value = r.km || "";
+            document.getElementById("officinaInt").value = r.officina || "";
+            document.getElementById("noteInt").value = r.note || "";
 
-        document.getElementById("nomeInt").value = r.manutenzione || "";
-        document.getElementById("kmInt").value = r.km || "";
-        document.getElementById("officinaInt").value = r.officina || "";
-        document.getElementById("noteInt").value = r.note || "";
+            // 🔥 genera le correlate
+            aggiornaCorrelate();
+
+            // 🔥 attiva toggle salvati
+            if(r && r.correlate){
+                r.correlate.forEach(id=>{
+                    const sw = document.getElementById("corr_"+id);
+
+                    if(sw){
+                        sw.classList.add("switchActive");
+                    }
+                });
+            }
+        }
     }
+}
+
+window.toggleCorrelata = function(id){
+    const sw = document.getElementById("corr_"+id);
+    sw.classList.toggle("switchActive");
+}
+
+window.nuovoRegistro = function(){
+    setRegistroEditId(null); // reset modalità modifica
+    setTab("registroAdd","registro");
+    render();
 }
 
 window.salvaRegistro = async function(){
@@ -130,10 +222,27 @@ window.salvaRegistro = async function(){
     const vehicleRef = doc(db,"vehicles",vehicleId);
     const snap = await getDoc(vehicleRef);
     const v = snap.data();
-    const nuovoStato = calcolaTagliando(km, v.tagliando_km);
+
+    let nuovoTagliandoKm = v.tagliando_km;
+    if(nome === "Tagliando completo"){
+        const intervallo = v.tagliando_intervallo || 15000;
+        nuovoTagliandoKm = Number(km) + intervallo;
+    }
+
+    const nuovoStato = calcolaTagliando(Number(km), nuovoTagliandoKm);
+
     await setDoc(vehicleRef,{
+        tagliando_km: nuovoTagliandoKm,
         tagliando_stato: nuovoStato
     },{merge:true});
+
+    let correlate = [];
+    for(const m of cacheManut){
+        const sw = document.getElementById("corr_"+m.id);
+        if(sw && sw.classList.contains("switchActive")){
+            correlate.push(m.id);
+        }
+    }
 
     if(registroEditId){
         await setDoc(
@@ -143,7 +252,8 @@ window.salvaRegistro = async function(){
                 km:Number(km),
                 officina,
                 note,
-                data
+                data,
+                correlate
             },
             { merge:true }
         );
@@ -157,11 +267,59 @@ window.salvaRegistro = async function(){
                 km:Number(km),
                 data,
                 officina,
-                note
+                note,
+                correlate
             }
         );
     }
+
+    if(nome === "Tagliando completo"){
+        for(const m of cacheManut){
+            if(
+                m.data.nome.includes("olio") ||
+                m.data.nome.includes("filtro")
+            ){
+                await setDoc(
+                    doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
+                    {
+                        ultimo_km:Number(km),
+                        ultima_data:data
+                    },
+                    {merge:true}
+                );
+            }
+        }
+    }
+
+    /* aggiorna manutenzione principale */
+    for(const m of cacheManut){
+        if(m.data.nome === nome){
+            await setDoc(
+                doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
+                {
+                    ultimo_km:Number(km),
+                    ultima_data:data
+                },
+                {merge:true}
+            );
+        }
+    }
+
+    /* manutenzioni correlate */
+    for(const m of cacheManut){
+        const sw = document.getElementById("corr_"+m.id);
+        if(sw && sw.classList.contains("switchActive"))
+            await setDoc(
+                doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
+                {
+                    ultimo_km:Number(km),
+                    ultima_data:data
+                },
+                {merge:true}
+            );
+    }
     setCacheRegistro(null);
+    setCacheManut(null);
     setTab("registro");
     await render();
 }
@@ -174,46 +332,56 @@ window.modificaRegistro = function(id){
 
 window.eliminaRegistro = async function(id){
     if(!confirm("Eliminare intervento?")) return;
-    const snap = await getDoc(
-        doc(db,"vehicles",vehicleId,"registro",id)
-    );
-
-    const nomeManut = snap.data().manutenzione;
     await deleteDoc(
         doc(db,"vehicles",vehicleId,"registro",id)
     );
-
-    /* trova ultimo intervento rimasto */
-    const storico = await getDocs(
-        collection(db,"vehicles",vehicleId,"registro")
-    );
-
-    let ultimoKm = 0;
-    let ultimaData = null;
-    storico.forEach(d=>{
-        const r = d.data();
-        if(r.manutenzione === nomeManut){
-            if(r.km > ultimoKm){
-                ultimoKm = r.km;
-                ultimaData = r.data;
-            }
-        }
-    });
-
-    /* aggiorna manutenzione */
-    cacheManut.forEach(async m=>{
-        if(m.data.nome === nomeManut){
-            await setDoc(
-                doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
-                {
-                    ultimo_km: ultimoKm,
-                    ultima_data: ultimaData
-                },
-                { merge:true }
-            );
-        }
-    });
+    await ricalcolaManutenzioni();
     setCacheRegistro(null);
     setCacheManut(null);
     await render();
+}
+
+function aggiornaCorrelate(){
+    const nome = document.getElementById("nomeInt").value;
+    let correlate = [];
+
+    if(nome === "Tagliando completo"){
+        correlate = cacheManut.filter(m =>
+            m.data.tagliando === true
+        );
+    }else{
+        correlate = cacheManut.filter(m =>
+            m.data.dipende_da === nome
+        );
+    }
+
+    let html = "";
+    if(correlate.length > 0){
+        html += `
+            <div class="section">
+                Manutenzioni correlate
+            </div>
+        `;
+
+        correlate.forEach(m=>{
+            html += `
+                <div class="row">
+                    <div class="fuelToggleRow">
+
+                        <span class="fuelToggleLabel">
+                            ${m.data.nome}
+                        </span>
+
+                        <div class="switch"
+                            onclick="toggleCorrelata('${m.id}')"
+                            id="corr_${m.id}">
+
+                            <div class="switchKnob"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    document.getElementById("manutCorrelate").innerHTML = html;
 }
