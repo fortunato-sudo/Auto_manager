@@ -687,7 +687,9 @@ button{
 
 .group{
     margin:16px;
-    background:white;
+    padding:20px;
+    border-radius:14px;
+    background:rgba(255,255,255,0.04);
     border-radius:16px;
     overflow:hidden;
 }
@@ -749,6 +751,12 @@ button{
     color:white;
 	font-size:14px;
     margin:16px;
+}
+
+.secondaryBtn{
+    padding:14px;
+    font-size:14px;
+    border-radius:14px;
 }
 
 .deleteBtn{
@@ -1204,8 +1212,7 @@ body.menuOpen{
 }
 
 select{
-    max-width:150px;
-    max-height:40px;
+    max-height:50px;
     width:100%;
     background:var(--card-bg);
     color:var(--text);
@@ -1263,4 +1270,67 @@ select{
 
 .progressFill{
     transition: width 0.6s ease;
+}
+
+.manutPercent{
+    font-size:11px;
+    opacity:0.7;
+    margin-top:3px;
+    text-align:right;
+}
+
+.formGroup{
+    margin-bottom:16px;
+}
+
+.formLabel{
+    font-size:13px;
+    opacity:0.7;
+    margin-bottom:4px;
+}
+
+.formInput,
+.formSelect{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.15);
+    background:rgba(255,255,255,0.05);
+    font-size:16px;
+    margin-top:4px;
+    box-sizing:border-box;
+}
+
+.formInput:focus,
+.formSelect:focus{
+    outline:none;
+    border-color:#4da3ff;
+}
+
+.formButton{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:12px;
+    background:#0a84ff;
+    color:white;
+    font-size:16px;
+    margin-top:20px;
+}
+
+.fuelAdditivoTag{
+    display:inline-block;
+    margin-top:6px;
+    padding:4px 8px;
+    border-radius:6px;
+    background:rgba(255,193,7,0.15);
+    color:#ffc107;
+    font-size:13px;
+    font-weight:600;
+}
+
+.wSub{
+    font-size:14px;
+    opacity:0.75;
+    margin-top:6px;
 }

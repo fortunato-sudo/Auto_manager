@@ -1,8 +1,8 @@
 import { renderHome } from "./home.js";
 import { renderGarage } from "./garage.js";
 import { renderManut, renderManutAdd, renderManutList, renderDettaglio, calcolaStato } from "./manut.js";
-import { renderFuel, renderFuelAdd, getFuelList } from "./fuel.js";
-import { renderStats, calcolaStatisticheFuel } from "./stats.js";
+import { renderFuel, renderFuelAdd, getFuelList, renderDistributori } from "./fuel.js";
+import { renderStats, calcolaStatisticheFuel, calcolaCostoAuto, calcolaAutonomia } from "./stats.js";
 import { renderRegistro, renderRegistroAdd } from "./registro.js";
 import { db, collection, getDocs, getDoc, doc, setDoc } from "./firebase.js";
 import {
@@ -108,6 +108,11 @@ async function preloadDB(){
             setCacheConfig(km);
         }
 
+        let autonomia=null;
+        if(tab==="home" || tab==="stats"){
+            autonomia = calcolaAutonomia(fuelList, km, currentVehicle);
+        }
+
         const vehicleNameBox = document.getElementById("menuVehicleName");
         const vehicleKmBox = document.getElementById("menuVehicleKm");
 
@@ -140,6 +145,11 @@ async function preloadDB(){
             setCacheRegistro(registroList);
         }
         registroList = registroList || [];
+
+        let costoAuto = null;
+        if(tab==="home" || tab==="stats"){
+            costoAuto = calcolaCostoAuto(fuelList, registroList, km);
+        }
 
         const lastManut = {};
         registroList.forEach(r=>{
@@ -229,7 +239,7 @@ async function preloadDB(){
                     doc(db,"vehicles",vehicleId)
                 );
                 const vehicle = vehicleSnap.data();
-                renderHome(appDiv, km, manutList, stats, vehicle);
+                renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, autonomia);
             break;
 
             case "manut":
@@ -254,6 +264,10 @@ async function preloadDB(){
 
             case "fuelAdd":
                 await renderFuelAdd(appDiv);
+            break;
+
+            case "stations":
+                renderDistributori(appDiv, fuelList);
             break;
 
             case "stats":

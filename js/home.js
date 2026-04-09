@@ -37,7 +37,7 @@ export function statoVeicolo(urgenti, imminenti, tagliando){
     };
 }
 
-export function renderHome(appDiv, km, manutList, stats, vehicle){
+export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, autonomia){
     let urg=0;
     let imm=0;
 
@@ -95,6 +95,22 @@ export function renderHome(appDiv, km, manutList, stats, vehicle){
 
         <div class="widgets">
             <div class="widget">
+                <div class="wTitle">
+                    🚗 Autonomia stimata
+                </div>
+                <div class="wValue">
+                    ${autonomia ? Math.round(autonomia.autonomiaTeorica)+" km" : "-"}
+                </div>
+                <div class="wSub">
+                    Ultimo pieno: ${
+                        autonomia ? Math.round(autonomia.autonomiaUltimoPieno)+" km" : "-"
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="widgets">
+            <div class="widget">
                 <div class="wTitle">⛽ Consumo medio</div>
                 <div class="wValue">
                     ${stats.consumoMedio ? formatNumero(stats.consumoMedio,2)+" km/l" : "-"}
@@ -104,6 +120,31 @@ export function renderHome(appDiv, km, manutList, stats, vehicle){
                 <div class="wTitle">💶 Spesa carburante mese</div>
                 <div class="wValue">
                     ${stats.spesaMese ? formatNumero(stats.spesaMese,2)+" €" : "-"}
+                </div>
+            </div>
+        </div>
+
+        <div class="widgets">
+            <div class="widget">
+                <div class="wTitle">
+                    ⛽ Costo totale carburante:
+                    ${costoAuto ? formatNumero(costoAuto.carburanteTot,2)+" €" : "-"}
+                </div>
+
+                <div class="wTitle">
+                    🔧 Costo totale manutenzione: 
+                    ${costoAuto ? formatNumero(costoAuto.manutTot,2)+" €" : "-"}
+                </div>
+            </div>
+
+            <div class="widget">
+                <div class="wTitle">
+                    💰 Costo totale veicolo:
+                    ${costoAuto ? formatNumero(costoAuto.totale,2)+" €" : "-"}
+                </div>
+
+                <div class="wTitle">
+                    📉 ${costoAuto?.costoKm ? formatNumero(costoAuto.costoKm,3)+" €/km" : "-"}
                 </div>
             </div>
         </div>

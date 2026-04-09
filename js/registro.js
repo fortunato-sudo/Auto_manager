@@ -100,31 +100,31 @@ export async function renderRegistroAdd(appDiv){
         ${headerBack("Nuovo intervento")}
 
         <div class="group">
-            <div class="row">
-                <div>Intervento</div>
-                <select id="nomeInt" class="selectIntervento"></select>
+            <div class="formGroup">
+                <div class="formLabel">Intervento</div>
+                <select id="nomeInt" class="formInput"></select>
             </div>
 
-            <div class="row">
-                <div>Km</div>
-                <input id="kmInt" placeholder="km intervento">
+            <div class="formGroup">
+                <div class="formLabel">Km</div>
+                <input id="kmInt" class="formInput">
             </div>
 
-            <div class="row">
-                <div>Officina</div>
-                <input id="officinaInt" placeholder="Nome officina">
+            <div class="formGroup">
+                <div class="formLabel">Officina</div>
+                <input id="officinaInt" class="formInput">
             </div>
 
-            <div class="row">
-                <div>Note</div>
-                <input id="noteInt" placeholder="Note (facoltative)">
+            <div class="formGroup">
+                <div class="formLabel">Note</div>
+                <input id="noteInt" class="formInput">
             </div>
 
             <div id="manutCorrelate"></div>
 
-            <div class="row center">
-                <button onclick="salvaRegistro()">Salva</button>
-            </div>
+            <button class="formButton" onclick="salvaRegistro()">
+                Salva intervento
+            </button>
         </div>
     `;
 

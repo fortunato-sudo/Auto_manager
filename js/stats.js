@@ -145,6 +145,33 @@ export function calcolaStatisticheFuel(fuelList){
     };
 }
 
+export function calcolaCostoAuto(fuelList, registroList, kmAttuali){
+    let carburanteTot = 0;
+    let manutTot = 0;
+
+    fuelList.forEach(f=>{
+        carburanteTot += f.data.totale || 0;
+    });
+
+    registroList.forEach(r=>{
+        if(r.data.costo){
+            manutTot += r.data.costo;
+        }
+    });
+
+    const totale = carburanteTot + manutTot;
+    let costoKm = null;
+    if(kmAttuali && kmAttuali > 0){
+        costoKm = totale / kmAttuali;
+    }
+    return {
+        carburanteTot,
+        manutTot,
+        totale,
+        costoKm
+    };
+}
+
 function mediaMobileConsumi(listaConsumi, windowSize=5){
     let result=[];
     for(let i=0;i<listaConsumi.length;i++){
@@ -172,6 +199,33 @@ function mediaMobileConsumi(listaConsumi, windowSize=5){
         }
     }
     return result;
+}
+
+export function calcolaAutonomia(fuelList, kmAttuali, vehicle){
+    if(!fuelList || fuelList.length === 0) return null;
+    const lista = [...fuelList].sort((a,b)=> b.data.km - a.data.km);
+    let consumi = [];
+    lista.forEach(f=>{
+        if(f.data.consumo){
+            consumi.push(f.data.consumo);
+        }
+    });
+    if(consumi.length === 0) return null;
+    consumi = consumi.slice(0,5);
+
+    const consumoMedio =
+        consumi.reduce((a,b)=>a+b,0) / consumi.length;
+    const ultimo = lista[0].data;
+    const serbatoio = vehicle?.serbatoio || 55;
+    const autonomiaTeorica = consumoMedio * serbatoio;
+    const autonomiaUltimoPieno =
+        consumoMedio * ultimo.litri;
+
+    return {
+        autonomiaTeorica,
+        autonomiaUltimoPieno,
+        consumoMedio
+    };
 }
 
 export function renderStats(appDiv, fuelList, stats){
@@ -218,7 +272,7 @@ export function renderStats(appDiv, fuelList, stats){
                 <div class="wValue" id="spesaMese">-</div>
             </div>
             <div class="widget">
-                <div class="wTitle">🛣️ Autonomia</div>
+                <div class="wTitle">🛣️ Autonomia ultimo pieno</div>
                 <div class="wValue" id="autonomia">-</div>
             </div>
         </div>

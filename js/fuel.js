@@ -66,6 +66,7 @@ window.salvaFuel = async function(){
     await aggiornaKmAutoSeMaggiore(km);
     await getFuelList();
     let saltoConsumo = document.getElementById("saltaConsumo")?.checked;
+    let fuelType = document.getElementById("fuelType").value;
     let consumo = null;
 
     const vehicleRef = doc(db,"vehicles",vehicleId);
@@ -111,6 +112,7 @@ window.salvaFuel = async function(){
             litro,
             litri,
             km,
+            fuelType:fuelType,
             distributore,
             additivo:additivo,
             pieno_perso:pienoPerso,
@@ -125,6 +127,7 @@ window.salvaFuel = async function(){
             litro,
             litri,
             km,
+            fuelType:fuelType,
             distributore,
             additivo:additivo,
             pieno_perso:pienoPerso,
@@ -285,12 +288,47 @@ window.nuovoFuel=function(){
     render();
 }
 
+function getFuelIcon(tipo){
+    if(tipo === "Diesel") return "🛢️";
+    if(tipo === "Benzina") return "⛽";
+    if(tipo === "GPL") return "🔥";
+    if(tipo === "Metano") return "💨";
+    if(tipo === "Elettrico") return "⚡";
+    return "⛽";
+}
+
+export function calcolaDistributori(fuelList){
+    const stats = {};
+    fuelList.forEach(f=>{
+        const s = f.data;
+        if(!s.distributore) return;
+        if(!stats[s.distributore]){
+            stats[s.distributore] = {
+                count:0,
+                totale:0,
+                litri:0,
+                prezzoTot:0
+            };
+        }
+        stats[s.distributore].count++;
+        stats[s.distributore].totale += s.totale || 0;
+        stats[s.distributore].litri += s.litri || 0;
+        stats[s.distributore].prezzoTot += (s.litro || 0);
+    });
+    return stats;
+}
+
 export function renderFuel(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
         ${headerMenu("Rifornimenti")}
         <button onclick="nuovoFuel()" class="mainBtn">
             + Nuovo rifornimento
         </button>
+
+        <button onclick="nav('stations')" class="secondaryBtn">
+            Storico Distributori
+        </button>
+        
         <div class="section">Ultimi rifornimenti</div>
         <div id="fuelList"></div>
     `;
@@ -349,29 +387,46 @@ export function renderFuel(appDiv, fuelList, stats){
 	    if(s.consumo){
 	        listaConsumi.push(s.consumo);
 	    }
-	
+
 	    let row = `
 	        <div class="manutRow">
 	            <div class="manutInfo">
 	                <div class="fuelTitle">
 	                    ${formatDate(s.data)} • ${formatNumero(s.totale,2)} €
 	                </div>
-	                ${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
-	                <div class="fuelGrid">
-	                    <div class="fuelInfo">
+
+                    <div class="fuelGrid">
+                        <div class="fuelInfo">
+	                        ${s.distributore ? `<div class="fuelStation">⛽ ${s.distributore}</div>` : ""}
+                        </div>
+                    
+                        <div class="fuelInfo">
+                            ${getFuelIcon(s.fuelType)} ${s.fuelType || "diesel"}
+                        </div>
+
+                        <div class="fuelInfo">
 	                        💧 ${formatNumero(s.litro,3)} €/L
 	                    </div>
+
 	                    <div class="fuelInfo">
 	                        ⛽ ${formatNumero(s.litri,2)} L
 	                    </div>
+
 	                    <div class="fuelInfo">
 	                        🚗 ${formatKm(s.km)} km
 	                    </div>
+
 	                    ${s.consumo ?
 	                        `<div class="fuelConsumo ${getConsumoClasse(s.consumo)}">📈 ${formatNumero(s.consumo,2)} km/l</div>`
 	                        :
 	                        `<div class="fuelNoConsumo">⚠️ Consumo non calcolato</div>`
 	                    }
+                        
+                        ${s.additivo ? `
+                            <div class="fuelAdditivoTag">
+                                🧴 Additivo inserito
+                            </div>
+                        ` : ""}
 	                </div>
 	                <div class="fuelActions">
 	                    <button class="btnEdit" onclick="modificaFuel('${id}')">
@@ -398,29 +453,40 @@ export async function renderFuelAdd(appDiv){
         ${headerBack(titoloFuel)}
 
         <div class="group">
-            <div class="row">
-                <div>Prezzo totale</div>
-                <input id="totale" placeholder="€" oninput="calcolaFuel('totale')">
+            <div class="formGroup">
+                <div class="formLabel">Prezzo totale</div>
+                <input id="totale" class="formInput">
             </div>
 
-            <div class="row">
-                <div>Prezzo al litro</div>
-                <input id="litro" placeholder="€/L" oninput="calcolaFuel('litro')">
+            <div class="formGroup">
+                <div class="formLabel">Prezzo al litro</div>
+                <input id="litro" class="formInput" oninput="calcolaFuel('litro')">
             </div>
 
-            <div class="row">
-                <div>Litri</div>
-                <input id="litri" placeholder="L" oninput="calcolaFuel('litri')">
+            <div class="formGroup">
+                <div class="formLabel">Litri</div>
+                <input id="litri" class="formInput" oninput="calcolaFuel('litri')">
             </div>
 
-            <div class="row">
-                <div>Km auto</div>
-                <input id="kmFuel" placeholder="km">
+            <div class="formGroup">
+                <div class="formLabel">Km auto</div>
+                <input id="kmFuel" class="formInput">
             </div>
 
-            <div class="row">
-                <div>Distributore</div>
-                <input id="distributore" placeholder="Nome distributore">
+            <div class="formGroup">
+                <div class="formLabel">Tipo carburante</div>
+                <select id="fuelType" class="formSelect">
+                    <option value="Diesel">Diesel</option>
+                    <option value="Benzina">Benzina</option>
+                    <option value="GPL">GPL</option>
+                    <option value="Metano">Metano</option>
+                    <option value="Elettrico">Elettrico</option>
+                </select>
+            </div>
+
+            <div class="formGroup">
+                <div class="formLabel">Distributore</div>
+                <input id="distributore" class="formInput">
             </div>
 
             <div class="row">
@@ -441,9 +507,9 @@ export async function renderFuelAdd(appDiv){
                     </div>
             </div>
 
-            <div class="row center">
-                <button onclick="salvaFuel()">Salva</button>
-            </div>
+            <button class="formButton" onclick="salvaFuel()">
+                Salva rifornimento
+            </button>
         </div>
     `;
     additivo = false;
@@ -459,6 +525,7 @@ export async function renderFuelAdd(appDiv){
         document.getElementById("litri").value = f.litri || "";
         document.getElementById("kmFuel").value = f.km || "";
         document.getElementById("distributore").value = f.distributore || "";
+        document.getElementById("fuelType").value = f.fuelType || "diesel";
 
         /* stato pieno perso */
         if(f.pieno_perso){
@@ -476,4 +543,51 @@ export async function renderFuelAdd(appDiv){
                 .classList.add("switchActive");
         }
     }
+}
+
+export function renderDistributori(appDiv, fuelList){
+    const stats = calcolaDistributori(fuelList);
+    let html = `
+        ${headerBack("Distributori")}
+        <div class="section">Storico distributori</div>
+    `;
+
+    Object.entries(stats).forEach(([nome,d])=>{
+        const prezzoMedio = d.prezzoTot / d.count;
+        html += `
+            <div class="manutRow">
+                <div class="manutInfo">
+
+                    <div class="fuelTitle">
+                        ⛽ ${nome}
+                    </div>
+
+                    <div class="fuelGrid">
+
+                        <div class="fuelInfo">
+                            Numero Rifornimenti:
+                        </div>
+                        <div class="fuelInfo">
+                            ${d.count}
+                        </div>
+
+                        <div class="fuelInfo">
+                            Spesa totale:
+                        </div>
+                        <div class="fuelInfo">
+                            ${formatNumero(d.totale,2)} €
+                        </div>
+
+                        <div class="fuelInfo">
+                            Prezzo medio:
+                        </div>
+                        <div class="fuelInfo">
+                            ${formatNumero(prezzoMedio,3)} €/L
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    appDiv.innerHTML = html;
 }

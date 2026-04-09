@@ -120,6 +120,10 @@ export function renderManutList(manutList, km){
                     <div class="progressBar">
                         <div class="progressFill" style="width:${stato.progress}%; background:${stato.colore}"></div>
                     </div>
+
+                    <div class="manutPercent">
+                        ${Math.round(stato.progress)}%
+                    </div>
                 </div>
             </div>
         `;
@@ -147,34 +151,34 @@ export function renderManutAdd(appDiv){
             ${headerBack("Nuova manutenzione")}
 
             <div class="group">
-                <div class="row">
-                    <div>Nome manutenzione</div>
-                    <input id="nomeMan" placeholder="Es. Olio motore">
+                <div class="formGroup">
+                <div class="formLabel">Nome manutenzione</div>
+                    <input id="nomeMan" class="formInput" placeholder="Sostituzione olio motore">
                 </div>
 
-                <div class="row">
-                    <div>Frequenza km</div>
-                    <input id="freqKm" placeholder="km">
+                <div class="formGroup">
+                    <div class="formLabel">Frequenza km</div>
+                    <input id="freqKm" class="formInput" placeholder="15000">
                 </div>
 
-                <div class="row">
-                    <div>Frequenza mesi</div>
-                    <input id="freqMesi" placeholder="mesi">
+                <div class="formGroup">
+                    <div class="formLabel">Frequenza mesi</div>
+                    <input id="freqMesi" class="formInput" placeholder="12">
                 </div>
 
-                <div class="row">
-                    <div>Prodotto</div>
-                    <input id="prodottoMan" placeholder="Es. Motul 8100">
+                <div class="formGroup">
+                    <div class="formLabel">Prodotto</div>
+                    <input id="prodottoMan" class="formInput" placeholder="Motul Specific 0720 5W-30">
                 </div>
 
-                <div class="row">
-                    <div>Immagine (URL GitHub)</div>
-                    <input id="imgMan">
+                <div class="formGroup">
+                    <div class="formLabel">Immagine (URL GitHub)</div>
+                    <input id="imgMan" class="formInput">
                 </div>
 
-                <div class="row center">
-                    <button onclick="salvaManutenzione()">Salva</button>
-                </div>
+                <button class="formButton" onclick="salvaManutenzione()">
+                    Salva manutenzione
+                </button>
             </div>
         `;
     }
@@ -326,6 +330,8 @@ export function calcolaStato(m, kmAttuali){
     let progress = 0;
     if(m.frequenza_km && m.frequenza_km > 0){
         progress = ((kmAttuali - (m.ultimo_km || 0)) / m.frequenza_km) * 100;
+        if(progress > 100) progress = 100;
+        if(progress < 0) progress = 0;
     }
 
     else if(m.frequenza_mesi && m.ultima_data){

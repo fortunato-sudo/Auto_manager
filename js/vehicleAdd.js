@@ -9,50 +9,53 @@ export function renderVehicleAdd(appDiv){
 
         <div class="group">
 
-            <div class="row">
-                <div>Tipologia</div>
-                <select id="tipoVeicolo">
+            <div class="formGroup">
+                <div class="formLabel">Tipologia</div>
+                <select id="tipoVeicolo" class="formInput">
                     <option value="auto">🚗 Auto</option>
                     <option value="moto">🏍 Moto</option>
                     <option value="van">🚚 Furgone</option>
                 </select>
             </div>
 
-            <div class="row">
-                <div>Nome veicolo (facoltativo)</div>
-                <input id="nomeVeicolo" placeholder="Es: La Rossa">
+            <div class="formGroup">
+                <div class="formLabel">Nome veicolo (facoltativo)</div>
+                <input id="nomeVeicolo" class="formInput" placeholder="La Rossa">
             </div>
 
-            <div class="row">
-                <div>Marca</div>
-                <input id="marcaVeicolo" placeholder="Nissan">
+            <div class="formGroup">
+                <div class="formLabel">Marca</div>
+                <input id="marcaVeicolo" class="formInput" placeholder="Nissan">
             </div>
 
-            <div class="row">
-                <div>Modello</div>
-                <input id="modelloVeicolo" placeholder="Qashqai">
+            <div class="formGroup">
+                <div class="formLabel">Modello</div>
+                <input id="modelloVeicolo" class="formInput" placeholder="Qashqai">
             </div>
 
-            <div class="row">
-                <div>Anno</div>
-                <input id="annoVeicolo" type="number" placeholder="2016">
+            <div class="formGroup">
+                <div class="formLabel">Anno</div>
+                <input id="annoVeicolo" type="number" class="formInput" placeholder="2016">
             </div>
 
-            <div class="row">
-                <div>Motorizzazione</div>
-                <input id="motoreVeicolo" placeholder="1.5 dCi 110cv">
+            <div class="formGroup">
+                <div class="formLabel">Motorizzazione</div>
+                <input id="motoreVeicolo" class="formInput" placeholder="1.5 dCi">
             </div>
 
-            <div class="row">
-                <div>Targa</div>
-                <input id="targaVeicolo" placeholder="AA123BB">
+            <div class="formGroup">
+                <div class="formLabel">Litri serbatoio</div>
+                <input id="serbatoioVeicolo" class="formInput" placeholder="55">
             </div>
 
-            <div class="row center">
-                <button onclick="salvaVeicolo()" class="mainBtn">
-                    Salva
-                </button>
+            <div class="formGroup">
+                <div class="formLabel">Targa</div>
+                <input id="targaVeicolo" class="formInput" placeholder="AA123BB">
             </div>
+
+            <button class="formButton" onclick="salvaVeicolo()">
+                Salva veicolo
+            </button>
         </div>
     `;
 }
@@ -64,6 +67,7 @@ window.salvaVeicolo = async function(){
     let modello = document.getElementById("modelloVeicolo").value;
     let anno = document.getElementById("annoVeicolo").value;
     let motore = document.getElementById("motoreVeicolo").value;
+    let serbatoio = Number(document.getElementById("serbatoioVeicolo").value);
     let targa = document.getElementById("targaVeicolo").value;
 
     await addDoc(collection(db,"vehicles"),{
@@ -73,6 +77,7 @@ window.salvaVeicolo = async function(){
         modello,
         anno,
         motore,
+        serbatoio:serbatoio,
         targa,
         km_attuali:0,
         pieni_senza_additivo:0,
