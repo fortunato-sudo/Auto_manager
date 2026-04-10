@@ -2,8 +2,8 @@ import { renderHome } from "./home.js";
 import { renderGarage } from "./garage.js";
 import { renderManut, renderManutAdd, renderManutList, renderDettaglio, calcolaStato } from "./manut.js";
 import { renderFuel, renderFuelAdd, getFuelList, renderDistributori } from "./fuel.js";
-import { renderStats, calcolaStatisticheFuel, calcolaCostoAuto, calcolaAutonomia } from "./stats.js";
-import { renderRegistro, renderRegistroAdd } from "./registro.js";
+import { renderStats, calcolaStatisticheFuel, calcolaCostoAuto, calcolaAutonomia, previsioneCarburanteKm } from "./stats.js";
+import { renderRegistro, renderRegistroAdd, renderCronologiaManut } from "./registro.js";
 import { db, collection, getDocs, getDoc, doc, setDoc } from "./firebase.js";
 import {
     tab,
@@ -92,6 +92,7 @@ async function preloadDB(){
         let stats=null;
         if(tab==="home" || tab==="fuel" || tab==="stats"){
             stats = calcolaStatisticheFuel(fuelList);
+            stats.previsioneKm = previsioneCarburanteKm(fuelList);
         }
 
         if(tab === "vehicleAdd"){
@@ -248,6 +249,10 @@ async function preloadDB(){
 
             case "manutAdd":
                 renderManutAdd(appDiv);
+            break;
+
+            case "manutHistory":
+                renderCronologiaManut(appDiv, registroList);
             break;
 
             case "registro":

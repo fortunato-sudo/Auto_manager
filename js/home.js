@@ -107,6 +107,26 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
                     }
                 </div>
             </div>
+
+            <div class="widget">
+                <div class="wTitle">
+                    ⛽ Previsione carburante
+                </div>
+                <div class="wValue">
+                    ${stats.previsioneKm ?
+                        formatNumero(stats.previsioneKm.costoMese,0)+" €"
+                        :
+                        "-"
+                    }
+                </div>
+                <div class="wSub">
+                    ${stats.previsioneKm ?
+                        "Basato su "+Math.round(stats.previsioneKm.kmGiorno)+" km/giorno"
+                        :
+                        ""
+                    }
+                </div>
+            </div>
         </div>
 
         <div class="widgets">
@@ -126,25 +146,26 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
 
         <div class="widgets">
             <div class="widget">
-                <div class="wTitle">
-                    ⛽ Costo totale carburante:
+                <div class="wTitle">⛽ Totale carburante</div>
+                <div class="wValue">
                     ${costoAuto ? formatNumero(costoAuto.carburanteTot,2)+" €" : "-"}
                 </div>
 
-                <div class="wTitle">
-                    🔧 Costo totale manutenzione: 
+                <div class="wTitle">🔧 Totale manutenzione</div>
+                <div class="wValue">
                     ${costoAuto ? formatNumero(costoAuto.manutTot,2)+" €" : "-"}
                 </div>
             </div>
 
             <div class="widget">
-                <div class="wTitle">
-                    💰 Costo totale veicolo:
+                <div class="wTitle">💰 Costo totale veicolo</div>
+                <div class="wValue">
                     ${costoAuto ? formatNumero(costoAuto.totale,2)+" €" : "-"}
                 </div>
-
-                <div class="wTitle">
-                    📉 ${costoAuto?.costoKm ? formatNumero(costoAuto.costoKm,3)+" €/km" : "-"}
+                
+                <div class="wTitle">📉 Costo per Km</div>
+                <div class="wValue">
+                    ${costoAuto?.costoKm ? formatNumero(costoAuto.costoKm,3)+" €/km" : "-"}
                 </div>
             </div>
         </div>

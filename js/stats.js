@@ -172,6 +172,55 @@ export function calcolaCostoAuto(fuelList, registroList, kmAttuali){
     };
 }
 
+export function previsioneCarburanteKm(fuelList){
+    if(!fuelList || fuelList.length < 2){
+        return null;
+    }
+
+    const lista = [...fuelList]
+        .map(f=>f.data)
+        .sort((a,b)=>a.km - b.km);
+
+    const primo = lista[0];
+    const ultimo = lista[lista.length-1];
+    if(!primo.km || !ultimo.km) return null;
+    const kmPercorsi = ultimo.km - primo.km;
+
+    const giorni =
+        (new Date(ultimo.data) - new Date(primo.data))
+        / (1000*60*60*24);
+    if(giorni <= 0) return null;
+    const kmGiorno = kmPercorsi / giorni;
+
+    /* consumo medio */
+    let consumi = lista
+        .filter(f=>f.consumo)
+        .map(f=>f.consumo);
+
+    if(consumi.length === 0) return null;
+    const consumoMedio =
+        consumi.reduce((a,b)=>a+b,0) / consumi.length;
+
+    /* prezzo medio carburante */
+    let prezzi = lista
+        .filter(f=>f.litro)
+        .map(f=>f.litro);
+
+    const prezzoMedio =
+        prezzi.reduce((a,b)=>a+b,0) / prezzi.length;
+    const giorniMese =
+        new Date().getDate();
+    const kmMese = kmGiorno * 30;
+    const litriMese = kmMese / consumoMedio;
+    const costoMese = litriMese * prezzoMedio;
+    return {
+        kmGiorno,
+        costoMese,
+        consumoMedio,
+        prezzoMedio
+    };
+}
+
 function mediaMobileConsumi(listaConsumi, windowSize=5){
     let result=[];
     for(let i=0;i<listaConsumi.length;i++){

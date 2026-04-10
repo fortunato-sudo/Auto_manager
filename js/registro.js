@@ -1,6 +1,6 @@
 import { db, collection, getDocs, getDoc, addDoc, setDoc, deleteDoc, doc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
-import { formatDateOnly, formatKm } from "./utils.js";
+import { formatDateOnly, formatKm, formatNumero } from "./utils.js";
 import { cacheManut, setCacheManut, cacheRegistro, setCacheRegistro ,setTab, vehicleId, registroEditId, setRegistroEditId } from "./state.js";
 import { calcolaTagliando } from "./manut.js";
 
@@ -78,6 +78,7 @@ export async function renderRegistro(appDiv){
 
                     ${s.data.officina ? `<div class="manutFreq">Officina: ${s.data.officina}</div>` : ""}
                     ${s.data.note ? `<div class="manutFreq">Note: ${s.data.note}</div>` : ""}
+                    ${s.data.costo ? `<div class="manutFreq">💰 ${formatNumero(s.data.costo,2)} €</div>` : ""}
 
                     <div class="fuelActions">
                         <button class="btnEdit" onclick="modificaRegistro('${s.id}')">
@@ -95,6 +96,26 @@ export async function renderRegistro(appDiv){
     });
 }
 
+export function calcolaManutenzioneAnnuale(registroList){
+    const anni = {};
+    registroList.forEach(r=>{
+        const d = new Date(r.data.data);
+        const anno = d.getFullYear();
+        if(!anni[anno]){
+            anni[anno] = {
+                interventi:[],
+                totale:0
+            };
+        }
+        anni[anno].interventi.push(r.data);
+
+        if(r.data.costo){
+            anni[anno].totale += r.data.costo;
+        }
+    });
+    return anni;
+}
+
 export async function renderRegistroAdd(appDiv){
     appDiv.innerHTML+=`
         ${headerBack("Nuovo intervento")}
@@ -107,17 +128,22 @@ export async function renderRegistroAdd(appDiv){
 
             <div class="formGroup">
                 <div class="formLabel">Km</div>
-                <input id="kmInt" class="formInput">
+                <input id="kmInt" class="formInput" placeholder="100000">
             </div>
 
             <div class="formGroup">
                 <div class="formLabel">Officina</div>
-                <input id="officinaInt" class="formInput">
+                <input id="officinaInt" class="formInput" placeholder="Norauto">
             </div>
 
             <div class="formGroup">
                 <div class="formLabel">Note</div>
                 <input id="noteInt" class="formInput">
+            </div>
+
+            <div class="formGroup">
+                <div class="formLabel">Costo intervento</div>
+                <input id="costoInt" class="formInput" placeholder="€">
             </div>
 
             <div id="manutCorrelate"></div>
@@ -199,6 +225,66 @@ export async function renderRegistroAdd(appDiv){
     }
 }
 
+export function renderCronologiaManut(appDiv, registroList){
+    const anni = calcolaManutenzioneAnnuale(registroList);
+
+    let totaleManut = 0;
+    registroList.forEach(r=>{
+        if(r.data.costo){
+            totaleManut += r.data.costo;
+        }
+    });
+
+    let html = `
+        ${headerBack("Cronologia manutenzione")}
+        <div class="manutTotalGlobal">
+            🔧 Manutenzione totale<br>
+            <span class="manutTotalValue">
+                ${formatNumero(totaleManut,2)} €
+            </span>
+        </div>
+    `;
+
+    Object.entries(anni)
+    .sort((a,b)=>b[0]-a[0])
+    .forEach(([anno,d])=>{
+        html += `
+        <div class="section">${anno}</div>
+        `;
+        d.interventi.forEach(i=>{
+            html += `
+            <div class="manutRow">
+
+                <div class="manutInfo">
+
+                    <div class="manutTitle">
+                        ${i.manutenzione}
+                    </div>
+
+                    <div class="manutFreq">
+                        ${formatDateOnly(i.data)}
+                    </div>
+
+                    ${i.costo ? `
+                        <div class="manutCost">
+                            💰 ${formatNumero(i.costo,2)} €
+                        </div>
+                    ` : ""}
+                </div>
+            </div>
+            `;
+        });
+
+        html += `
+        <div class="manutTotal">
+            Totale ${anno}: 
+            ${formatNumero(d.totale,2)} €
+        </div>
+        `;
+    });
+    appDiv.innerHTML = html;
+}
+
 window.toggleCorrelata = function(id){
     const sw = document.getElementById("corr_"+id);
     sw.classList.toggle("switchActive");
@@ -215,6 +301,9 @@ window.salvaRegistro = async function(){
     let km = document.getElementById("kmInt").value;
     let officina = document.getElementById("officinaInt").value;
     let note = document.getElementById("noteInt").value;
+    let costo = parseNumero(
+        document.getElementById("costoInt").value
+    );
     let data = new Date().toISOString();
 
     await aggiornaKmAutoSeMaggiore(km);
@@ -268,6 +357,7 @@ window.salvaRegistro = async function(){
                 data,
                 officina,
                 note,
+                costo:costo,
                 correlate
             }
         );

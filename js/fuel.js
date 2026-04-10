@@ -4,6 +4,45 @@ import { formatNumero, formatDate, formatKm, parseNumero, getConsumoClasse } fro
 import { cacheFuel, setCacheFuel, fuelEditId, setFuelEditId, setTab, vehicleId } from "./state.js";
 import { calcolaTagliando } from "./manut.js";
 
+export async function ricalcolaConsumi(){
+    const fuelSnap = await getDocs(
+        collection(db,"vehicles",vehicleId,"fuel")
+    );
+
+    let fuelList = fuelSnap.docs
+        .map(d => ({
+            id:d.id,
+            data:d.data()
+        }))
+        .sort((a,b)=> a.data.km - b.data.km);
+
+    for(let i=0;i<fuelList.length;i++){
+        let curr = fuelList[i];
+        let consumo = null;
+        if(i > 0){
+            let prev = fuelList[i-1];
+            if(
+                !prev.data.pieno_perso &&
+                !curr.data.pieno_perso &&
+                prev.data.km &&
+                curr.data.km &&
+                curr.data.litri
+            ){
+                let kmPercorsi = curr.data.km - prev.data.km;
+
+                if(kmPercorsi > 0){
+                    consumo = kmPercorsi / curr.data.litri;
+                }
+            }
+        }
+        await setDoc(
+            doc(db,"vehicles",vehicleId,"fuel",curr.id),
+            { consumo },
+            { merge:true }
+        );
+    }
+}
+
 export async function getFuelList(){
     if(cacheFuel !== null){
         return cacheFuel;
@@ -65,6 +104,19 @@ window.salvaFuel = async function(){
         .classList.contains("switchActive");
     await aggiornaKmAutoSeMaggiore(km);
     await getFuelList();
+    const fuelListUlt = await getFuelList();
+    let ultimoKmRegistrato = 0;
+    fuelListUlt.forEach(f=>{
+        if(f.data.km > ultimoKmRegistrato){
+            ultimoKmRegistrato = f.data.km;
+        }
+    });
+
+    if(km < ultimoKmRegistrato && !fuelEditId){
+        alert("⚠️ Chilometri inferiori all'ultimo rifornimento registrato");
+        return;
+    }
+
     let saltoConsumo = document.getElementById("saltaConsumo")?.checked;
     let fuelType = document.getElementById("fuelType").value;
     let consumo = null;
@@ -135,14 +187,12 @@ window.salvaFuel = async function(){
             data:new Date().toISOString()
         });
     }
+    await ricalcolaConsumi();
 
-    const fuelSnapList = await getDocs(
-            collection(db,"vehicles",vehicleId,"fuel")
-        );
-
-    const lista = fuelSnapList.docs
-        .map(d => d.data())
-        .sort((a,b)=> new Date(b.data) - new Date(a.data))
+    const fuelListCache = await getFuelList();
+    const lista = fuelListCache
+        .map(f => f.data)
+        .sort((a,b)=> new Date(b.data) - new Date(a.data));
 
     let pieniSenzaAdditivo = 0;
     for(const f of lista){
@@ -222,6 +272,7 @@ window.modificaFuel = function(id){
 window.eliminaFuel = async function(id){
     if(confirm("Eliminare questo rifornimento?")){
         await deleteDoc(doc(db,"vehicles",vehicleId,"fuel",id));
+        await ricalcolaConsumi();
         const fuelSnapList = await getDocs(
             collection(db,"vehicles",vehicleId,"fuel")
         );
@@ -299,9 +350,11 @@ function getFuelIcon(tipo){
 
 export function calcolaDistributori(fuelList){
     const stats = {};
+
     fuelList.forEach(f=>{
         const s = f.data;
         if(!s.distributore) return;
+
         if(!stats[s.distributore]){
             stats[s.distributore] = {
                 count:0,
@@ -313,7 +366,12 @@ export function calcolaDistributori(fuelList){
         stats[s.distributore].count++;
         stats[s.distributore].totale += s.totale || 0;
         stats[s.distributore].litri += s.litri || 0;
-        stats[s.distributore].prezzoTot += (s.litro || 0);
+        stats[s.distributore].prezzoTot += s.litro || 0;
+    });
+
+    /* calcolo prezzo medio */
+    Object.values(stats).forEach(d=>{
+        d.prezzoMedio = d.prezzoTot / d.count;
     });
     return stats;
 }
@@ -455,22 +513,22 @@ export async function renderFuelAdd(appDiv){
         <div class="group">
             <div class="formGroup">
                 <div class="formLabel">Prezzo totale</div>
-                <input id="totale" class="formInput">
+                <input id="totale" class="formInput" placeholder="€">
             </div>
 
             <div class="formGroup">
                 <div class="formLabel">Prezzo al litro</div>
-                <input id="litro" class="formInput" oninput="calcolaFuel('litro')">
+                <input id="litro" class="formInput" oninput="calcolaFuel('litro')" placeholder="€/L">
             </div>
 
             <div class="formGroup">
                 <div class="formLabel">Litri</div>
-                <input id="litri" class="formInput" oninput="calcolaFuel('litri')">
+                <input id="litri" class="formInput" oninput="calcolaFuel('litri')" placeholder="L">
             </div>
 
             <div class="formGroup">
                 <div class="formLabel">Km auto</div>
-                <input id="kmFuel" class="formInput">
+                <input id="kmFuel" class="formInput" placeholder="100000">
             </div>
 
             <div class="formGroup">
@@ -486,7 +544,7 @@ export async function renderFuelAdd(appDiv){
 
             <div class="formGroup">
                 <div class="formLabel">Distributore</div>
-                <input id="distributore" class="formInput">
+                <input id="distributore" class="formInput" placeholder="Tamoil">
             </div>
 
             <div class="row">
@@ -525,7 +583,7 @@ export async function renderFuelAdd(appDiv){
         document.getElementById("litri").value = f.litri || "";
         document.getElementById("kmFuel").value = f.km || "";
         document.getElementById("distributore").value = f.distributore || "";
-        document.getElementById("fuelType").value = f.fuelType || "diesel";
+        document.getElementById("fuelType").value = f.fuelType || "Diesel";
 
         /* stato pieno perso */
         if(f.pieno_perso){
@@ -547,6 +605,17 @@ export async function renderFuelAdd(appDiv){
 
 export function renderDistributori(appDiv, fuelList){
     const stats = calcolaDistributori(fuelList);
+
+    let minPrezzo = Infinity;
+    let migliore = null;
+
+    Object.entries(stats).forEach(([nome,d])=>{
+        if(d.prezzoMedio < minPrezzo){
+            minPrezzo = d.prezzoMedio;
+            migliore = nome;
+        }
+    });
+
     let html = `
         ${headerBack("Distributori")}
         <div class="section">Storico distributori</div>
@@ -560,6 +629,7 @@ export function renderDistributori(appDiv, fuelList){
 
                     <div class="fuelTitle">
                         ⛽ ${nome}
+                        ${nome === migliore ? `<span class="bestStation">🏆 Più economico</span>` : ""}
                     </div>
 
                     <div class="fuelGrid">
@@ -583,6 +653,13 @@ export function renderDistributori(appDiv, fuelList){
                         </div>
                         <div class="fuelInfo">
                             ${formatNumero(prezzoMedio,3)} €/L
+                        </div>
+
+                        <div class="fuelInfo">
+                            Litri totali:
+                        </div>
+                        <div class="fuelInfo">
+                            ${formatNumero(d.litri,2)} L
                         </div>
                     </div>
                 </div>

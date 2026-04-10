@@ -1,4 +1,8 @@
 #app{
+    max-width:500px;
+    margin:0 auto;
+    padding:16px;
+    box-sizing:border-box;
 	opacity:0;
 	visibility:hidden;
 	transition:opacity .35s;
@@ -9,15 +13,47 @@
 	background:var(--bg);
 }
 
+:root{
+    /* sfondi */
+    --bg:#f2f2f7;
+    --card-bg:#ffffff;
+
+    /* testo */
+    --text:#000;
+    --text-secondary:#6e6e73;
+
+    /* colori app */
+    --accent:#007aff;
+
+    /* bordi */
+    --border:#e5e5ea;
+}
+
+body.dark{
+    --bg:#000000;
+    --card-bg:#1c1c1e;
+    --text:#ffffff;
+    --text-secondary:#9a9a9e;
+    --border:#2c2c2e;
+}
+
+body.dark .manutRow{
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.6);
+}
+
 html,body{
 	height:100%;
+    margin:0;
+    overflow-x:hidden;
 }
 
 body{
 	margin:0;
 	font-family:-apple-system;
-	background:#f2f2f7;
-	color:#1c1c1e;
+	background:var(--bg);
+    color:var(--text);
+    overflow-x:hidden;
 }
 
 body.loading #app{
@@ -621,20 +657,37 @@ button{
     padding:16px;
     padding-bottom:0px;
     padding-top:8px;
-    margin-top:8px;
-    color:#6e6e73;
+    font-size:14px;
     font-weight:600;
-    font-size:17px;
+    color:var(--text-secondary);
+    margin-top:20px;
+    margin-bottom:8px;
     text-transform:uppercase;
+}
+
+.wTitle{
+    font-size:13px;
+    color:var(--text-secondary);
+}
+
+.wValue{
+    font-size:22px;
+    font-weight:600;
 }
 
 /* LIST */
 
 .manutRow{
-    display:flex;
-    gap:14px;
-    padding:16px;
-    border-bottom:1px solid #e5e5ea;
+    background:var(--card-bg);
+    border-radius:14px;
+    padding:14px;
+    margin-bottom:12px;
+    border:1px solid var(--border);
+    transition:transform .15s ease;
+}
+
+.manutRow:active{
+    transform:scale(.98);
 }
 
 .manutImg{
@@ -664,11 +717,17 @@ button{
 /* PROGRESS BAR */
 
 .progressBar{
-    width:50%;
-    height:6px;
-    background:#e5e5ea;
-    border-radius:6px;
+    position:relative;
+    height:12px;
+    border-radius:8px;
+    background:var(--border);
     margin-top:8px;
+}
+
+.progressFill{
+    height:100%;
+    border-radius:8px;
+    transition:width .3s ease;
 }
 
 .manutInfo{
@@ -676,11 +735,24 @@ button{
     min-width:0;
 }
 
-.progressFill{
-    height:6px;
-    background:#007aff;
-    border-radius:6px;
-    max-width:100%;
+.manutTotal{
+    font-weight:600;
+    margin-top:8px;
+    margin-bottom:20px;
+    color:var(--text-secondary);
+}
+
+.manutTotalGlobal{
+    background:var(--card-bg);
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:20px;
+    border:1px solid var(--border);
+}
+
+.manutTotalValue{
+    font-size:22px;
+    font-weight:600;
 }
 
 /* GROUP */
@@ -747,10 +819,15 @@ button{
 }
 
 .mainBtn{
-    background:#007aff;
+    width:100%;
+    padding:14px;
+    border-radius:12px;
+    border:none;
+    font-size:16px;
+    font-weight:600;
+    background:var(--accent);
     color:white;
-	font-size:14px;
-    margin:16px;
+    margin-bottom:16px;
 }
 
 .secondaryBtn{
@@ -1268,10 +1345,6 @@ select{
     border-radius: 6px;
 }
 
-.progressFill{
-    transition: width 0.6s ease;
-}
-
 .manutPercent{
     font-size:11px;
     opacity:0.7;
@@ -1280,42 +1353,44 @@ select{
 }
 
 .formGroup{
-    margin-bottom:16px;
+    margin-bottom:14px;
 }
 
 .formLabel{
     font-size:13px;
-    opacity:0.7;
+    color:var(--text-secondary);
     margin-bottom:4px;
 }
 
 .formInput,
 .formSelect{
     width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:1px solid rgba(255,255,255,0.15);
-    background:rgba(255,255,255,0.05);
+    padding:14px;
+    border-radius:12px;
+    border:1px solid var(--border);
+    background:var(--card-bg);
+    color:var(--text);
     font-size:16px;
-    margin-top:4px;
     box-sizing:border-box;
 }
 
 .formInput:focus,
 .formSelect:focus{
     outline:none;
-    border-color:#4da3ff;
+    border-color:var(--accent);
+    box-shadow:0 0 0 2px rgba(0,122,255,0.15);
 }
 
 .formButton{
     width:100%;
-    padding:14px;
+    padding:16px;
     border:none;
     border-radius:12px;
-    background:#0a84ff;
+    background:var(--accent);
     color:white;
     font-size:16px;
-    margin-top:20px;
+    font-weight:600;
+    margin-top:10px;
 }
 
 .fuelAdditivoTag{

@@ -17,7 +17,15 @@ import {
 export function renderManut(appDiv){
     appDiv.innerHTML+=`
         ${headerMenu("Manutenzioni")}
-        <button class="addBtn" onclick="nav('manutAdd')">+ Aggiungi manutenzione</button>
+        <button class="mainBtn" onclick="nav('manutAdd')">
+            + Aggiungi manutenzione
+        </button>
+
+        <button class="secondaryBtn" onclick="nav('manutHistory')">
+            Cronologia manutenzioni
+        </button>
+
+        <div class="section">Lista manutenzioni</div>
         <div id="lista"></div>
     `;
 }
@@ -119,10 +127,6 @@ export function renderManutList(manutList, km){
                     </div>
                     <div class="progressBar">
                         <div class="progressFill" style="width:${stato.progress}%; background:${stato.colore}"></div>
-                    </div>
-
-                    <div class="manutPercent">
-                        ${Math.round(stato.progress)}%
                     </div>
                 </div>
             </div>
