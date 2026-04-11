@@ -627,9 +627,9 @@ export function renderDistributori(appDiv, fuelList){
             <div class="manutRow">
                 <div class="manutInfo">
 
-                    <div class="fuelTitle">
+                    <div class="bestStation">
                         ⛽ ${nome}
-                        ${nome === migliore ? `<span class="bestStation">🏆 Più economico</span>` : ""}
+                        ${nome === migliore ? `<span class="bestSBadge">🏆 Più economico</span>` : ""}
                     </div>
 
                     <div class="fuelGrid">

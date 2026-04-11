@@ -1,6 +1,6 @@
 import { db, collection, getDocs, getDoc, addDoc, setDoc, deleteDoc, doc } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
-import { formatDateOnly, formatKm, formatNumero } from "./utils.js";
+import { formatDateOnly, formatKm, formatNumero, parseNumero } from "./utils.js";
 import { cacheManut, setCacheManut, cacheRegistro, setCacheRegistro ,setTab, vehicleId, registroEditId, setRegistroEditId } from "./state.js";
 import { calcolaTagliando } from "./manut.js";
 

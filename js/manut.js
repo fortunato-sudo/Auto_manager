@@ -192,13 +192,13 @@ export function formatScadenza(kmRestanti){
     if(kmRestanti === null) return "-";
 
     if(kmRestanti < 0){
-        return `Scaduto da ${formatKm(Math.abs(kmRestanti))} km`;
+        return `⚠️ Scaduto da ${formatKm(Math.abs(kmRestanti))} km`;
     }
 
     if(kmRestanti === 0){
         return "Scade ora";
     }
-    return `Tra ${formatKm(kmRestanti)} km`;
+    return `⏳ Tra ${formatKm(kmRestanti)} km`;
 }
 
 export function calcolaTagliando(kmAttuali, kmTagliando){
@@ -375,7 +375,20 @@ window.apriDettaglio=function(id){
 }
 
 export function renderDettaglio(appDiv, m, km){
-    let stato=calcolaStato(m,km);
+    let stato = calcolaStato(m,km);
+
+    let colore = "#007aff";
+    if(stato.stato === "imminente") colore = "#ff9f0a";
+    if(stato.stato === "urgente") colore = "#ff3b30";
+
+    let prossimoTesto =
+        `${formatDateOnly(stato.nextDate)} | ${formatKm(stato.nextKm)} km`;
+
+    if(stato.stato === "urgente"){
+        prossimoTesto =
+        `⚠️ Scaduto | ${formatKm(stato.nextKm)} km`;
+    }
+
     appDiv.innerHTML+=`
         <div class="headerBar">
                 <button class="headerBack" onclick="indietro()">←</button>
@@ -391,20 +404,28 @@ export function renderDettaglio(appDiv, m, km){
             </div>
         </div>
 
-        <div class="group">
-            <div class="row">
-                <div>Ultimo intervento</div>
-                <div>${formatDateOnly(m.ultima_data)} | ${formatKm(m.ultimo_km)} km</div>
+        <div class="detailCard">
+
+            <div class="detailRow">
+                <div class="detailLabel">Ultimo intervento</div>
+                <div class="detailValue">
+                    ${formatDateOnly(m.ultima_data)} | ${formatKm(m.ultimo_km)} km
+                </div>
             </div>
-            <div class="row">
-                <div>Prossimo intervento</div>
-                <div>${formatDateOnly(stato.nextDate)} | ${formatKm(stato.nextKm)} km</div>
+
+            <div class="detailRow">
+                <div class="detailLabel">Prossimo intervento</div>
+                <div class="detailValue" style="color:${colore}">
+                    ${prossimoTesto}
+                </div>
             </div>
-            <div class="row productLabel">
-                <div>Prodotto:</div>
+
+            <div class="detailRow productLabel">
+                <div class="detailLabel">Prodotto consigliato</div>
             </div>
-            <div class="row productValue">
-                <div>${m.prodotto||"-"}</div>
+
+            <div class="detailRow productValue">
+                <div class="detailValue">${m.prodotto||"-"}</div>
             </div>
         </div>
 
@@ -412,6 +433,7 @@ export function renderDettaglio(appDiv, m, km){
             <button class="manutBtnPrimary" onclick="segnaFatto()">
                 Registra intervento
             </button>
+
             <button class="manutBtnDelete" onclick="eliminaManutenzione()">
                 Elimina manutenzione
             </button>

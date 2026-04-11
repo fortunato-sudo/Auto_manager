@@ -78,13 +78,23 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
     appDiv.innerHTML+=`
         ${headerMenu("Dashboard")}
 
-        <div class="widgets">
-            <div class="widget statoWidget">
-                <div class="wTitle">🚗 Stato veicolo</div>
-                <div class="wValue statoValue">
-                    ${stato.icon} ${stato.text}
-                </div>
+        <div class="widget healthWidget">
+            <div class="wTitle">
+                🚗 Salute veicolo
             </div>
+
+            <div class="healthScore ${classeSalute}">
+                ${salute} / 100
+            </div>
+
+            ${
+                problemiSalute.length > 0 ?
+                `<div class="healthIssues">
+                    ${problemiSalute.join("<br>")}
+                </div>`
+                :
+                `<div class="healthIssuesOk">Nessun problema rilevato</div>`
+            }
         </div>
 		
         <div class="widgets">
@@ -109,43 +119,36 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
             </button>
         </div>
 
-        <div class="widget healthWidget">
-            <div class="widgetLabel">
-                🚗 Salute veicolo
-            </div>
-
-            <div class="healthScore ${classeSalute}">
-                ${salute} / 100
-            </div>
-
-            ${
-                problemiSalute.length > 0 ?
-                `<div class="healthIssues">
-                    ${problemiSalute.join("<br>")}
-                </div>`
-                :
-                `<div class="healthIssuesOk">Nessun problema rilevato</div>`
-            }
-        </div>
-
         <div class="widgets">
             <div class="widget">
                 <div class="wTitle">
-                    🚗 Autonomia stimata
+                    🚗 Autonomia veicolo
                 </div>
+
                 <div class="wValue">
                     ${autonomia ? Math.round(autonomia.autonomiaTeorica)+" km" : "-"}
                 </div>
+
                 <div class="wSub">
-                    Ultimo pieno: ${
-                        autonomia ? Math.round(autonomia.autonomiaUltimoPieno)+" km" : "-"
+                    Consumo medio ${
+                        stats.consumoMedio ?
+                        formatNumero(stats.consumoMedio,2)+" km/l"
+                        : "-"
+                    }
+                </div>
+
+                <div class="wSub">
+                    Ultimo pieno ${
+                        autonomia ?
+                        Math.round(autonomia.autonomiaUltimoPieno)+" km"
+                        : "-"
                     }
                 </div>
             </div>
 
             <div class="widget">
                 <div class="wTitle">
-                    ⛽ Previsione carburante
+                    ⛽ Previsione carburante mese
                 </div>
                 <div class="wValue">
                     ${stats.previsioneKm ?
@@ -166,53 +169,27 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
 
         <div class="widgets">
             <div class="widget">
-                <div class="wTitle">⛽ Consumo medio</div>
-                <div class="wValue">
-                    ${stats.consumoMedio ? formatNumero(stats.consumoMedio,2)+" km/l" : "-"}
-                </div>
-            </div>
-            <div class="widget">
-                <div class="wTitle">💶 Spesa carburante mese</div>
-                <div class="wValue">
-                    ${stats.spesaMese ? formatNumero(stats.spesaMese,2)+" €" : "-"}
-                </div>
-            </div>
-        </div>
-
-        <div class="widgets">
-            <div class="widget">
-                <div class="wTitle">⛽ Totale carburante</div>
-                <div class="wValue">
-                    ${costoAuto ? formatNumero(costoAuto.carburanteTot,2)+" €" : "-"}
+                <div class="wTitle">
+                    💰 Costi veicolo
                 </div>
 
-                <div class="wTitle">🔧 Totale manutenzione</div>
                 <div class="wValue">
-                    ${costoAuto ? formatNumero(costoAuto.manutTot,2)+" €" : "-"}
+                    Questo mese ${stats.spesaMese ? formatNumero(stats.spesaMese,2)+" €" : "-"}
                 </div>
-            </div>
 
-            <div class="widget">
-                <div class="wTitle">💰 Costo totale veicolo</div>
-                <div class="wValue">
-                    ${costoAuto ? formatNumero(costoAuto.totale,2)+" €" : "-"}
+                <div class="wSub">
+                    Totale ${
+                        costoAuto ? formatNumero(costoAuto.totale,2)+" €" : "-"
+                    }
                 </div>
-                
-                <div class="wTitle">📉 Costo per Km</div>
-                <div class="wValue">
-                    ${costoAuto?.costoKm ? formatNumero(costoAuto.costoKm,3)+" €/km" : "-"}
-                </div>
-            </div>
-        </div>
 
-        <div class="widgets">
-            <div class="widget">
-                <div class="wTitle">Interventi Urgenti</div>
-                <div class="wValue">${urg}</div>
-            </div>
-            <div class="widget">
-                <div class="wTitle">Interventi Imminenti</div>
-                <div class="wValue">${imm}</div>
+                <div class="wSub">
+                    Costo/km ${
+                        costoAuto?.costoKm ?
+                        formatNumero(costoAuto.costoKm,3)+" €/km"
+                        : "-"
+                    }
+                </div>
             </div>
         </div>
 
