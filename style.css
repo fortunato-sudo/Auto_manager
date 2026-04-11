@@ -49,11 +49,9 @@ html,body{
 }
 
 body{
-	margin:0;
 	font-family:-apple-system;
 	background:var(--bg);
     color:var(--text);
-    overflow-x:hidden;
 }
 
 body.loading #app{
@@ -75,6 +73,7 @@ body:not(.dark) .menuItem{
 }
 
 #splash{
+    height:100dvh;
 	position:fixed;
 	inset:0;
 	background:#0f0f12;
@@ -177,10 +176,6 @@ body:not(.dark) .menuItem{
 
 .dark .manutFreq{
     color:#9a9a9a;
-}
-
-.dark .progressBar{
-    background:#2c2c2e;
 }
 
 .dark .nav{
@@ -604,8 +599,8 @@ body:not(.dark) .menuItem{
 
 .widget{
     background:white;
-    padding:20px;
-    border-radius:18px;
+    padding:22px;
+    border-radius:22px;
     flex:1;
     text-align:center;
 }
@@ -666,13 +661,18 @@ button{
 }
 
 .wTitle{
-    font-size:13px;
+    font-size:18px;
+    font-weight:700;
     color:var(--text-secondary);
 }
 
 .wValue{
-    font-size:22px;
-    font-weight:600;
+color:#7a7a7a;
+font-size:15px;
+}
+
+body.dark .wValue{
+color:#9a9a9a;
 }
 
 /* LIST */
@@ -722,6 +722,10 @@ button{
     border-radius:8px;
     background:var(--border);
     margin-top:8px;
+}
+
+.dark .progressBar{
+    background:#2c2c2e;
 }
 
 .progressFill{
@@ -1335,7 +1339,6 @@ select{
     width: 60%;
     height: 6px;
     margin: 10px auto 0 auto;
-    background: rgba(255,255,255,0.1);
     border-radius: 6px;
     overflow: hidden;
 }
@@ -1408,4 +1411,53 @@ select{
     font-size:14px;
     opacity:0.75;
     margin-top:6px;
+}
+
+.quickActions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-top:15px;
+}
+
+.quickActions button{
+    padding:16px;
+    border-radius:16px;
+    font-size:16px;
+    font-weight:600;
+}
+
+.healthWidget{
+    margin-top:16px;
+}
+
+.healthScore{
+    font-size:34px;
+    font-weight:700;
+    margin-top:6px;
+}
+
+.healthGood{
+    color:#2ecc71;
+}
+
+.healthWarning{
+    color:#f1c40f;
+}
+
+.healthBad{
+    color:#e74c3c;
+}
+
+.healthIssues{
+margin-top:8px;
+font-size:13px;
+color:#ff9f0a;
+line-height:1.4;
+}
+
+.healthIssuesOk{
+margin-top:8px;
+font-size:13px;
+color:#34c759;
 }

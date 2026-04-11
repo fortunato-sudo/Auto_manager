@@ -277,6 +277,41 @@ export function calcolaAutonomia(fuelList, kmAttuali, vehicle){
     };
 }
 
+export function calcolaSaluteVeicolo(urgenti=0, imminenti=0, stats={}){
+    let score = 100;
+    let problemi = [];
+
+    if(urgenti > 0){
+        score -= Math.min(urgenti * 5, 60);
+        problemi.push(`⚠️ ${urgenti} manutenzioni urgenti`);
+    }
+
+    if(imminenti > 0){
+        score -= Math.min(imminenti * 3, 30);
+        problemi.push(`⚠️ ${imminenti} manutenzioni imminenti`);
+    }
+
+    if(stats.anomaliaConsumo){
+        score -= 5;
+        problemi.push("⚠️ consumo carburante peggiorato");
+    }
+
+    if(score < 0){
+        score = 0;
+    }
+
+    return {
+        score,
+        problemi
+    };
+}
+
+export function getClasseSalute(score){
+    if(score >= 80) return "healthGood";
+    if(score >= 60) return "healthWarning";
+    return "healthBad";
+}
+
 export function renderStats(appDiv, fuelList, stats){
     appDiv.innerHTML+=`
         ${headerMenu("Statistiche")}

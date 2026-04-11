@@ -27,6 +27,12 @@ import { updateDarkLabel } from "./ui.js";
 import { renderVehicleAdd } from "./vehicleAdd.js";
 import "./config.js";
 
+const darkSaved = localStorage.getItem("darkMode");
+if(darkSaved === "true"){
+    document.body.classList.add("dark");
+}
+updateDarkLabel();
+
 const splashStart = Date.now();
 
 window.aggiornaKmAutoSeMaggiore = async function(kmNuovi){
@@ -316,6 +322,7 @@ async function preloadDB(){
         }
     }
     updateDarkLabel();
+    window.scrollTo(0,0);
 }
 
 window.indietro=function(){

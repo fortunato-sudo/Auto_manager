@@ -1,7 +1,8 @@
 import { headerMenu } from "./ui.js";
 import { calcolaStato } from "./manut.js";
 import { formatNumero, formatKm } from "./utils.js";
-
+import { calcolaSaluteVeicolo, getClasseSalute } from "./stats.js"
+ 
 export function statoVeicolo(urgenti, imminenti, tagliando){
     if(urgenti > 0){
         return {
@@ -47,6 +48,10 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
         if(stato.stato==="imminente") imm++;
     });
 
+    const saluteData = calcolaSaluteVeicolo(urg, imm, stats);
+    const salute = saluteData.score;
+    const problemiSalute = saluteData.problemi;
+
     let tagliandoKm = vehicle?.tagliando_km || null;
     let tagliandoStato = vehicle?.tagliando_stato || "ok";
     let tagliandoText = "-";
@@ -69,6 +74,7 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
 
 	appDiv.style.opacity = 0;
     const stato = statoVeicolo(urg, imm, null);
+    const classeSalute = getClasseSalute(salute);   
     appDiv.innerHTML+=`
         ${headerMenu("Dashboard")}
 
@@ -91,6 +97,35 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
                     <button onclick="saveKm()">Aggiorna km</button>
                 </div>
             </div>
+        </div>
+
+        <div class="quickActions">
+            <button onclick="nav('fuelAdd')">
+                ⛽ Aggiungi Rifornimento
+            </button>
+
+            <button onclick="nav('registroAdd')">
+                🔧 Aggiungi Intervento 
+            </button>
+        </div>
+
+        <div class="widget healthWidget">
+            <div class="widgetLabel">
+                🚗 Salute veicolo
+            </div>
+
+            <div class="healthScore ${classeSalute}">
+                ${salute} / 100
+            </div>
+
+            ${
+                problemiSalute.length > 0 ?
+                `<div class="healthIssues">
+                    ${problemiSalute.join("<br>")}
+                </div>`
+                :
+                `<div class="healthIssuesOk">Nessun problema rilevato</div>`
+            }
         </div>
 
         <div class="widgets">

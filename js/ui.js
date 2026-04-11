@@ -19,13 +19,20 @@ export function headerBack(titolo){
 }
 
 export function updateDarkLabel(){
-    const el = document.getElementById("darkLabel");
-    if(!el) return;
+    const label = document.getElementById("darkLabel");
+    const switchEl = document.getElementById("darkSwitch");
+    const dark = document.body.classList.contains("dark");
 
-    if(document.body.classList.contains("dark")){
-        el.textContent="☀️ Light mode";
-    }else{
-        el.textContent="🌙 Dark mode";
+    if(label){
+        label.textContent = "🌙 Dark mode";
+    }
+
+    if(switchEl){
+        if(dark){
+            switchEl.classList.add("switchActive");
+        }else{
+            switchEl.classList.remove("switchActive");
+        }
     }
 }
 
@@ -48,12 +55,8 @@ window.toggleMenu=function(){
 
 window.toggleDark=function(){
     document.body.classList.toggle("dark");
-    localStorage.setItem(
-        "darkMode",
-        document.body.classList.contains("dark")
-    );
-    document.getElementById("darkSwitch")
-    ?.classList.toggle("switchActive");
+    const active = document.body.classList.contains("dark");
+    localStorage.setItem("darkMode", active);
     updateDarkLabel();
 }
 

@@ -379,7 +379,6 @@ export function renderDettaglio(appDiv, m, km){
     appDiv.innerHTML+=`
         <div class="headerBar">
                 <button class="headerBack" onclick="indietro()">←</button>
-                <button class="darkToggle headerDark" onclick="toggleDark()">🌙</button>
         </div>
 
         <div class="detailTop">
