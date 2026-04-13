@@ -1,29 +1,25 @@
 import { register, login } from "./auth.js";
 
-export function renderLogin(appDiv){
+export function renderLogin(){
 
-appDiv.innerHTML = `
-<div class="loginBox">
+    const app = document.getElementById("app");
 
-<h2>DriveTrack</h2>
+    if(!app){
+        console.error("Elemento #app non trovato");
+        return;
+    }
 
-<input id="email" placeholder="Email">
+    app.innerHTML = `
+        <div class="loginScreen">
+            <h2>Login</h2>
 
-<input id="password" type="password" placeholder="Password">
+            <input id="email" placeholder="Email">
 
-<button onclick="doLogin()">Login</button>
+            <input id="password" type="password" placeholder="Password">
 
-<button onclick="doRegister()">Registrati</button>
-
-</div>
-`;
-
-const splash = document.getElementById("splash");
-
-if(splash){
-    splash.remove();
-    document.body.classList.remove("loading");
-}
+            <button onclick="doLogin()">Login</button>
+        </div>
+    `;
 }
 
 window.doLogin = async function(){

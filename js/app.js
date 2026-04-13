@@ -3,15 +3,30 @@ import { getVehicles, saveVehicle, vehicleDoc } from "./sync.js";
 import { renderLogin } from "./login.js";
 
 auth.onAuthStateChanged(async user => {
+
+    console.log("AUTH STATE", user);
+
+    const splash = document.getElementById("splash");
+
+    if(splash){
+        splash.remove();
+        document.body.classList.remove("loading");
+    }
+
     if(!user){
+        console.log("SHOW LOGIN");
         renderLogin();
         return;
     }
+
+    console.log("USER LOGGED");
+
     try{
         await preloadDB();
     }catch(e){
         console.warn("Preload fallito", e);
     }
+
     render();
 });
 
