@@ -1,4 +1,4 @@
-import { db, collection, getDocs, getDoc, addDoc, setDoc, deleteDoc, doc } from "./firebase.js";
+import { db, collection, getDocs, getDoc, addDoc, setDoc, deleteDoc, doc, vehiclePath } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDateOnly, formatKm, formatNumero, parseNumero } from "./utils.js";
 import { cacheManut, setCacheManut, cacheRegistro, setCacheRegistro ,setTab, vehicleId, registroEditId, setRegistroEditId } from "./state.js";
@@ -6,7 +6,7 @@ import { calcolaTagliando } from "./manut.js";
 
 async function ricalcolaManutenzioni(){
     const storicoSnap = await getDocs(
-        collection(db,"vehicles",vehicleId,"registro")
+        collection(db,...vehiclePath(vehicleId),"registro")
     );
 
     const storico = storicoSnap.docs.map(d=>d.data());
@@ -29,7 +29,7 @@ async function ricalcolaManutenzioni(){
         });
 
         await setDoc(
-            doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
+            doc(db,...vehiclePath(vehicleId),"manutenzioni",m.id),
             {
                 ultimo_km: ultimoKm,
                 ultima_data: ultimaData
@@ -51,7 +51,7 @@ export async function renderRegistro(appDiv){
     let storicoList = cacheRegistro;
 
 	if(!storicoList){
-    	const snap = await getDocs(collection(db,"vehicles",vehicleId,"registro"));
+    	const snap = await getDocs(collection(db,...vehiclePath(vehicleId),"registro"));
     	storicoList = snap.docs.map(doc=>({
         	id:doc.id,
         	data:doc.data()
@@ -158,7 +158,7 @@ export async function renderRegistroAdd(appDiv){
     let lista = cacheManut;
     if(!lista){
         const snap = await getDocs(
-            collection(db,"vehicles",vehicleId,"manutenzioni")
+            collection(db,...vehiclePath(vehicleId),"manutenzioni")
         );
 
         lista = snap.docs.map(d=>({
@@ -198,7 +198,7 @@ export async function renderRegistroAdd(appDiv){
 
     if(registroEditId){
         const snap = await getDoc(
-            doc(db,"vehicles",vehicleId,"registro",registroEditId)
+            doc(db,...vehiclePath(vehicleId),"registro",registroEditId)
         );
 
         const r = snap.data();
@@ -308,7 +308,7 @@ window.salvaRegistro = async function(){
 
     await aggiornaKmAutoSeMaggiore(km);
 
-    const vehicleRef = doc(db,"vehicles",vehicleId);
+    const vehicleRef = doc(db,...vehiclePath(vehicleId));
     const snap = await getDoc(vehicleRef);
     const v = snap.data();
 
@@ -335,7 +335,7 @@ window.salvaRegistro = async function(){
 
     if(registroEditId){
         await setDoc(
-            doc(db,"vehicles",vehicleId,"registro",registroEditId),
+            doc(db,...vehiclePath(vehicleId),"registro",registroEditId),
             {
                 manutenzione:nome,
                 km:Number(km),
@@ -349,7 +349,7 @@ window.salvaRegistro = async function(){
         setRegistroEditId(null);
     }else{
         await addDoc(
-            collection(db,"vehicles",vehicleId,"registro"),
+            collection(db,...vehiclePath(vehicleId),"registro"),
             {
                 vehicleId:"default",
                 manutenzione:nome,
@@ -370,7 +370,7 @@ window.salvaRegistro = async function(){
                 m.data.nome.includes("filtro")
             ){
                 await setDoc(
-                    doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
+                    doc(db,...vehiclePath(vehicleId),"manutenzioni",m.id),
                     {
                         ultimo_km:Number(km),
                         ultima_data:data
@@ -385,7 +385,7 @@ window.salvaRegistro = async function(){
     for(const m of cacheManut){
         if(m.data.nome === nome){
             await setDoc(
-                doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
+                doc(db,...vehiclePath(vehicleId),"manutenzioni",m.id),
                 {
                     ultimo_km:Number(km),
                     ultima_data:data
@@ -400,7 +400,7 @@ window.salvaRegistro = async function(){
         const sw = document.getElementById("corr_"+m.id);
         if(sw && sw.classList.contains("switchActive"))
             await setDoc(
-                doc(db,"vehicles",vehicleId,"manutenzioni",m.id),
+                doc(db,...vehiclePath(vehicleId),"manutenzioni",m.id),
                 {
                     ultimo_km:Number(km),
                     ultima_data:data
@@ -423,7 +423,7 @@ window.modificaRegistro = function(id){
 window.eliminaRegistro = async function(id){
     if(!confirm("Eliminare intervento?")) return;
     await deleteDoc(
-        doc(db,"vehicles",vehicleId,"registro",id)
+        doc(db,...vehiclePath(vehicleId),"registro",id)
     );
     await ricalcolaManutenzioni();
     setCacheRegistro(null);

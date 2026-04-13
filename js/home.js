@@ -1,7 +1,7 @@
 import { headerMenu } from "./ui.js";
 import { calcolaStato } from "./manut.js";
 import { formatNumero, formatKm } from "./utils.js";
-import { calcolaSaluteVeicolo, getClasseSalute } from "./stats.js"
+import { calcolaSaluteVeicolo, getClasseSalute, getStatoSalute } from "./stats.js"
  
 export function statoVeicolo(urgenti, imminenti, tagliando){
     if(urgenti > 0){
@@ -75,6 +75,7 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
 	appDiv.style.opacity = 0;
     const stato = statoVeicolo(urg, imm, null);
     const classeSalute = getClasseSalute(salute);   
+    const statoSalute = getStatoSalute(salute);
     appDiv.innerHTML+=`
         ${headerMenu("Dashboard")}
 
@@ -84,7 +85,17 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
             </div>
 
             <div class="healthScore ${classeSalute}">
-                ${salute} / 100
+                ${salute}%
+            </div>
+
+            <div class="healthState ${classeSalute}">
+                ${statoSalute}
+            </div>
+
+            <div class="healthBar">
+                <div class="healthFill ${classeSalute}" 
+                    data-score="${salute}">
+                </div>
             </div>
 
             ${
@@ -206,7 +217,32 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
         </div>
 
         <div class="section">⚠️ Interventi da controllare</div>
-        <div id="imminenti"></div>
+        <div id="imminenti">
+            ${
+                urg === 0 && imm === 0
+                ?
+                `<div class="noInterventi">
+                    <div class="noInterventiIcon">✅</div>
+                    <div class="noInterventiText">
+                        Tutto in regola
+                    </div>
+                    <div class="noInterventiSub">
+                        Nessun intervento necessario
+                    </div>
+                </div>`
+                :
+                ""
+            }
+        </div>
     `;
 	appDiv.style.opacity = 1;
+
+    setTimeout(()=>{
+        const bar = document.querySelector(".healthFill");
+
+        if(bar){
+            const score = bar.dataset.score;
+            bar.style.width = score + "%";
+        }
+    },100);
 }

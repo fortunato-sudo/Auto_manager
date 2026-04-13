@@ -1,4 +1,4 @@
-import { db, collection, getDocs } from "./firebase.js";
+import { db, collection, getDocs, auth } from "./firebase.js";
 import { setVehicleId, setTab } from "./state.js";
 import { headerMenu } from "./ui.js";
 import { calcolaStato } from "./manut.js";
@@ -21,7 +21,9 @@ export async function renderGarage(appDiv){
     <div id="garageList"></div>
   `;
   
-  const vehiclesSnap = await getDocs(collection(db,"vehicles"));
+  const vehiclesSnap = await getDocs(
+    collection(db,"users",auth.currentUser.uid,"vehicles")
+  );
 
   let html="";
   for(const vDoc of vehiclesSnap.docs){

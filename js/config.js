@@ -1,4 +1,4 @@
-import { db, doc, setDoc } from "./firebase.js";
+import { db, doc, setDoc, vehiclePath } from "./firebase.js";
 import { setCacheConfig, vehicleId } from "./state.js";
 
 window.saveKm=async function(){
@@ -7,7 +7,7 @@ window.saveKm=async function(){
     .value
     .replace(/\./g,"");
     await setDoc(
-        doc(db,"vehicles",vehicleId),
+        doc(db,...vehiclePath(vehicleId)),
         {
             km_attuali:Number(km)
         },

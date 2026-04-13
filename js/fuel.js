@@ -1,4 +1,4 @@
-import { db, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc, query, orderBy, limit } from "./firebase.js";
+import { db, collection, getDocs, getDoc, doc, setDoc, addDoc, deleteDoc, query, orderBy, limit, vehiclePath } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatNumero, formatDate, formatKm, parseNumero, getConsumoClasse } from "./utils.js";
 import { cacheFuel, setCacheFuel, fuelEditId, setFuelEditId, setTab, vehicleId } from "./state.js";
@@ -6,7 +6,7 @@ import { calcolaTagliando } from "./manut.js";
 
 export async function ricalcolaConsumi(){
     const fuelSnap = await getDocs(
-        collection(db,"vehicles",vehicleId,"fuel")
+        collection(db,...vehiclePath(vehicleId),"fuel")
     );
 
     let fuelList = fuelSnap.docs
@@ -36,7 +36,7 @@ export async function ricalcolaConsumi(){
             }
         }
         await setDoc(
-            doc(db,"vehicles",vehicleId,"fuel",curr.id),
+            doc(db,...vehiclePath(vehicleId),"fuel",curr.id),
             { consumo },
             { merge:true }
         );
@@ -50,7 +50,7 @@ export async function getFuelList(){
 
     const snap = await getDocs(
 	    query(
-	        collection(db,"vehicles",vehicleId,"fuel"),
+	        collection(db,...vehiclePath(vehicleId),"fuel"),
 	        orderBy("data","desc"),
 	        limit(200)
 	    )
@@ -121,7 +121,7 @@ window.salvaFuel = async function(){
     let fuelType = document.getElementById("fuelType").value;
     let consumo = null;
 
-    const vehicleRef = doc(db,"vehicles",vehicleId);
+    const vehicleRef = doc(db,...vehiclePath(vehicleId));
     const snap = await getDoc(vehicleRef);
     const v = snap.data();
     const nuovoStato = calcolaTagliando(km, v.tagliando_km);
@@ -159,7 +159,7 @@ window.salvaFuel = async function(){
 
     /* salva */
     if(fuelEditId){
-        await setDoc(doc(db,"vehicles",vehicleId,"fuel",fuelEditId),{
+        await setDoc(doc(db,...vehiclePath(vehicleId),"fuel",fuelEditId),{
             totale,
             litro,
             litri,
@@ -173,7 +173,7 @@ window.salvaFuel = async function(){
         },{merge:true});
         setFuelEditId(null);
     }else{
-        await addDoc(collection(db,"vehicles",vehicleId,"fuel"),{
+        await addDoc(collection(db,...vehiclePath(vehicleId),"fuel"),{
 			vehicleId:"default",
             totale,
             litro,
@@ -213,7 +213,7 @@ window.salvaFuel = async function(){
     }
 
     await setDoc(
-        doc(db,"vehicles",vehicleId),
+        doc(db,...vehiclePath(vehicleId)),
         {
             pieni_senza_additivo: pieniSenzaAdditivo,
             stato_additivo: statoAdditivo
@@ -223,7 +223,7 @@ window.salvaFuel = async function(){
 
     /* RICALCOLO CONSUMI DOPO MODIFICA */
     const fuelSnap = await getDocs(
-        collection(db,"vehicles",vehicleId,"fuel")
+        collection(db,...vehiclePath(vehicleId),"fuel")
     );
 
     let fuelList = fuelSnap.docs
@@ -251,7 +251,7 @@ window.salvaFuel = async function(){
         }
 
         await setDoc(
-            doc(db,"vehicles",vehicleId,"fuel",curr.id),
+            doc(db,...vehiclePath(vehicleId),"fuel",curr.id),
             { consumo },
             { merge:true }
         );
@@ -271,10 +271,10 @@ window.modificaFuel = function(id){
 
 window.eliminaFuel = async function(id){
     if(confirm("Eliminare questo rifornimento?")){
-        await deleteDoc(doc(db,"vehicles",vehicleId,"fuel",id));
+        await deleteDoc(doc(db,...vehiclePath(vehicleId),"fuel",id));
         await ricalcolaConsumi();
         const fuelSnapList = await getDocs(
-            collection(db,"vehicles",vehicleId,"fuel")
+            collection(db,...vehiclePath(vehicleId),"fuel")
         );
 
         const lista = fuelSnapList.docs
@@ -301,7 +301,7 @@ window.eliminaFuel = async function(id){
         }
 
         await setDoc(
-            doc(db,"vehicles",vehicleId),
+            doc(db,...vehiclePath(vehicleId)),
             {
                 pieni_senza_additivo: pieniSenzaAdditivo,
                 stato_additivo: statoAdditivo
@@ -395,7 +395,10 @@ export function renderFuel(appDiv, fuelList, stats){
     if(stats.anomaliaConsumo){
         fuelBox.innerHTML+=`
             <div class="anomaliaBox">
-                ⚠️ Consumo +${stats.anomaliaConsumo}% rispetto alla media
+                ⚠️ Consumo aumentato del ${stats.anomaliaConsumo}% rispetto alla media
+                <span class="anomaliaDettaglio">
+                    Ultimo pieno: ${formatNumero(listaConsumi[0],2)} km/l
+                </span>
             </div>
         `;
     }
@@ -404,6 +407,9 @@ export function renderFuel(appDiv, fuelList, stats){
         fuelBox.innerHTML+=`
             <div class="anomaliaBox">
                 📉 Consumo migliorato del ${stats.miglioramentoConsumo}%
+                <span class="anomaliaDettaglio">
+                    Ultimo pieno: ${formatNumero(listaConsumi[0],2)} km/l
+                </span>
             </div>
         `;
     }
@@ -411,7 +417,10 @@ export function renderFuel(appDiv, fuelList, stats){
     if(stats.anomaliaPrezzo){
         fuelBox.innerHTML+=`
             <div class="anomaliaBox">
-                ⛽ Prezzo carburante +${stats.anomaliaPrezzo}% rispetto alla media
+                ⛽ Prezzo carburante più alto del ${stats.anomaliaPrezzo}%
+                <span class="anomaliaDettaglio">
+                    Controlla il distributore
+                </span>
             </div>
         `;
     }
@@ -574,7 +583,7 @@ export async function renderFuelAdd(appDiv){
     pienoPerso = false;
 
     if(fuelEditId){
-        const snap = await getDoc(doc(db,"vehicles",vehicleId,"fuel",fuelEditId));
+        const snap = await getDoc(doc(db,...vehiclePath(vehicleId),"fuel",fuelEditId));
 
         let f = snap.data();
 

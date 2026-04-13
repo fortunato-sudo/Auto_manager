@@ -70,7 +70,7 @@ window.salvaVeicolo = async function(){
     let serbatoio = Number(document.getElementById("serbatoioVeicolo").value);
     let targa = document.getElementById("targaVeicolo").value;
 
-    await addDoc(collection(db,"vehicles"),{
+    await addDoc(collection(db,"users",auth.currentUser.uid,"vehicles"),{
         nome,
         tipo,
         marca,

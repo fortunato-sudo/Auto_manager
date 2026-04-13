@@ -1,4 +1,4 @@
-import { db, collection, addDoc, setDoc, getDoc, doc, deleteDoc } from "./firebase.js";
+import { db, collection, addDoc, setDoc, getDoc, doc, deleteDoc, vehiclePath } from "./firebase.js";
 import { headerMenu, headerBack } from "./ui.js";
 import { formatDate, formatDateOnly, formatKm } from "./utils.js";
 import { 
@@ -224,7 +224,7 @@ window.aggiungiManutenzione=function(){
     let mesi=parts[2];
     let prodotto=parts[3];
 
-    addDoc(collection(db,"vehicles",vehicleId,"manutenzioni"),{
+    addDoc(collection(db,...vehiclePath(vehicleId),"manutenzioni"),{
         vehicleId:vehicleId,
         nome:nomeMan,
         frequenza_km:Number(km),
@@ -240,7 +240,7 @@ window.salvaManutenzione = async function(){
     let prodotto = document.getElementById("prodottoMan").value;
     let img = document.getElementById("imgMan").value;
 
-    await addDoc(collection(db,"vehicles",vehicleId,"manutenzioni"),{
+    await addDoc(collection(db,...vehiclePath(vehicleId),"manutenzioni"),{
         vehicleId: vehicleId,
         nome:nome,
         frequenza_km:Number(km),
@@ -261,7 +261,7 @@ window.segnaFatto = async function(){
     let note = prompt("Note (facoltativo)");
     let data = new Date().toISOString().split("T")[0];
 
-    const vehicleRef = doc(db,"vehicles",vehicleId);
+    const vehicleRef = doc(db,...vehiclePath(vehicleId));
     const snap = await getDoc(vehicleRef);
     const v = snap.data();
 
@@ -278,7 +278,7 @@ window.segnaFatto = async function(){
         tagliando_stato: nuovoStato
     },{merge:true});
 
-    await addDoc(collection(db,"vehicles",vehicleId,"registro"),{
+    await addDoc(collection(db,...vehiclePath(vehicleId),"registro"),{
         manutenzione: dettaglioManut.nome,
         km: Number(km),
         data: data,
@@ -286,7 +286,7 @@ window.segnaFatto = async function(){
         note: note || ""
     });
 
-    await setDoc(doc(db,"vehicles",vehicleId,"manutenzioni",dettaglioId),{
+    await setDoc(doc(db,...vehiclePath(vehicleId),"manutenzioni",dettaglioId),{
         ultimo_km:Number(km),
         ultima_data:data
     },{merge:true});
@@ -406,18 +406,20 @@ export function renderDettaglio(appDiv, m, km){
 
         <div class="detailCard">
 
-            <div class="detailRow">
+            <div class="detailRow productLabel">
                 <div class="detailLabel">Ultimo intervento</div>
-                <div class="detailValue">
-                    ${formatDateOnly(m.ultima_data)} | ${formatKm(m.ultimo_km)} km
-                </div>
             </div>
 
-            <div class="detailRow">
+            <div class="detailRow detailValue">
+                ${formatDateOnly(m.ultima_data)} | ${formatKm(m.ultimo_km)} km
+            </div>
+
+            <div class="detailRow productLabel">
                 <div class="detailLabel">Prossimo intervento</div>
-                <div class="detailValue" style="color:${colore}">
+            </div>
+
+            <div class="detailRow detailValue" style="color:${colore}">
                     ${prossimoTesto}
-                </div>
             </div>
 
             <div class="detailRow productLabel">
@@ -443,7 +445,7 @@ export function renderDettaglio(appDiv, m, km){
 
 window.eliminaManutenzione=async function(){
     if(confirm("Eliminare questa manutenzione?")){
-        await deleteDoc(doc(db,"vehicles",vehicleId,"manutenzioni",dettaglioId));
+        await deleteDoc(doc(db,...vehiclePath(vehicleId),"manutenzioni",dettaglioId));
         setCacheManut(null);
         setTab("manut");
         render();

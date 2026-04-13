@@ -281,24 +281,28 @@ export function calcolaSaluteVeicolo(urgenti=0, imminenti=0, stats={}){
     let score = 100;
     let problemi = [];
 
+    /* manutenzioni urgenti */
     if(urgenti > 0){
-        score -= Math.min(urgenti * 5, 60);
-        problemi.push(`⚠️ ${urgenti} manutenzioni urgenti`);
+        const penalitaUrgenti = Math.min(urgenti * 5, 60);
+        score -= penalitaUrgenti;
+        problemi.push(`🔴 ${urgenti} manutenzioni urgenti`);
     }
 
+    /* manutenzioni imminenti */
     if(imminenti > 0){
-        score -= Math.min(imminenti * 3, 30);
-        problemi.push(`⚠️ ${imminenti} manutenzioni imminenti`);
+        const penalitaImminenti = Math.min(imminenti * 2, 30);
+        score -= penalitaImminenti;
+        problemi.push(`🟡 ${imminenti} manutenzioni imminenti`);
     }
 
+    /* consumo peggiorato */
     if(stats.anomaliaConsumo){
         score -= 5;
-        problemi.push("⚠️ consumo carburante peggiorato");
+        problemi.push("⛽ consumo carburante peggiorato");
     }
 
-    if(score < 0){
-        score = 0;
-    }
+    /* sicurezza */
+    score = Math.max(0, Math.round(score));
 
     return {
         score,
@@ -310,6 +314,13 @@ export function getClasseSalute(score){
     if(score >= 80) return "healthGood";
     if(score >= 60) return "healthWarning";
     return "healthBad";
+}
+
+export function getStatoSalute(score){
+    if(score >= 90) return "Ottimo";
+    if(score >= 70) return "Buono";
+    if(score >= 50) return "Attenzione";
+    return "Critico";
 }
 
 export function renderStats(appDiv, fuelList, stats){

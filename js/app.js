@@ -1,10 +1,27 @@
+import { auth, db, doc, setDoc, vehiclePath } from "./firebase.js";
+import { getVehicles, saveVehicle, vehicleDoc } from "./sync.js";
+import { renderLogin } from "./login.js";
+
+auth.onAuthStateChanged(async user => {
+    if(!user){
+        renderLogin();
+        return;
+    }
+    try{
+        await preloadDB();
+    }catch(e){
+        console.warn("Preload fallito", e);
+    }
+    render();
+});
+
 import { renderHome } from "./home.js";
 import { renderGarage } from "./garage.js";
 import { renderManut, renderManutAdd, renderManutList, renderDettaglio, calcolaStato } from "./manut.js";
 import { renderFuel, renderFuelAdd, getFuelList, renderDistributori } from "./fuel.js";
 import { renderStats, calcolaStatisticheFuel, calcolaCostoAuto, calcolaAutonomia, previsioneCarburanteKm } from "./stats.js";
 import { renderRegistro, renderRegistroAdd, renderCronologiaManut } from "./registro.js";
-import { db, collection, getDocs, getDoc, doc, setDoc } from "./firebase.js";
+import { collection, getDocs, getDoc } from "./firebase.js";
 import {
     tab,
     dettaglioManut,
@@ -35,13 +52,18 @@ updateDarkLabel();
 
 const splashStart = Date.now();
 
+window.logout = async function(){
+    await auth.signOut();
+    location.reload();
+}
+
 window.aggiornaKmAutoSeMaggiore = async function(kmNuovi){
-    const snap = await getDoc(doc(db,"vehicles",vehicleId));
+    const snap = await getDoc(doc(db,...vehiclePath(vehicleId)));
     let kmAttuali = snap.data()?.km_attuali || 0;
 
     if(kmNuovi > kmAttuali){
         await setDoc(
-            doc(db,"vehicles",vehicleId),
+            doc(db,...vehiclePath(vehicleId)),
             { km_attuali:Number(kmNuovi) },
             { merge:true }
         );
@@ -57,7 +79,7 @@ async function preloadDB(){
 
     /* manutenzioni */
     if(cacheManut === null){
-        const snap = await getDocs(collection(db,"vehicles",vehicleId,"manutenzioni"));
+        const snap = await getDocs(collection(db,...vehiclePath(vehicleId),"manutenzioni"));
         setCacheManut(
             snap.docs.map(doc=>({
                 id:doc.id,
@@ -67,7 +89,7 @@ async function preloadDB(){
     }
 
     if(cacheRegistro===null){
-        const snap = await getDocs(collection(db,"vehicles",vehicleId,"registro"));
+        const snap = await getDocs(collection(db,...vehiclePath(vehicleId),"registro"));
         const registroList = snap.docs.map(doc=>({
             id:doc.id,
             data:doc.data()
@@ -77,7 +99,7 @@ async function preloadDB(){
 
     /* km auto */
     if(cacheConfig===null){
-        const snap = await getDoc(doc(db,"vehicles",vehicleId));
+        const snap = await getDoc(doc(db,...vehiclePath(vehicleId)));
         setCacheConfig(snap.data()?.km_attuali || 0);
     }
 }
@@ -105,12 +127,12 @@ async function preloadDB(){
             renderVehicleAdd(appDiv);
         }
 
-        const vehicleSnap = await getDoc(doc(db,"vehicles",vehicleId));
+        const vehicleSnap = await getDoc(doc(db,...vehiclePath(vehicleId)));
         const currentVehicle = vehicleSnap.data();
 
         let km = cacheConfig;
         if(km===null){
-            const snap = await getDoc(doc(db,"vehicles",vehicleId,"config","auto"));
+            const snap = await getDoc(doc(db,...vehiclePath(vehicleId),"config","auto"));
             km = snap.data()?.km_attuali || 0;
             setCacheConfig(km);
         }
@@ -133,7 +155,7 @@ async function preloadDB(){
 
         let manutList = cacheManut;
         if((tab==="home" || tab==="manut" || tab==="dettaglio") && manutList===null){
-            const snap = await getDocs(collection(db,"vehicles",vehicleId,"manutenzioni"));
+            const snap = await getDocs(collection(db,...vehiclePath(vehicleId),"manutenzioni"));
             manutList = snap.docs.map(doc=>({
                 id:doc.id,
                 data:doc.data()
@@ -144,7 +166,7 @@ async function preloadDB(){
 
         let registroList = cacheRegistro;
         if(registroList===null){
-            const snap = await getDocs(collection(db,"vehicles",vehicleId,"registro"));
+            const snap = await getDocs(collection(db,...vehiclePath(vehicleId),"registro"));
             registroList = snap.docs.map(doc=>({
                 id:doc.id,
                 data:doc.data()
@@ -199,7 +221,7 @@ async function preloadDB(){
             }
         }
         await setDoc(
-            doc(db,"vehicles",vehicleId),
+            doc(db,...vehiclePath(vehicleId)),
             {
                 urgenti,
                 imminenti
@@ -243,7 +265,7 @@ async function preloadDB(){
                 
             case "home":
                 const vehicleSnap = await getDoc(
-                    doc(db,"vehicles",vehicleId)
+                    doc(db,...vehiclePath(vehicleId))
                 );
                 const vehicle = vehicleSnap.data();
                 renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, autonomia);
@@ -335,28 +357,25 @@ window.indietro=function(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+
     updateDarkLabel();
+
     if(localStorage.getItem("darkMode")==="true"){
         document.body.classList.add("dark");
     }
-    (async function(){
-        try{
-            await preloadDB();
-        }catch(e){
-            console.warn("Preload fallito", e);
-        }
-        render();
-    })();
 
     /* swipe menu */
     let startX = 0;
+
     document.addEventListener("touchstart",function(e){
         startX = e.touches[0].clientX;
     });
+
     document.addEventListener("touchmove",function(e){
         let currentX = e.touches[0].clientX;
         let diff = currentX - startX;
         const menu=document.getElementById("menuDrawer");
+
         if(menu && menu.classList.contains("menuOpen")){
             if(diff < -50){
                 menu.classList.remove("menuOpen");
@@ -365,21 +384,26 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+
     const overlay = document.getElementById("menuOverlay");
+
     if(overlay){
         overlay.addEventListener("click",function(){
             document.getElementById("menuDrawer")
             .classList.remove("menuOpen");
+
             overlay.classList.remove("menuOverlayOpen");
+
             document.body.classList.remove("menuOpen");
 
-            /* refresh status bar */
             document.body.style.background="transparent";
+
             requestAnimationFrame(()=>{
                 document.body.style.background="";
             });
         });
     }
+
 });
 
 window.render = render;
