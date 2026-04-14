@@ -3,14 +3,13 @@
     margin:0 auto;
     padding:16px;
     box-sizing:border-box;
-	opacity:0;
-	visibility:hidden;
-	transition:opacity .35s;
-	padding-bottom:40px;
-	min-height:100vh;
-	padding-top:env(safe-area-inset-top);
-	padding-bottom:env(safe-area-inset-bottom);
-	background:var(--bg);
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .35s;
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:calc(40px + env(safe-area-inset-bottom));
+    min-height:100dvh;
+    background:var(--bg);
 }
 
 :root{
@@ -43,11 +42,13 @@ body.dark .manutRow{
 }
 
 html,body{
+    height:100%;
     margin:0;
     overflow-x:hidden;
 }
 
 body{
+    min-height:100dvh;
 	font-family:-apple-system;
 	background:var(--bg);
     color:var(--text);
@@ -976,7 +977,6 @@ body.dark .wValue{
 
 .menuFooter{
     padding:16px;
-	padding-bottom: calc(16px + env(safe-area-inset-bottom));
     border-top:1px solid #2c2c2e;
     flex-shrink:0;
 }
