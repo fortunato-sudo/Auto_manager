@@ -6,12 +6,12 @@
     opacity:0;
     visibility:hidden;
     transition:opacity .35s;
-
-    padding-top:env(safe-area-inset-top);
     padding-bottom:40px;
 
     min-height:100dvh;
 
+    padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
     background:var(--bg);
 }
 
