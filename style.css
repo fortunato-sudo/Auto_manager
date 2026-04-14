@@ -954,20 +954,15 @@ body.dark .wValue{
     position:fixed;
     top:0;
     left:0;
-
     width:260px;
     height:100dvh;
-
-    display:flex;
-    flex-direction:column;
-
-    padding-top:calc(60px + env(safe-area-inset-top));
-    padding-bottom:env(safe-area-inset-bottom);
-
+    background:#1c1c1e;
     transform:translateX(-260px);
     transition:transform .25s ease;
-
-    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    padding-top:env(safe-area-inset-top);
+    z-index:1000;
 }
 
 .menuHeader{
@@ -977,14 +972,12 @@ body.dark .wValue{
 .menuContent{
     flex:1;
     overflow-y:auto;
-    padding-bottom:10px;
 }
 
 .menuFooter{
-    flex-shrink:0;
     padding:16px;
     border-top:1px solid #2c2c2e;
-    background:inherit;
+    flex-shrink:0;
 }
 
 .menuLogout{
