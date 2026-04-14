@@ -1016,6 +1016,11 @@ body.menuOpen{
     overflow:hidden;
 }
 
+body.menuOpen #app{
+    position:fixed;
+    width:100%;
+}
+
 .menuItem{
 	padding:18px 20px;
 	font-size:18px;
