@@ -44,6 +44,8 @@ export async function ricalcolaConsumi(){
 }
 
 export async function getFuelList(){
+    if(!vehicleId) return [];
+
     if(cacheFuel !== null){
         return cacheFuel;
     }
@@ -383,12 +385,29 @@ export function renderFuel(appDiv, fuelList, stats){
             + Nuovo rifornimento
         </button>
 
-        <button onclick="nav('stations')" class="secondaryBtn">
-            Storico Distributori
-        </button>
-        
-        <div class="section">Ultimi rifornimenti</div>
-        <div id="fuelList"></div>
+        ${fuelList.length > 0 ? `
+            <button onclick="nav('stations')" class="secondaryBtn">
+                Storico Distributori
+            </button>
+        ` : ""}
+
+        ${fuelList.length > 0 ? `    
+            <div class="section">Ultimi rifornimenti</div>
+            <div id="fuelList"></div>
+        ` : `
+            <div class="fuelEmpty">
+                <div class="fuelEmptyIcon">⛽</div>
+
+                <div class="fuelEmptyTitle">
+                    Nessun rifornimento registrato
+                </div>
+
+                <div class="fuelEmptyText">
+                    Aggiungi il primo pieno per vedere
+                    consumi e statistiche.
+                </div>
+            </div>
+        `}
     `;
 
     let fuelBox=document.getElementById("fuelList");
@@ -586,7 +605,6 @@ export async function renderFuelAdd(appDiv){
         const snap = await getDoc(doc(db,...vehiclePath(vehicleId),"fuel",fuelEditId));
 
         let f = snap.data();
-
         document.getElementById("totale").value = f.totale || "";
         document.getElementById("litro").value = f.litro || "";
         document.getElementById("litri").value = f.litri || "";
@@ -617,7 +635,6 @@ export function renderDistributori(appDiv, fuelList){
 
     let minPrezzo = Infinity;
     let migliore = null;
-
     Object.entries(stats).forEach(([nome,d])=>{
         if(d.prezzoMedio < minPrezzo){
             minPrezzo = d.prezzoMedio;

@@ -31,31 +31,35 @@
         <div id="app"></div>
         
         <div id="menuDrawer" class="menuDrawer">
-			<div class="menuVehicle">
-				<div id="menuVehicleName"></div>
-				<div id="menuVehicleKm"></div>
+			<div class="menuHeader">
+				<div class="menuVehicle">
+					<div id="menuVehicleName"></div>
+					<div id="menuVehicleKm"></div>
+				</div>
+				<div class="menuDivider"></div>
 			</div>
 
-			<div class="menuDivider"></div>
-			<div class="menuGarage" onclick="nav('garage')">🚘 Garage</div>
-			<div class="menuDivider"></div>
-			<div class="menuItem" onclick="nav('home')">🏠 Dashboard</div>
-			<div class="menuItem" onclick="nav('manut')">🔧 Manutenzioni</div>
-			<div class="menuItem" onclick="nav('registro')">📋 Registro</div>
-			<div class="menuItem" onclick="nav('fuel')">⛽ Rifornimenti</div>
-			<div class="menuItem" onclick="nav('stats')">📊 Statistiche</div>
+			<div class="menuContent">
+				<div class="menuGarage" onclick="nav('garage')">🚘 Garage</div>
+				<div id="menu_home" class="menuItem" onclick="nav('home')">🏠 Dashboard</div>
+				<div id="menu_manut" class="menuItem" onclick="nav('manut')">🔧 Manutenzioni</div>
+				<div id="menu_registro" class="menuItem" onclick="nav('registro')">📋 Registro</div>
+				<div id="menu_fuel" class="menuItem" onclick="nav('fuel')">⛽ Rifornimenti</div>
+				<div id="menu_stats" class="menuItem" onclick="nav('stats')">📊 Statistiche</div>
+			</div>
 
-			<div class="menuBottom">
+			<div class="menuFooter">
 				<div class="menuDarkRow" onclick="toggleDark()">
 					<span id="darkLabel">🌙 Dark mode</span>
-
 					<div class="switch switchActive" id="darkSwitch">
 						<div class="switchKnob"></div>
 					</div>
 				</div>
+
+				<button class="menuLogout" onclick="logout()">Logout</button>
 			</div>
-			<button onclick="logout()">Logout</button>
 		</div>
+
 		<div id="menuOverlay" class="menuOverlay"></div>
 	</body>
 </html>

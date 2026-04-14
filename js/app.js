@@ -3,11 +3,9 @@ import { getVehicles, saveVehicle, vehicleDoc } from "./sync.js";
 import { renderLogin } from "./login.js";
 
 auth.onAuthStateChanged(async user => {
-
     console.log("AUTH STATE", user);
 
     const splash = document.getElementById("splash");
-
     if(splash){
         splash.remove();
         document.body.classList.remove("loading");
@@ -18,7 +16,6 @@ auth.onAuthStateChanged(async user => {
         renderLogin();
         return;
     }
-
     console.log("USER LOGGED");
 
     try{
@@ -26,7 +23,6 @@ auth.onAuthStateChanged(async user => {
     }catch(e){
         console.warn("Preload fallito", e);
     }
-
     render();
 });
 
@@ -53,7 +49,8 @@ import {
     setCacheConfig,
     setRendering,
     setTab,
-    vehicleId
+    vehicleId,
+    setVehicleId
 } from "./state.js";
 import { updateDarkLabel } from "./ui.js";
 import { renderVehicleAdd } from "./vehicleAdd.js";
@@ -68,8 +65,27 @@ updateDarkLabel();
 const splashStart = Date.now();
 
 window.logout = async function(){
-    await auth.signOut();
-    location.reload();
+    const menu = document.getElementById("menuDrawer")
+    const overlay = document.getElementById("menuOverlay")
+
+    menu?.classList.remove("menuOpen")
+    overlay?.classList.remove("menuOverlayOpen")
+    document.body.classList.remove("menuOpen")
+
+    const splash = document.getElementById("splash")
+    if(splash){
+        splash.innerHTML = `
+            <div class="splashContent">
+                <img src="img/logo.png" class="splashLogo">
+                <div class="splashTitle">Disconnessione...</div>
+            </div>
+        `
+        splash.style.opacity="1"
+        splash.style.visibility="visible"
+    }
+
+    document.body.classList.add("loading")
+    await auth.signOut()
 }
 
 window.aggiornaKmAutoSeMaggiore = async function(kmNuovi){
@@ -87,6 +103,10 @@ window.aggiornaKmAutoSeMaggiore = async function(kmNuovi){
 }
 
 async function preloadDB(){
+    if(!vehicleId){
+        return;
+    }
+
     /* fuel */
     if(!cacheFuel){
         setCacheFuel(await getFuelList());
@@ -119,7 +139,30 @@ async function preloadDB(){
     }
 }
 
- async function render(){
+async function render(){
+    const appDiv = document.getElementById("app");
+        if(!vehicleId){
+        const vehiclesSnap = await getDocs(
+            collection(db,"users",auth.currentUser.uid,"vehicles")
+        );
+
+        if(!vehiclesSnap.empty){
+            const firstVehicle = vehiclesSnap.docs[0];
+            setVehicleId(firstVehicle.id);
+            await preloadDB();
+        }else{
+            if(tab === "vehicleAdd"){
+                renderVehicleAdd(appDiv);
+                setRendering(false);
+                return;
+            }
+
+            renderGarage(appDiv);
+            setRendering(false);
+            return;
+        }
+    }
+
     if(rendering) return;
     setRendering(true);
     try{
@@ -136,10 +179,6 @@ async function preloadDB(){
         if(tab==="home" || tab==="fuel" || tab==="stats"){
             stats = calcolaStatisticheFuel(fuelList);
             stats.previsioneKm = previsioneCarburanteKm(fuelList);
-        }
-
-        if(tab === "vehicleAdd"){
-            renderVehicleAdd(appDiv);
         }
 
         const vehicleSnap = await getDoc(doc(db,...vehiclePath(vehicleId)));
@@ -279,11 +318,7 @@ async function preloadDB(){
             break;
                 
             case "home":
-                const vehicleSnap = await getDoc(
-                    doc(db,...vehiclePath(vehicleId))
-                );
-                const vehicle = vehicleSnap.data();
-                renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, autonomia);
+                renderHome(appDiv, km, manutList, stats, currentVehicle, costoAuto, autonomia);
             break;
 
             case "manut":
@@ -360,6 +395,14 @@ async function preloadDB(){
     }
     updateDarkLabel();
     window.scrollTo(0,0);
+
+    document.querySelectorAll(".menuItem")
+        .forEach(el=>el.classList.remove("menuItemActive"));
+
+    const active = document.getElementById("menu_"+tab);
+    if(active){
+        active.classList.add("menuItemActive");
+    }
 }
 
 window.indietro=function(){
@@ -372,16 +415,13 @@ window.indietro=function(){
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
     updateDarkLabel();
-
     if(localStorage.getItem("darkMode")==="true"){
         document.body.classList.add("dark");
     }
 
     /* swipe menu */
     let startX = 0;
-
     document.addEventListener("touchstart",function(e){
         startX = e.touches[0].clientX;
     });
@@ -401,7 +441,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     const overlay = document.getElementById("menuOverlay");
-
     if(overlay){
         overlay.addEventListener("click",function(){
             document.getElementById("menuDrawer")
@@ -418,7 +457,5 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
-
 });
-
 window.render = render;

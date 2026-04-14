@@ -281,18 +281,25 @@ export function calcolaSaluteVeicolo(urgenti=0, imminenti=0, stats={}){
     let score = 100;
     let problemi = [];
 
+    if(!stats || Object.keys(stats).length === 0){
+        return{
+            score:0,
+            problemi:["Nessun dato rilevato"]
+        }
+    }
+
     /* manutenzioni urgenti */
     if(urgenti > 0){
         const penalitaUrgenti = Math.min(urgenti * 5, 60);
         score -= penalitaUrgenti;
-        problemi.push(`🔴 ${urgenti} manutenzioni urgenti`);
+        problemi.push(`🔴 ${urgenti === 1 ? "1 intervento urgente" : urgenti + " interventi urgenti"}`);
     }
 
     /* manutenzioni imminenti */
     if(imminenti > 0){
         const penalitaImminenti = Math.min(imminenti * 2, 30);
         score -= penalitaImminenti;
-        problemi.push(`🟡 ${imminenti} manutenzioni imminenti`);
+        problemi.push(`🟡 ${imminenti === 1 ? "1 intervento imminente" : imminenti + " interventi imminenti"}`);
     }
 
     /* consumo peggiorato */
@@ -499,7 +506,26 @@ export function renderStats(appDiv, fuelList, stats){
         formatNumero(stats.autonomia,0)+" km";
     }
 
-    if(chartData.length > 0 && window.Chart){
+    if(chartData.length === 0){
+        document.getElementById("fuelChart").parentElement.innerHTML = `
+            <div class="chartEmpty">
+                <div class="chartEmptyIcon">📊</div>
+
+                <div class="chartEmptyTitle">
+                    Nessun dato disponibile
+                </div>
+
+                <div class="chartEmptyText">
+                    Aggiungi rifornimenti per vedere
+                    l'andamento dei consumi
+                </div>
+            </div>
+        `;
+
+        return;
+    }
+
+    if(window.Chart){
         const ctx = document.getElementById("fuelChart");
         if(ctx){
             if(fuelChart && typeof fuelChart.destroy === "function"){

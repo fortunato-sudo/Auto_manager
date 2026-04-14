@@ -315,12 +315,29 @@ body:not(.dark) .menuItem{
 }
 
 .vehicleBadge{
-	background:#ff3b30;
-	color:white;
-	font-size:12px;
+    display: inline-block;
+    padding: 5px 8px 6px 8px;
+    border-radius:8px;
+    font-size:13px;
 	font-weight:600;
-	padding:2px 7px;
-	border-radius:10px;
+    margin-right: 6px;
+}
+
+.badgeOk{
+    background: #1e8e3e20;
+	color:#34c759;
+	font-size:14px;
+	font-weight:500;
+}
+
+.badgeWarning{
+    background: #ff9f0a20;
+    color: #ff9f0a;
+}
+
+.badgeDanger{
+    background: #ff3b3020;
+    color: #ff3b30;
 }
 
 .vehicleSubtitle{
@@ -372,11 +389,6 @@ body:not(.dark) .menuItem{
     font-weight:600;
 }
 
-.tagliandoOk{
-    color:#34c759;
-    font-weight:600;
-}
-
 .vehicleInterventi{
 	font-size:14px;
 	display:flex;
@@ -389,11 +401,6 @@ body:not(.dark) .menuItem{
 .vehicleDivider{
     opacity:0.4;
     margin:0 4px;
-}
-
-.interventiDivider{
-  margin:0 6px;
-  opacity:0.6;
 }
 
 .interventiText{
@@ -436,30 +443,6 @@ body:not(.dark) .menuItem{
 	border-color:#444;
 }
 
-.badgeUrgente{
-	background:#ff3b30;
-	color:white;
-	padding:4px 8px;
-	border-radius:8px;
-	font-size:13px;
-	font-weight:600;
-}
-
-.badgeImminente{
-	background:#ff9500;
-	color:white;
-	padding:4px 8px;
-	border-radius:8px;
-	font-size:13px;
-	font-weight:600;
-}
-
-.badgeOk{
-	color:#34c759;
-	font-size:14px;
-	font-weight:500;
-}
-
 .vehicleRow{
 	display:flex;
 	justify-content:space-between;
@@ -496,7 +479,7 @@ body:not(.dark) .menuItem{
 .plateITA{
     display:inline-block;
     margin:4px 0 6px 0;
-    padding:3px 10px;
+    padding:3px 8px;
     background:white;
     border:1px solid #ccc;
     border-radius:6px;
@@ -504,26 +487,8 @@ body:not(.dark) .menuItem{
     letter-spacing:2px;
     font-weight:600;
     position:relative;
-}
-
-.plateITA::before{
-    content:"";
-    position:absolute;
-    left:0;
-    top:0;
-    bottom:0;
-    width:8px;
-    background:#003399;
-}
-
-.plateITA::after{
-    content:"";
-    position:absolute;
-    right:0;
-    top:0;
-    bottom:0;
-    width:8px;
-    background:#003399;
+    border-left:10px solid #003399 !important;
+    border-right:10px solid #003399 !important;
 }
 
 .dark .plateITA{
@@ -577,11 +542,14 @@ body:not(.dark) .menuItem{
 }
 
 .vehicleFuelQuick{
-    font-size:15px;
-    color:#4da3ff;
+    font-size:14px;
+    font-weight:600;
     margin-top:4px;
     cursor:pointer;
-    font-weight:600;
+    padding: 6px 10px 8px 8px;
+    border-radius: 6px;
+    background: rgba(2, 132, 199, 0.15);
+    color: #0ea5e9;
 }
 
 .vehicleFuelQuick:active{
@@ -690,7 +658,7 @@ button{
 }
 
 body.dark .wValue{
-color:#9a9a9a;
+    color:#9a9a9a;
 }
 
 /* LIST */
@@ -840,31 +808,31 @@ color:#9a9a9a;
 }
 
 .detailCard{
-background:var(--card-bg);
-border-radius:20px;
-padding:5px 20px;
-margin:16px 0;
-border:1px solid var(--border);
+    background:var(--card-bg);
+    border-radius:20px;
+    padding:5px 20px;
+    margin:16px 0;
+    border:1px solid var(--border);
 }
 
 .detailRow{
-display:flex;
-justify-content:space-between;
-padding:14px 0;
-border-bottom:1px solid var(--border);
+    display:flex;
+    justify-content:space-between;
+    padding:14px 0;
+    border-bottom:1px solid var(--border);
 }
 
 .detailRow:last-child{
-border-bottom:none;
+    border-bottom:none;
 }
 
 .detailLabel{
-color:var(--text-secondary);
-font-size:15px;
+    color:var(--text-secondary);
+    font-size:15px;
 }
 
 .detailValue{
-font-weight:600;
+    font-weight:600;
 }
 
 /* ACTION BUTTONS */
@@ -986,14 +954,35 @@ font-weight:600;
     position:fixed;
     top:0;
     left:0;
-    transform:translateX(-260px);
-    width:240px;
-    height:100%;
+    width:260px;
+    height:100dvh;
     background:#1c1c1e;
-    padding-top:80px;
-    transition:0.25s;
+    transform:translateX(-260px);
+    transition:transform .25s ease;
+    display:flex;
+    flex-direction:column;
+    padding-top:env(safe-area-inset-top);
     z-index:1000;
+}
+
+.menuHeader{
+    padding:10px;
+}
+
+.menuContent{
+    flex:1;
     overflow-y:auto;
+}
+
+.menuFooter{
+    padding:16px;
+    border-top:1px solid #2c2c2e;
+    flex-shrink:0;
+}
+
+.menuLogout{
+    width:100%;
+    margin-top:12px;
 }
 
 .menuBottom{
@@ -1017,7 +1006,9 @@ font-weight:600;
 }
 
 body.menuOpen{
-	overflow:hidden;
+    overflow:hidden;
+    position:fixed;
+    width:100%;
 }
 
 .menuItem{
@@ -1025,6 +1016,16 @@ body.menuOpen{
 	font-size:18px;
 	border-bottom:1px solid #2c2c2e;
 	color:white;
+}
+
+.menuItemActive{
+    background:rgba(0,122,255,0.15);
+    border-left:4px solid #007aff;
+    font-weight:600;
+}
+
+.dark .menuItemActive{
+    background:rgba(10,132,255,0.25);
 }
 
 .menuItem:active{
@@ -1042,6 +1043,7 @@ body.menuOpen{
 	pointer-events:none;
 	transition:0.25s;
 	z-index:900;
+    backdrop-filter:blur(4px);
 }
 
 .menuOverlayOpen{
@@ -1075,8 +1077,9 @@ body.menuOpen{
 }
 
 .menuVehicle{
+    position:relative;
 	background:#f2f2f7;
-	margin:10px;
+	margin:0 0 10px 0;
 	padding:14px;
 	border-radius:12px;
 }
@@ -1514,7 +1517,7 @@ select{
 .healthIssues{
     margin-top:10px;
     font-size:14px;
-    line-height:1.4;
+    line-height:1.8;
     color:#ff9f0a;
 }
 
@@ -1588,6 +1591,14 @@ select{
     color:#ff3b30;
 }
 
+.healthNoData{
+    color:#9ca3af;
+}
+
+.healthNoDataText{
+    color:#9ca3af;
+}
+
 .noInterventi{
     text-align:center;
     padding:20px;
@@ -1608,4 +1619,127 @@ select{
     font-size:14px;
     color:var(--text-secondary);
     margin-top:2px;
+}
+
+.loginWrapper{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+}
+
+.loginCard{
+    width:100%;
+    max-width:360px;
+    background:var(--card-bg);
+    padding:28px;
+    border-radius:18px;
+    border:1px solid var(--border);
+    text-align:center;
+}
+
+.loginLogo{
+    text-align:center;
+}
+
+.loginLogo img{
+    height:110px;
+    width:auto;
+}
+
+.loginTitle{
+    font-size:24px;
+    font-weight:700;
+    margin-bottom:20px;
+}
+
+.loginField{
+    margin-bottom:12px;
+}
+
+.loginDivider{
+    font-size:13px;
+    color:var(--text-secondary);
+    margin:16px 0;
+}
+
+.garageEmpty{
+    text-align:center;
+    padding:60px 20px;
+}
+
+.garageEmptyIcon{
+    font-size:40px;
+    margin-bottom:10px;
+}
+
+.garageEmptyTitle{
+    font-size:22px;
+    font-weight:600;
+    margin-bottom:10px;
+}
+
+.garageEmptyText{
+    opacity:.7;
+    margin-bottom:25px;
+}
+
+.fuelEmpty{
+    text-align:center;
+    padding:60px 20px;
+}
+
+.fuelEmptyIcon{
+    font-size:40px;
+    margin-bottom:10px;
+}
+
+.fuelEmptyTitle{
+    font-size:20px;
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.fuelEmptyText{
+    opacity:.7;
+}
+
+.chartEmpty{
+    text-align:center;
+    padding:40px;
+    opacity:.7;
+}
+
+.chartEmptyIcon{
+    font-size:36px;
+    margin-bottom:10px;
+}
+
+.vehicleDeleteBtn{
+    position:absolute;
+    top:12px;
+    right:12px;
+
+    width:32px;
+    height:32px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#ff3b30;
+    color:white;
+
+    font-size:16px;
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transition:all .2s ease;
+}
+
+.vehicleDeleteBtn:hover{
+    background:#ff453a;
+    transform:scale(1.05);
 }

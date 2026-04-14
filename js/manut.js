@@ -216,6 +216,8 @@ export function calcolaTagliando(kmAttuali, kmTagliando){
 }
 
 window.aggiungiManutenzione=function(){
+    if(!vehicleId) return;
+
     let nome=prompt("Nome manutenzione | Frequenza km | Frequenza mesi | Prodotto\n\nEsempio:\nOlio motore, 15000, 12, Motul");
     if(!nome) return;
     let parts=nome.split(",");
@@ -234,6 +236,8 @@ window.aggiungiManutenzione=function(){
 }
 
 window.salvaManutenzione = async function(){
+    if(!vehicleId) return;
+
     let nome = document.getElementById("nomeMan").value;
     let km = document.getElementById("freqKm").value;
     let mesi = document.getElementById("freqMesi").value;
@@ -254,6 +258,8 @@ window.salvaManutenzione = async function(){
 }
 
 window.segnaFatto = async function(){
+    if(!vehicleId) return;
+
     let km = prompt("KM intervento");
     if(!km) return;
     await aggiornaKmAutoSeMaggiore(km);
@@ -405,7 +411,6 @@ export function renderDettaglio(appDiv, m, km){
         </div>
 
         <div class="detailCard">
-
             <div class="detailRow productLabel">
                 <div class="detailLabel">Ultimo intervento</div>
             </div>
@@ -444,6 +449,8 @@ export function renderDettaglio(appDiv, m, km){
 }
 
 window.eliminaManutenzione=async function(){
+    if(!vehicleId) return;
+    
     if(confirm("Eliminare questa manutenzione?")){
         await deleteDoc(doc(db,...vehiclePath(vehicleId),"manutenzioni",dettaglioId));
         setCacheManut(null);

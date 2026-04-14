@@ -1,5 +1,5 @@
-import { db, collection, addDoc } from "./firebase.js";
-import { setTab } from "./state.js";
+import { db, collection, addDoc, auth } from "./firebase.js";
+import { setTab, setVehicleId } from "./state.js";
 import { headerBack } from "./ui.js";
 
 export function renderVehicleAdd(appDiv){
@@ -70,19 +70,23 @@ window.salvaVeicolo = async function(){
     let serbatoio = Number(document.getElementById("serbatoioVeicolo").value);
     let targa = document.getElementById("targaVeicolo").value;
 
-    await addDoc(collection(db,"users",auth.currentUser.uid,"vehicles"),{
-        nome,
-        tipo,
-        marca,
-        modello,
-        anno,
-        motore,
-        serbatoio:serbatoio,
-        targa,
-        km_attuali:0,
-        pieni_senza_additivo:0,
-        stato_additivo:"ok"
-    });
-    setTab("garage");
+    const docRef = await addDoc(
+        collection(db,"users",auth.currentUser.uid,"vehicles"),
+        {
+            nome,
+            tipo,
+            marca,
+            modello,
+            anno,
+            motore,
+            serbatoio:serbatoio,
+            targa,
+            km_attuali:0,
+            pieni_senza_additivo:0,
+            stato_additivo:"ok"
+        }
+    );
+    setVehicleId(docRef.id);
+    setTab("home");
     render();
 }

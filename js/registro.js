@@ -5,6 +5,8 @@ import { cacheManut, setCacheManut, cacheRegistro, setCacheRegistro ,setTab, veh
 import { calcolaTagliando } from "./manut.js";
 
 async function ricalcolaManutenzioni(){
+    if(!vehicleId) return;
+
     const storicoSnap = await getDocs(
         collection(db,...vehiclePath(vehicleId),"registro")
     );
@@ -40,6 +42,8 @@ async function ricalcolaManutenzioni(){
 }
 
 export async function renderRegistro(appDiv){
+    if(!vehicleId) return;
+
     appDiv.innerHTML+=`
         ${headerMenu("Registro")}
         <button class="mainBtn" onclick="nuovoRegistro()">
@@ -49,7 +53,6 @@ export async function renderRegistro(appDiv){
     `;
     
     let storicoList = cacheRegistro;
-
 	if(!storicoList){
     	const snap = await getDocs(collection(db,...vehiclePath(vehicleId),"registro"));
     	storicoList = snap.docs.map(doc=>({
@@ -297,6 +300,8 @@ window.nuovoRegistro = function(){
 }
 
 window.salvaRegistro = async function(){
+    if(!vehicleId) return;
+
     let nome = document.getElementById("nomeInt").value;
     let km = document.getElementById("kmInt").value;
     let officina = document.getElementById("officinaInt").value;
@@ -421,6 +426,8 @@ window.modificaRegistro = function(id){
 }
 
 window.eliminaRegistro = async function(id){
+    if(!vehicleId) return;
+    
     if(!confirm("Eliminare intervento?")) return;
     await deleteDoc(
         doc(db,...vehiclePath(vehicleId),"registro",id)

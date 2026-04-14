@@ -17,8 +17,7 @@ export let cacheFuel=null;
 export let cacheManut=null;
 export let cacheConfig=null;
 export let cacheRegistro=null;
-
-export let vehicleId = "qashqai";
+export let vehicleId=null;
 
 /* setter */
 

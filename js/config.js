@@ -2,6 +2,8 @@ import { db, doc, setDoc, vehiclePath } from "./firebase.js";
 import { setCacheConfig, vehicleId } from "./state.js";
 
 window.saveKm=async function(){
+    if(!vehicleId) return;
+    
     let km = document
     .getElementById("km")
     .value

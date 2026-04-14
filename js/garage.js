@@ -1,8 +1,7 @@
-import { db, collection, getDocs, auth } from "./firebase.js";
+import { db, collection, getDocs, auth, deleteDoc, doc } from "./firebase.js";
 import { setVehicleId, setTab } from "./state.js";
 import { headerMenu } from "./ui.js";
 import { calcolaStato } from "./manut.js";
-
 
 function getVehicleIcon(v){
   if(v.tipo === "moto") return "🏍";
@@ -11,19 +10,44 @@ function getVehicleIcon(v){
 }
 
 export async function renderGarage(appDiv){
-  appDiv.innerHTML = `
-    <div class="garageHeader">
-      🚘 Garage
-    </div>
-    <button class="addVehicleBtn" onclick="nav('vehicleAdd')">
-      + Aggiungi veicolo
-    </button>
-    <div id="garageList"></div>
-  `;
-  
   const vehiclesSnap = await getDocs(
     collection(db,"users",auth.currentUser.uid,"vehicles")
   );
+  
+  appDiv.innerHTML = `
+    ${!vehiclesSnap.empty ? `
+      <div class="garageHeader">
+        🚘 Garage
+      </div>
+
+      <button class="addVehicleBtn" onclick="nav('vehicleAdd')">
+        + Aggiungi veicolo
+      </button>
+    ` : ""}
+    <div id="garageList"></div>
+  `;
+
+  if(vehiclesSnap.empty){
+    document.getElementById("garageList").innerHTML = `
+      <div class="garageEmpty">
+          <div class="garageEmptyIcon">🚘</div>
+
+          <div class="garageEmptyTitle">
+              Il tuo garage è vuoto
+          </div>
+
+          <div class="garageEmptyText">
+              Gestisci manutenzioni, rifornimenti e costi<br>
+              del tuo veicolo in un unico posto.
+          </div>
+
+          <button class="mainBtn" onclick="nav('vehicleAdd')">
+              + Aggiungi il tuo primo veicolo
+          </button>
+      </div>
+    `;
+    return;
+  }
 
   let html="";
   for(const vDoc of vehiclesSnap.docs){
@@ -39,15 +63,15 @@ export async function renderGarage(appDiv){
     let tagliandoText;
     let interventiText;
     if(tagliandoStato === "urgente"){
-      tagliandoText = `<span class="tagliandoUrgente">🔴 Tagliando urgente</span>`;
+      tagliandoText = `<span class="vehicleBadge badgeDanger">🔴 Tagliando urgente</span>`;
     }
 
     else if(tagliandoStato === "imminente"){
-      tagliandoText = `<span class="tagliandoImminente">🟠 Tagliando tra ${(tagliandoKm - km).toLocaleString()} km</span>`;
+      tagliandoText = `<span class="vehicleBadge badgeWarning">🟠 Tagliando tra ${(tagliandoKm - km).toLocaleString()} km</span>`;
     }
 
     else{
-      tagliandoText = `<span class="tagliandoOk">🟢 Tagliando ok</span>`;
+      tagliandoText = `<span class="vehicleBadge badgeOk">🟢 Tagliando ok</span>`;
     }
 
     let additivoText = "";
@@ -72,32 +96,36 @@ export async function renderGarage(appDiv){
     }
 
     if(urgenti === 0 && imminenti === 0){
-      interventiText = `<span class="interventiOk">🟢 Interventi ok</span>`;
+      interventiText = `<span class="vehicleBadge badgeOk">🟢 Interventi ok</span>`;
     }
     else{
       let parts = [];
 
       if(urgenti > 0){
         parts.push(
-          `<span class="interventiUrgenti">🔴 ${urgenti === 1 ? "1 intervento urgente" : urgenti + " interventi urgenti"}</span>`
+          `<span class="vehicleBadge badgeDanger">🔴 ${urgenti === 1 ? "1 intervento urgente" : urgenti + " interventi urgenti"}</span>`
         );
       }
 
       if(imminenti > 0){
         parts.push(
-          `<span class="interventiImminenti">🟠 ${imminenti === 1 ? "1 intervento imminente" : imminenti + " interventi imminenti"}</span>`
+          `<span class="vehicleBadge badgeWarning">🟠 ${imminenti === 1 ? "1 intervento imminente" : imminenti + " interventi imminenti"}</span>`
         );
       }
 
       interventiText = `
         <span class="interventiText">
-          ${parts.join('<span class="interventiDivider">•</span>')}
+          ${parts.join('<span class="interventiDivider"></span>')}
         </span>
       `;
     }
 
     html += `
       <div class="vehicleCard vehicleEnter" onclick="entraVeicolo('${id}')">
+        <button class="vehicleDeleteBtn" onclick="event.stopPropagation(); eliminaVeicolo('${id}')">
+          🗑
+        </button>
+
         <div class="vehicleArrow">›</div>
         <div class="vehicleTitle">
           ${getVehicleIcon(v)} ${v.marca || ""} ${v.modello || v.nome || ""}
@@ -157,4 +185,31 @@ window.entraVeicolo=function(id){
   setVehicleId(id);
   setTab("home","garage");
   render();
+}
+
+window.eliminaVeicolo = async function(id){
+  if(!confirm("Eliminare completamente questo veicolo?")) return;
+
+  const base = ["users",auth.currentUser.uid,"vehicles",id];
+  const collezioni = [
+    "manutenzioni",
+    "registro",
+    "fuel"
+  ];
+
+  for(const c of collezioni){
+    const snap = await getDocs(
+      collection(db,...base,c)
+    );
+
+    for(const d of snap.docs){
+      await deleteDoc(d.ref);
+    }
+  }
+
+  await deleteDoc(
+    doc(db,...base)
+  );
+
+  location.reload();
 }

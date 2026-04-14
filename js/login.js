@@ -1,51 +1,77 @@
 import { register, login } from "./auth.js";
 
 export function renderLogin(){
+    document.body.classList.remove("loading");
 
-    const app = document.getElementById("app");
-
-    if(!app){
-        console.error("Elemento #app non trovato");
-        return;
-    }
+    const splash = document.getElementById("splash");
+    if(splash) splash.remove();
+    
+    const app = document.getElementById("app")
 
     app.innerHTML = `
-        <div class="loginScreen">
-            <h2>Login</h2>
+        <div class="loginWrapper">
+            <div class="loginCard">
 
-            <input id="email" placeholder="Email">
+                <div class="loginLogo">
+                    <img src="./img/logo.png" alt="Logo">
+                </div>
+                <div class="loginTitle">Garage Manager</div>
 
-            <input id="password" type="password" placeholder="Password">
+                <div class="loginField">
+                    <input id="email" class="formInput" placeholder="Email">
+                </div>
 
-            <button onclick="doLogin()">Login</button>
+                <div class="loginField">
+                    <input id="password" type="password" class="formInput" placeholder="Password">
+                </div>
+
+                <button class="formButton" onclick="doLogin()">
+                    Accedi
+                </button>
+
+                <div class="loginDivider">oppure</div>
+
+                <button class="secondaryBtn" onclick="doRegister()">
+                    Crea account
+                </button>
+            </div>
         </div>
-    `;
+    `
 }
 
 window.doLogin = async function(){
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
 
-const email = document.getElementById("email").value;
-const pass = document.getElementById("password").value;
+    try{
+        await login(email,pass)
+    }catch(e){
+        let msg = "Errore login"
 
-try{
-await login(email,pass);
-location.reload();
-}catch(e){
-alert(e.message);
-}
+        if(e.code === "auth/user-not-found"){
+            msg = "Utente non registrato"
+        }
 
+        if(e.code === "auth/wrong-password"){
+            msg = "Password errata"
+        }
+
+        if(e.code === "auth/invalid-email"){
+            msg = "Email non valida"
+        }
+
+        alert(msg)
+    }
 }
 
 window.doRegister = async function(){
+    const email = document.getElementById("email").value;
+    const pass = document.getElementById("password").value;
 
-const email = document.getElementById("email").value;
-const pass = document.getElementById("password").value;
-
-try{
-await register(email,pass);
-location.reload();
-}catch(e){
-alert(e.message);
-}
-
+    try{
+        await register(email,pass);
+        location.reload();
+    }catch(e){
+        alert(e.message);
+    }
 }

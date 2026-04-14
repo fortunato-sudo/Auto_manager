@@ -48,9 +48,10 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
         if(stato.stato==="imminente") imm++;
     });
 
-    const saluteData = calcolaSaluteVeicolo(urg, imm, stats);
-    const salute = saluteData.score;
-    const problemiSalute = saluteData.problemi;
+    let saluteData = calcolaSaluteVeicolo(urg, imm, stats);
+    const nessunDato = manutList.length === 0;
+    const salute = nessunDato ? null : saluteData.score;
+    const problemiSalute = nessunDato ? [] : saluteData.problemi;
 
     let tagliandoKm = vehicle?.tagliando_km || null;
     let tagliandoStato = vehicle?.tagliando_stato || "ok";
@@ -76,6 +77,8 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
     const stato = statoVeicolo(urg, imm, null);
     const classeSalute = getClasseSalute(salute);   
     const statoSalute = getStatoSalute(salute);
+    
+
     appDiv.innerHTML+=`
         ${headerMenu("Dashboard")}
 
@@ -84,13 +87,29 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
                 🚗 Salute veicolo
             </div>
 
-            <div class="healthScore ${classeSalute}">
-                ${salute}%
-            </div>
+            ${
+                nessunDato
+                ?
+                `
+                <div class="healthScore healthNoData">
+                    —
+                </div>
 
-            <div class="healthState ${classeSalute}">
-                ${statoSalute}
-            </div>
+                <div class="healthState healthNoDataText">
+                    Nessun dato
+                </div>
+                `
+                :
+                `
+                <div class="healthScore ${classeSalute}">
+                    ${salute}%
+                </div>
+
+                <div class="healthState ${classeSalute}">
+                    ${statoSalute}
+                </div>
+                `
+            }
 
             <div class="healthBar">
                 <div class="healthFill ${classeSalute}" 
@@ -99,7 +118,14 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
             </div>
 
             ${
-                problemiSalute.length > 0 ?
+                nessunDato
+                ?
+                `<div class="healthIssues">
+                    Aggiungi manutenzioni per monitorare lo stato del veicolo
+                </div>`
+                :
+                problemiSalute.length > 0
+                ?
                 `<div class="healthIssues">
                     ${problemiSalute.join("<br>")}
                 </div>`
@@ -216,24 +242,30 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
             </div>
         </div>
 
-        <div class="section">⚠️ Interventi da controllare</div>
-        <div id="imminenti">
-            ${
-                urg === 0 && imm === 0
-                ?
-                `<div class="noInterventi">
-                    <div class="noInterventiIcon">✅</div>
-                    <div class="noInterventiText">
-                        Tutto in regola
-                    </div>
-                    <div class="noInterventiSub">
-                        Nessun intervento necessario
-                    </div>
-                </div>`
-                :
-                ""
-            }
-        </div>
+        ${
+            urg > 0 || imm > 0
+            ?
+            `<div class="section">⚠️ Interventi da controllare</div>
+            <div id="imminenti"></div>
+            `
+            :
+            ""
+        }
+        ${
+            urg === 0 && imm === 0
+            ?
+            `<div class="noInterventi">
+                <div class="noInterventiIcon">✅</div>
+                <div class="noInterventiText">
+                    Tutto in regola
+                </div>
+                <div class="noInterventiSub">
+                    Nessun intervento necessario
+                </div>
+            </div>`
+            :
+            ""
+        }
     `;
 	appDiv.style.opacity = 1;
 
