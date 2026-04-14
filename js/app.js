@@ -182,7 +182,7 @@ async function render(){
         }
 
         const vehicleSnap = await getDoc(doc(db,...vehiclePath(vehicleId)));
-        const currentVehicle = vehicleSnap.data();
+        const currentVehicle = vehicleSnap.exists() ? vehicleSnap.data() : {};
 
         let km = cacheConfig;
         if(km===null){
@@ -376,7 +376,8 @@ async function render(){
     }
     finally{
         setRendering(false);
-        if(!document.getElementById("app")) return;
+        const app = document.getElementById("app");
+        if(!app) return;
         const splash = document.getElementById("splash");
         if(splash){
             const elapsed = Date.now() - splashStart;

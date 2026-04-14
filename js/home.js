@@ -56,7 +56,7 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
     let tagliandoKm = vehicle?.tagliando_km || null;
     let tagliandoStato = vehicle?.tagliando_stato || "ok";
     let tagliandoText = "-";
-    if(vehicle.tagliando_km){
+    if(vehicle?.tagliando_km){
         let diff = vehicle.tagliando_km - km;
 
         if(diff <= 0){
@@ -67,7 +67,7 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
     }
 
     let tagliandoProgress = 0;
-    if(vehicle.tagliando_km){
+    if(vehicle?.tagliando_km){
         const intervallo = vehicle.tagliando_intervallo || 15000;
         const fatto = intervallo - (vehicle.tagliando_km - km);
         tagliandoProgress = Math.max(0, Math.min(100, (fatto / intervallo) * 100));
@@ -79,7 +79,7 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
     const statoSalute = getStatoSalute(salute);
     
 
-    appDiv.innerHTML+=`
+    appDiv.innerHTML=`
         ${headerMenu("Dashboard")}
 
         <div class="widget healthWidget">
@@ -270,7 +270,7 @@ export function renderHome(appDiv, km, manutList, stats, vehicle, costoAuto, aut
 	appDiv.style.opacity = 1;
 
     setTimeout(()=>{
-        const bar = document.querySelector(".healthFill");
+        const bar = appDiv.querySelector(".healthFill");
 
         if(bar){
             const score = bar.dataset.score;
