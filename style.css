@@ -1009,6 +1009,8 @@ body.dark .wValue{
 
 body.menuOpen{
     overflow:hidden;
+    position:fixed;
+    width:100%;
 }
 
 .menuItem{
