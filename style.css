@@ -3,18 +3,14 @@
     margin:0 auto;
     padding:16px;
     box-sizing:border-box;
-
-    opacity:0;
-    visibility:hidden;
-    transition:opacity .35s;
-
-    padding-top:env(safe-area-inset-top);
-    padding-bottom:env(safe-area-inset-bottom);
-
-    min-height:100dvh;
-    height:100%;
-
-    background:var(--bg);
+	opacity:0;
+	visibility:hidden;
+	transition:opacity .35s;
+	padding-bottom:40px;
+	min-height:100vh;
+	padding-top:env(safe-area-inset-top);
+	padding-bottom:env(safe-area-inset-bottom);
+	background:var(--bg);
 }
 
 :root{
@@ -47,7 +43,6 @@ body.dark .manutRow{
 }
 
 html,body{
-	height:100%;
     margin:0;
     overflow-x:hidden;
 }
@@ -959,15 +954,20 @@ body.dark .wValue{
     position:fixed;
     top:0;
     left:0;
+
     width:260px;
     height:100dvh;
-    background:#1c1c1e;
-    transform:translateX(-260px);
-    transition:transform .25s ease;
+
     display:flex;
     flex-direction:column;
-    padding-top:env(safe-area-inset-top);
-    z-index:1000;
+
+    padding-top:calc(60px + env(safe-area-inset-top));
+    padding-bottom:env(safe-area-inset-bottom);
+
+    transform:translateX(-260px);
+    transition:transform .25s ease;
+
+    overflow:hidden;
 }
 
 .menuHeader{
@@ -977,12 +977,14 @@ body.dark .wValue{
 .menuContent{
     flex:1;
     overflow-y:auto;
+    padding-bottom:10px;
 }
 
 .menuFooter{
+    flex-shrink:0;
     padding:16px;
     border-top:1px solid #2c2c2e;
-    flex-shrink:0;
+    background:inherit;
 }
 
 .menuLogout{
