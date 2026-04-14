@@ -968,6 +968,7 @@ body.dark .wValue{
     flex-direction:column;
 
     padding-top:env(safe-area-inset-top);
+    padding-bottom:env(safe-area-inset-bottom);
 
     z-index:1000;
 }
@@ -1014,9 +1015,6 @@ body.dark .wValue{
 
 body.menuOpen{
     overflow:hidden;
-}
-
-body.menuOpen #app{
     position:fixed;
     width:100%;
 }
