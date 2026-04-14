@@ -8,10 +8,29 @@ auth.onAuthStateChanged(async user => {
     document.body.classList.add("loading");
 
     if(!user){
-        console.log("SHOW LOGIN");
+    console.log("SHOW LOGIN");
+
+    const splash = document.getElementById("splash");
+    const elapsed = Date.now() - splashStart;
+    const delay = Math.max(2000 - elapsed, 0);
+
+    setTimeout(()=>{
         renderLogin();
-        return;
-    }
+
+        if(splash){
+            splash.style.transform="scale(1.12)";
+            splash.style.opacity="0";
+
+            setTimeout(()=>{
+                splash.remove();
+                document.body.classList.remove("loading");
+            },400);
+        }
+
+    }, delay);
+
+    return;
+}
     console.log("USER LOGGED");
 
     try{
