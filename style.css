@@ -955,23 +955,29 @@ body.dark .wValue{
     top:0;
     left:0;
     width:260px;
-
-    height:100%;
-    max-height:100dvh;
-
+    height:100dvh;
     background:#1c1c1e;
-
     transform:translateX(-260px);
     transition:transform .25s ease;
-
     display:flex;
     flex-direction:column;
-
     padding-top:env(safe-area-inset-top);
-    padding-bottom:env(safe-area-inset-bottom);
-
+    /* NESSUN padding-bottom */
     z-index:1000;
+    box-sizing:border-box;
 }
+
+.menuFooter{
+    padding:16px;
+    padding-bottom: env(safe-area-inset-bottom);   /* ← solo questo, niente calc */
+    border-top:1px solid #2c2c2e;
+    flex-shrink:0;
+    margin-top:auto;
+    width:100%;
+    box-sizing:border-box;
+}
+
+/* Rimuovi completamente lo pseudo-elemento ::after se lo avevi aggiunto */
 
 .menuHeader{
     padding:10px;
@@ -980,12 +986,7 @@ body.dark .wValue{
 .menuContent{
     flex:1;
     overflow-y:auto;
-}
-
-.menuFooter{
-    padding:16px;
-    border-top:1px solid #2c2c2e;
-    flex-shrink:0;
+    min-height:0;      /* ← forza il flex a rispettare i limiti */
 }
 
 .menuLogout{
@@ -1015,8 +1016,6 @@ body.dark .wValue{
 
 body.menuOpen{
     overflow:hidden;
-    position:fixed;
-    width:100%;
 }
 
 .menuItem{
