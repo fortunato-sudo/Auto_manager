@@ -955,7 +955,7 @@ body.dark .wValue{
     top:0;
     left:0;
     width:260px;
-    height:100dvh;
+    min-height:100dvh;
     background:#1c1c1e;
     transform:translateX(-260px);
     transition:transform .25s ease;
