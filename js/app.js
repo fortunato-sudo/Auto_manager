@@ -5,11 +5,7 @@ import { renderLogin } from "./login.js";
 auth.onAuthStateChanged(async user => {
     console.log("AUTH STATE", user);
 
-    const splash = document.getElementById("splash");
-    if(splash){
-        splash.remove();
-        document.body.classList.remove("loading");
-    }
+    document.body.classList.add("loading");
 
     if(!user){
         console.log("SHOW LOGIN");
