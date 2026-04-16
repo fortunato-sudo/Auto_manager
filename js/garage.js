@@ -3,6 +3,7 @@ import { setVehicleId, setTab } from "./state.js";
 import { headerMenu } from "./ui.js";
 import { calcolaStato } from "./manut.js";
 
+let swipeListenersInitialized = false;
 let startX = 0;
 let currentX = 0;
 let dragging = false;
@@ -231,105 +232,124 @@ window.eliminaVeicolo = async function(id){
   render();
 }
 
-document.addEventListener("touchstart", e => {
-  const row = e.target.closest(".vehicleSwipe");
-  if(!row) return;
+if(!swipeListenersInitialized){
+  swipeListenersInitialized = true;
 
-  const card = row.querySelector(".vehicleCard");
-  startX = e.touches[0].clientX;
-  dragging = true;
-  activeRow = row;
-  moved = false;
-  card.style.transition = "none";
+  document.addEventListener("touchstart", e => {
+    const row = e.target.closest(".vehicleSwipe");
+    if(!row) return;
 
-  if(openedRow && openedRow !== row){
-    openedRow.querySelector(".vehicleCard")
-    .style.transform = "translateX(0)";
-    openedRow = null;
-  }
-});
+    const card = row.querySelector(".vehicleCard");
+    startX = e.touches[0].clientX;
+    dragging = true;
+    activeRow = row;
+    moved = false;
+    card.style.transition = "none";
 
-document.addEventListener("touchmove", e => {
-  if(!dragging || !activeRow) return;
+    if(openedRow && openedRow !== row){
+      openedRow.querySelector(".vehicleCard")
+      .style.transform = "translateX(0)";
+      openedRow.classList.remove("open");
+      openedRow = null;
+    }
+  });
 
-  const card = activeRow.querySelector(".vehicleCard");
-  currentX = e.touches[0].clientX;
+  document.addEventListener("touchmove", e => {
+    if(!dragging || !activeRow) return;
 
-  let diff = currentX - startX;
-  if(Math.abs(diff) > 10){
-    moved = true;
-  }
+    const card = activeRow.querySelector(".vehicleCard");
+    currentX = e.touches[0].clientX;
 
-  if(diff < 0){
-    let maxSwipe = -120;
-
-    if(diff < maxSwipe){
-        diff = maxSwipe;
+    let diff = currentX - startX;
+    if(Math.abs(diff) > 10){
+      moved = true;
     }
 
-    card.style.transform = `translateX(${diff}px)`;
-    const bg = activeRow.querySelector(".vehicleSwipeBg");
-    bg.style.width = Math.min(Math.abs(diff),120) + "px";
+    if(diff < 0){
+      let maxSwipe = -120;
 
-    /* vibrazione quando compare delete */
-    if(diff < -80 && !hapticTriggered){
-      hapticTriggered = true;
+      if(diff < maxSwipe){
+          diff = maxSwipe;
+      }
 
-      if(navigator.vibrate){
-        navigator.vibrate([5,10,5]);
+      card.style.transform = `translateX(${diff}px)`;
+      const bg = activeRow.querySelector(".vehicleSwipeBg");
+      bg.style.width = Math.min(Math.abs(diff),120) + "px";
+
+      /* vibrazione quando compare delete */
+      if(diff < -80 && !hapticTriggered){
+        hapticTriggered = true;
+
+        if(navigator.vibrate){
+          navigator.vibrate([5,10,5]);
+        }
       }
     }
-  }
-});
+  });
 
-document.addEventListener("touchend", async ()=>{
-  if(!dragging || !activeRow) return;
+  document.addEventListener("touchend", async ()=>{
+    if(!dragging || !activeRow) return;
 
-  const card = activeRow.querySelector(".vehicleCard");
-  const diff = currentX - startX;
-  card.style.transition = "transform .25s ease";
-  if(diff < -140 || (diff < -70 && Math.abs(diff) > 100)){
-    const id = activeRow.dataset.id;
-    if(confirm("Eliminare questo veicolo?")){
-      await deleteDoc(
-        doc(db,"users",auth.currentUser.uid,"vehicles",id)
-      );
-      render();
+    const card = activeRow.querySelector(".vehicleCard");
+    const diff = currentX - startX;
+
+    if(!currentX){
+      dragging=false;
+      activeRow=null;
+      return;
+    }
+    
+    if(Math.abs(diff) < 25){
+      dragging=false;
+      activeRow=null;
+      return;
     }
 
-    card.style.transform="translateX(0)";
-    activeRow.querySelector(".vehicleSwipeBg").style.width="0";
-  }
+    card.style.transition = "transform .25s ease";
+    if(diff < -140 || (diff < -70 && Math.abs(diff) > 100)){
+      const id = activeRow.dataset.id;
+      if(confirm("Eliminare questo veicolo?")){
+        await deleteDoc(
+          doc(db,"users",auth.currentUser.uid,"vehicles",id)
+        );
+        render();
+      }
 
-  else if(diff < -70){
-    card.style.transform="translateX(-120px)";
-    openedRow = activeRow;
-  }
+      card.style.transform="translateX(0)";
+      activeRow.querySelector(".vehicleSwipeBg").style.width="0";
+    }
 
-  else{
-    card.style.transform="translateX(0)";
-    activeRow.querySelector(".vehicleSwipeBg").style.width="0";
-    openedRow=null;
-  }
+    else if(diff < -70){
+      card.style.transform="translateX(-120px)";
+      openedRow = activeRow;
+      openedRow.classList.add("open");
+    }
 
-  hapticTriggered = false;
-  dragging = false;
-  activeRow = null;
-});
+    else{
+      card.style.transform="translateX(0)";
+      activeRow.querySelector(".vehicleSwipeBg").style.width="0";
+      openedRow=null;
+    }
 
-document.querySelectorAll(".vehicleDeleteSwipe")
-.forEach(btn=>{
-  btn.addEventListener("click",async e=>{
-    const row = btn.closest(".vehicleSwipe");
-    const id = row.dataset.id;
-
-    if(!confirm("Eliminare questo veicolo?")) return;
-
-    await deleteDoc(
-      doc(db,"users",auth.currentUser.uid,"vehicles",id)
-    );
-    render();
+    hapticTriggered = false;
+    dragging = false;
+    activeRow = null;
   });
+}
+
+document.addEventListener("click", async e=>{
+  const btn = e.target.closest(".vehicleDeleteSwipe");
+  if(!btn) return;
+
+  const row = btn.closest(".vehicleSwipe");
+  const id = row.dataset.id;
+
+  if(!confirm("Eliminare questo veicolo?")) return;
+
+  await deleteDoc(
+  doc(db,"users",auth.currentUser.uid,"vehicles",id)
+  );
+  render();
 });
 
 document.addEventListener("click",e=>{
