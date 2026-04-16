@@ -275,7 +275,7 @@ body:not(.dark) .menuItem{
     will-change:transform;
 	box-shadow:0 6px 18px rgba(0,0,0,0.08);
 	transition:
-        transform .15s ease,
+        transform .25s ease,
         box-shadow .15s ease,
         background .15s ease;
 	position:relative;
@@ -315,6 +315,10 @@ body:not(.dark) .menuItem{
 
 .vehicleSwipeBg{
     position:absolute;
+    right:0;
+    top:0;
+    bottom:0;
+    width:120px;
     inset:0;
     background:#ff3b30;
     display:flex;
