@@ -519,6 +519,34 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
+    
+    let backStartX = 0;
+    let backTracking = false;
+
+    document.addEventListener("pointerdown",e=>{
+
+        if(e.clientX < 20){
+            backStartX = e.clientX;
+            backTracking = true;
+        }
+    });
+
+    document.addEventListener("pointermove",e=>{
+        if(!backTracking) return;
+
+        let diff = e.clientX - backStartX;
+        if(diff > 120){
+            backTracking=false;
+
+            if(window.indietro){
+                window.indietro();
+            }
+        }
+    });
+
+    document.addEventListener("pointerup",()=>{
+        backTracking=false;
+    });
 });
 window.render = render;
 

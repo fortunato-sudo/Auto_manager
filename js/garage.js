@@ -3,14 +3,11 @@ import { setVehicleId, setTab } from "./state.js";
 import { headerMenu } from "./ui.js";
 import { calcolaStato } from "./manut.js";
 
-let swipeListenersInitialized = false;
 let startX = 0;
 let currentX = 0;
 let dragging = false;
-let activeRow = null;
-let openedRow = null;
-let hapticTriggered = false;
 let moved = false;
+let blockClick = false;
 
 function getVehicleIcon(v){
   if(v.tipo === "moto") return "🏍";
@@ -179,6 +176,8 @@ export async function renderGarage(appDiv){
   }
   document.getElementById("garageList").innerHTML = html;
 
+  initSwipe();
+
   requestAnimationFrame(()=>{
     document.querySelectorAll(".vehicleCard")
     .forEach((el,i)=>{
@@ -194,13 +193,117 @@ export async function renderGarage(appDiv){
   });
 }
 
+function initSwipe(){
+  const rows = document.querySelectorAll(".vehicleSwipe");
+  rows.forEach(row=>{
+    let startX = 0;
+    let currentX = 0;
+    let dragging = false;
+    let moved = false;
+
+    const card = row.querySelector(".vehicleCard");
+    const bg = row.querySelector(".vehicleSwipeBg");
+    row.addEventListener("pointerdown",e=>{
+      startX = e.clientX;
+      currentX = e.clientX;
+      dragging = true;
+      moved = false;
+
+      card.style.transition="none";
+    });
+
+    row.addEventListener("pointermove",e=>{
+      if(!dragging) return;
+
+      currentX = e.clientX;
+      let diff = currentX - startX;
+
+      if(Math.abs(diff) > 10){
+        moved = true;
+        blockClick = true;
+      }
+
+      if(diff < 0){
+          if(diff < -120){
+              diff = -120;
+          }
+
+          card.style.transform=`translateX(${diff}px)`;
+          bg.style.width = Math.min(Math.abs(diff),120)+"px";
+      }
+    });
+
+    row.addEventListener("pointerup",async ()=>{
+      if(!dragging) return;
+
+      if(!moved){
+          dragging=false;
+          return;
+      }
+
+      dragging = false;
+
+      let diff = currentX - startX;
+      card.style.transition="transform .25s ease";
+      if(diff < -100){
+        const id = row.dataset.id;
+
+        if(confirm("Eliminare questo veicolo?")){
+          await deleteDoc(
+            doc(db,"users",auth.currentUser.uid,"vehicles",id)
+          );
+
+          render();
+          return;
+        }
+      }
+
+      card.style.transform="translateX(0)";
+      bg.style.width="0";
+
+      setTimeout(()=>{
+        blockClick = false;
+      },150);
+    });
+  });
+}
+
 window.entraVeicolo=function(id){
+  if(blockClick) return;
 
-  if(moved) return;
+  const card = event.currentTarget;
+  const rect = card.getBoundingClientRect();
+  const clone = card.cloneNode(true);
 
-  setVehicleId(id);
-  setTab("home","garage");
-  render();
+  clone.classList.add("vehicleOpenAnim");
+  clone.style.top = rect.top + "px";
+  clone.style.left = rect.left + "px";
+  clone.style.width = rect.width + "px";
+  clone.style.height = rect.height + "px";
+
+  document.body.appendChild(clone);
+
+  const overlay = document.createElement("div");
+  overlay.className="vehicleOpenOverlay";
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(()=>{
+      overlay.style.opacity="1";
+      clone.style.top="0";
+      clone.style.left="0";
+      clone.style.width="100%";
+      clone.style.height="100%";
+      clone.style.borderRadius="0";
+  });
+
+  setTimeout(()=>{
+      setVehicleId(id);
+      setTab("home","garage");
+      render();
+
+      clone.remove();
+      overlay.remove();
+  },350);
 }
 
 window.eliminaVeicolo = async function(id){
@@ -231,147 +334,3 @@ window.eliminaVeicolo = async function(id){
   setTab("garage");
   render();
 }
-
-if(!swipeListenersInitialized){
-  swipeListenersInitialized = true;
-
-  document.addEventListener("touchstart", e => {
-    if(!document.getElementById("garageList")) return;
-
-    const row = e.target.closest(".vehicleSwipe");
-    if(!row) return;
-
-    const card = row.querySelector(".vehicleCard");
-    startX = e.touches[0].clientX;
-    dragging = true;
-    activeRow = row;
-    moved = false;
-    card.style.transition = "none";
-
-    if(openedRow && openedRow !== row){
-      openedRow.querySelector(".vehicleCard")
-      .style.transform = "translateX(0)";
-      openedRow.classList.remove("open");
-      openedRow = null;
-    }
-  });
-
-  document.addEventListener("touchmove", e => {
-    if(!document.getElementById("garageList")) return;
-
-    if(!dragging || !activeRow) return;
-
-    const card = activeRow.querySelector(".vehicleCard");
-    currentX = e.touches[0].clientX;
-
-    let diff = currentX - startX;
-    if(Math.abs(diff) > 10){
-      moved = true;
-    }
-
-    if(diff < 0){
-      let maxSwipe = -120;
-
-      if(diff < maxSwipe){
-          diff = maxSwipe;
-      }
-
-      card.style.transform = `translateX(${diff}px)`;
-      const bg = activeRow.querySelector(".vehicleSwipeBg");
-      bg.style.width = Math.min(Math.abs(diff),120) + "px";
-
-      /* vibrazione quando compare delete */
-      if(diff < -80 && !hapticTriggered){
-        hapticTriggered = true;
-
-        if(navigator.vibrate){
-          navigator.vibrate([5,10,5]);
-        }
-      }
-    }
-  });
-
-  document.addEventListener("touchend", async ()=>{
-    if(!document.getElementById("garageList")) return;
-    
-    if(!dragging || !activeRow) return;
-
-    const card = activeRow.querySelector(".vehicleCard");
-    const diff = currentX - startX;
-
-    if(!currentX){
-      dragging=false;
-      activeRow=null;
-      return;
-    }
-    
-    if(Math.abs(diff) < 25){
-      dragging=false;
-      activeRow=null;
-      return;
-    }
-
-    card.style.transition = "transform .25s ease";
-    if(diff < -140 || (diff < -70 && Math.abs(diff) > 100)){
-      const id = activeRow.dataset.id;
-      if(confirm("Eliminare questo veicolo?")){
-        await deleteDoc(
-          doc(db,"users",auth.currentUser.uid,"vehicles",id)
-        );
-        render();
-        return;
-      }
-
-      /* reset completo swipe */
-      card.style.transform="translateX(0)";
-      activeRow.querySelector(".vehicleSwipeBg").style.width="0";
-      activeRow.classList.remove("open");
-      openedRow = null;
-    }
-
-    else if(diff < -70){
-      card.style.transform="translateX(-120px)";
-      openedRow = activeRow;
-      openedRow.classList.add("open");
-    }
-
-    else{
-      card.style.transform="translateX(0)";
-      activeRow.querySelector(".vehicleSwipeBg").style.width="0";
-      openedRow=null;
-    }
-
-    hapticTriggered = false;
-    dragging = false;
-    activeRow = null;
-    currentX = 0;
-    startX = 0;
-  });
-}
-
-document.addEventListener("click", async e=>{
-  const btn = e.target.closest(".vehicleDeleteSwipe");
-  if(!btn) return;
-
-  const row = btn.closest(".vehicleSwipe");
-  const id = row.dataset.id;
-
-  if(!confirm("Eliminare questo veicolo?")) return;
-
-  await deleteDoc(
-  doc(db,"users",auth.currentUser.uid,"vehicles",id)
-  );
-  render();
-});
-
-document.addEventListener("click",e=>{
-    if(!openedRow) return;
-
-    if(!openedRow.contains(e.target)){
-      const card = openedRow.querySelector(".vehicleCard");
-      const bg = openedRow.querySelector(".vehicleSwipeBg");
-      card.style.transform="translateX(0)";
-      bg.style.width="0";
-      openedRow=null;
-    }
-});
