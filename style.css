@@ -284,33 +284,21 @@ body:not(.dark) .menuItem{
     z-index: 2;
 }
 
-.vehicleCard:hover{
-    transform:translateY(-2px);
-    box-shadow:0 6px 16px rgba(0,0,0,0.15);
+@media (hover:hover){
+  .vehicleCard:hover{
+      transform:translateY(-2px);
+      box-shadow:0 6px 16px rgba(0,0,0,0.15);
+  }
 }
 
 .vehicleCard:active{
-    box-shadow:0 2px 10px rgba(0,0,0,0.12);
-}
-
-.vehicleSwipe.vehicleEnter{
-    animation:vehicleEnter .35s ease;
-}
-
-@keyframes vehicleEnter{
-    from{
-        transform:scale(.96);
-        opacity:.6;
-    }
-    to{
-        transform:scale(1);
-        opacity:1;
-    }
+    transform:scale(.995);
 }
 
 .vehicleSwipe{
     position:relative;
     overflow:hidden;
+    touch-action:pan-y;
     contain: layout paint;
 }
 
@@ -458,8 +446,9 @@ body:not(.dark) .menuItem{
 }
 
 .interventiText{
-    font-size:14px;
-    font-weight:500;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
 }
 
 .dark .vehicleCard{

@@ -8,7 +8,6 @@ let currentX = 0;
 let dragging = false;
 let moved = false;
 let blockClick = false;
-let swipeListenersInitialized = false;
 
 function getVehicleIcon(v){
   if(v.tipo === "moto") return "🏍";
@@ -110,20 +109,20 @@ export async function renderGarage(appDiv){
 
       if(urgenti > 0){
         parts.push(
-          `<span class="vehicleBadge badgeDanger">🔴 ${urgenti === 1 ? "1 intervento urgente" : urgenti + " interventi urgenti"}</span>`
+          `<div class="vehicleBadge badgeDanger">🔴 ${urgenti === 1 ? "1 intervento urgente" : urgenti + " interventi urgenti"}</div>`
         );
       }
 
       if(imminenti > 0){
         parts.push(
-          `<span class="vehicleBadge badgeWarning">🟠 ${imminenti === 1 ? "1 intervento imminente" : imminenti + " interventi imminenti"}</span>`
+          `<div class="vehicleBadge badgeWarning">🟠 ${imminenti === 1 ? "1 intervento imminente" : imminenti + " interventi imminenti"}</div>`
         );
       }
 
       interventiText = `
-        <span class="interventiText">
-          ${parts.join('<span class="interventiDivider"></span>')}
-        </span>
+        <div class="interventiText">
+          ${parts.join("")}
+        </div>
       `;
     }
 
@@ -195,11 +194,9 @@ export async function renderGarage(appDiv){
 }
 
 function initSwipe(){
-  if(swipeListenersInitialized) return;
-  swipeListenersInitialized = true;
-
   const rows = document.querySelectorAll(".vehicleSwipe");
   rows.forEach(row=>{
+    row.style.touchAction="none";
     let startX = 0;
     let currentX = 0;
     let dragging = false;
@@ -208,8 +205,8 @@ function initSwipe(){
     const card = row.querySelector(".vehicleCard");
     const bg = row.querySelector(".vehicleSwipeBg");
     row.addEventListener("pointerdown",e=>{
-      e.preventDefault();   // blocca scroll browser
-
+      if(e.button !== 0) return;
+      
       startX = e.clientX;
       currentX = e.clientX;
       dragging = true;
@@ -277,39 +274,9 @@ function initSwipe(){
 window.entraVeicolo=function(id){
   if(blockClick) return;
 
-  const card = event.currentTarget;
-  const rect = card.getBoundingClientRect();
-  const clone = card.cloneNode(true);
-
-  clone.classList.add("vehicleOpenAnim");
-  clone.style.top = rect.top + "px";
-  clone.style.left = rect.left + "px";
-  clone.style.width = rect.width + "px";
-  clone.style.height = rect.height + "px";
-
-  document.body.appendChild(clone);
-
-  const overlay = document.createElement("div");
-  overlay.className="vehicleOpenOverlay";
-  document.body.appendChild(overlay);
-
-  requestAnimationFrame(()=>{
-      overlay.style.opacity="1";
-      clone.style.top="0";
-      clone.style.left="0";
-      clone.style.width="100%";
-      clone.style.height="100%";
-      clone.style.borderRadius="0";
-  });
-
-  setTimeout(()=>{
-      setVehicleId(id);
-      setTab("home","garage");
-      render();
-
-      clone.remove();
-      overlay.remove();
-  },350);
+  setVehicleId(id);
+  setTab("home","garage");
+  render();
 }
 
 window.eliminaVeicolo = async function(id){

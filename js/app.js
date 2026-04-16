@@ -482,31 +482,6 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.add("dark");
     }
 
-    /* swipe menu */
-    let startX = 0;
-    document.addEventListener("touchstart",function(e){
-        startX = e.touches[0].clientX;
-    });
-
-    document.addEventListener("touchmove",function(e){
-        const garage = document.getElementById("garageList");
-
-        /* se siamo nel garage NON aprire menu */
-        if(garage) return;
-
-        let currentX = e.touches[0].clientX;
-        let diff = currentX - startX;
-        const menu=document.getElementById("menuDrawer");
-
-        if(menu && menu.classList.contains("menuOpen")){
-            if(diff < -50){
-                menu.classList.remove("menuOpen");
-                document.getElementById("menuOverlay")
-                .classList.remove("menuOverlayOpen");
-            }
-        }
-    });
-
     const overlay = document.getElementById("menuOverlay");
     if(overlay){
         overlay.addEventListener("click",function(){
@@ -524,34 +499,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
-    
-    let backStartX = 0;
-    let backTracking = false;
-
-    document.addEventListener("pointerdown",e=>{
-
-        if(e.clientX < 20){
-            backStartX = e.clientX;
-            backTracking = true;
-        }
-    });
-
-    document.addEventListener("pointermove",e=>{
-        if(!backTracking) return;
-
-        let diff = e.clientX - backStartX;
-        if(diff > 120){
-            backTracking=false;
-
-            if(window.indietro){
-                window.indietro();
-            }
-        }
-    });
-
-    document.addEventListener("pointerup",()=>{
-        backTracking=false;
-    });
 });
 window.render = render;
 
@@ -575,3 +522,66 @@ if("serviceWorker" in navigator){
         });
     });
 }
+
+let gestureStartX = 0;
+let gestureStartY = 0;
+let gestureActive = false;
+let gestureType = null;
+
+document.addEventListener("pointerdown",e=>{
+
+    gestureStartX = e.clientX;
+    gestureStartY = e.clientY;
+    gestureActive = true;
+    gestureType = null;
+
+});
+
+document.addEventListener("pointermove",e=>{
+
+    if(!gestureActive) return;
+
+    const diffX = e.clientX - gestureStartX;
+    const diffY = e.clientY - gestureStartY;
+
+    /* ignora scroll verticale */
+    if(Math.abs(diffY) > Math.abs(diffX)) return;
+
+    const inGarage = document.getElementById("garageList");
+
+    /* se siamo nel garage lascia gestire lo swipe al garage.js */
+    if(inGarage){
+        gestureActive = false;
+        return;
+    }
+
+    /* swipe menu */
+    if(gestureStartX < 20 && diffX > 60){
+
+        const menu=document.getElementById("menuDrawer");
+        const overlay=document.getElementById("menuOverlay");
+
+        menu.classList.add("menuOpen");
+        overlay.classList.add("menuOverlayOpen");
+
+        gestureActive=false;
+        return;
+    }
+
+    /* swipe back */
+    if(gestureStartX < 20 && diffX > 120){
+
+        if(window.indietro){
+            window.indietro();
+        }
+
+        gestureActive=false;
+        return;
+    }
+
+});
+
+document.addEventListener("pointerup",()=>{
+    gestureActive=false;
+    gestureType=null;
+});
