@@ -9,6 +9,7 @@ let dragging = false;
 let activeRow = null;
 let openedRow = null;
 let hapticTriggered = false;
+let moved = false;
 
 function getVehicleIcon(v){
   if(v.tipo === "moto") return "🏍";
@@ -193,6 +194,9 @@ export async function renderGarage(appDiv){
 }
 
 window.entraVeicolo=function(id){
+
+  if(moved) return;
+
   setVehicleId(id);
   setTab("home","garage");
   render();
@@ -235,6 +239,7 @@ document.addEventListener("touchstart", e => {
   startX = e.touches[0].clientX;
   dragging = true;
   activeRow = row;
+  moved = false;
   card.style.transition = "none";
 
   if(openedRow && openedRow !== row){
@@ -251,12 +256,15 @@ document.addEventListener("touchmove", e => {
   currentX = e.touches[0].clientX;
 
   let diff = currentX - startX;
+  if(Math.abs(diff) > 10){
+    moved = true;
+  }
+
   if(diff < 0){
     let maxSwipe = -120;
 
-    /* elasticità */
     if(diff < maxSwipe){
-      diff = maxSwipe + (diff - maxSwipe) * 0.3;
+        diff = maxSwipe;
     }
 
     card.style.transform = `translateX(${diff}px)`;
