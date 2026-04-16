@@ -236,6 +236,8 @@ if(!swipeListenersInitialized){
   swipeListenersInitialized = true;
 
   document.addEventListener("touchstart", e => {
+    if(!document.getElementById("garageList")) return;
+
     const row = e.target.closest(".vehicleSwipe");
     if(!row) return;
 
@@ -255,6 +257,8 @@ if(!swipeListenersInitialized){
   });
 
   document.addEventListener("touchmove", e => {
+    if(!document.getElementById("garageList")) return;
+
     if(!dragging || !activeRow) return;
 
     const card = activeRow.querySelector(".vehicleCard");
@@ -288,6 +292,8 @@ if(!swipeListenersInitialized){
   });
 
   document.addEventListener("touchend", async ()=>{
+    if(!document.getElementById("garageList")) return;
+    
     if(!dragging || !activeRow) return;
 
     const card = activeRow.querySelector(".vehicleCard");
@@ -313,10 +319,14 @@ if(!swipeListenersInitialized){
           doc(db,"users",auth.currentUser.uid,"vehicles",id)
         );
         render();
+        return;
       }
 
+      /* reset completo swipe */
       card.style.transform="translateX(0)";
       activeRow.querySelector(".vehicleSwipeBg").style.width="0";
+      activeRow.classList.remove("open");
+      openedRow = null;
     }
 
     else if(diff < -70){
@@ -334,6 +344,8 @@ if(!swipeListenersInitialized){
     hapticTriggered = false;
     dragging = false;
     activeRow = null;
+    currentX = 0;
+    startX = 0;
   });
 }
 
