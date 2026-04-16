@@ -8,6 +8,15 @@ auth.onAuthStateChanged(async user => {
     document.body.classList.add("loading");
 
     if(!user){
+
+    setVehicleId(null);
+    setTab("garage");
+
+    setCacheFuel(null);
+    setCacheManut(null);
+    setCacheRegistro(null);
+    setCacheConfig(null);
+
     console.log("SHOW LOGIN");
 
     const splash = document.getElementById("splash");
@@ -32,6 +41,12 @@ auth.onAuthStateChanged(async user => {
     return;
 }
     console.log("USER LOGGED");
+
+    setVehicleId(null);
+    setCacheFuel(null);
+    setCacheManut(null);
+    setCacheRegistro(null);
+    setCacheConfig(null);
 
     try{
         await preloadDB();
@@ -155,8 +170,14 @@ async function preloadDB(){
 }
 
 async function render(){
+
+    if(!auth.currentUser){
+        return;
+    }
+
     const appDiv = document.getElementById("app");
-        if(!vehicleId){
+
+    if(!vehicleId){
         const vehiclesSnap = await getDocs(
             collection(db,"users",auth.currentUser.uid,"vehicles")
         );
@@ -197,7 +218,15 @@ async function render(){
         }
 
         const vehicleSnap = await getDoc(doc(db,...vehiclePath(vehicleId)));
-        const currentVehicle = vehicleSnap.exists() ? vehicleSnap.data() : {};
+
+        if(!vehicleSnap.exists()){
+            setVehicleId(null);
+            setTab("garage");
+            render();
+            return;
+        }
+
+        const currentVehicle = vehicleSnap.data();
 
         let km = cacheConfig;
         if(km===null){
@@ -391,22 +420,25 @@ async function render(){
     }
     finally{
         setRendering(false);
-        const app = document.getElementById("app");
-        if(!app) return;
+
         const splash = document.getElementById("splash");
+
         if(splash){
             const elapsed = Date.now() - splashStart;
             const delay = Math.max(1800 - elapsed, 0);
-            
+
             setTimeout(()=>{
                 splash.style.transform="scale(1.12)";
                 splash.style.opacity="0";
-        
+
                 setTimeout(()=>{
                     splash.remove();
                     document.body.classList.remove("loading");
                 },400);
             }, delay);
+        }
+        else{
+            document.body.classList.remove("loading");
         }
     }
     updateDarkLabel();

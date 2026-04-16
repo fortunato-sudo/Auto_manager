@@ -272,9 +272,15 @@ body:not(.dark) .menuItem{
 	border-radius:16px;
 	padding:16px;
 	margin:12px 0;
+    will-change:transform;
 	box-shadow:0 6px 18px rgba(0,0,0,0.08);
-	transition:transform .25s, box-shadow .25s;
+	transition:
+        transform .15s ease,
+        box-shadow .15s ease,
+        background .15s ease;
 	position:relative;
+    touch-action:pan-y;
+    z-index: 2;
 }
 
 .vehicleCard:hover{
@@ -283,10 +289,11 @@ body:not(.dark) .menuItem{
 }
 
 .vehicleCard:active{
-    transform:scale(.97);
+    transform:scale(.96);
+    box-shadow:0 2px 10px rgba(0,0,0,0.12);
 }
 
-.vehicleEnter{
+.vehicleSwipe.vehicleEnter{
     animation:vehicleEnter .35s ease;
 }
 
@@ -299,6 +306,49 @@ body:not(.dark) .menuItem{
         transform:scale(1);
         opacity:1;
     }
+}
+
+.vehicleSwipe{
+    position:relative;
+    overflow:hidden;
+}
+
+.vehicleSwipeBg{
+    position:absolute;
+    inset:0;
+    background:#ff3b30;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    padding-right:22px;
+    margin: 12px 0;
+    border-radius: 18px;
+    opacity:0;
+    transition:opacity .15s;
+}
+
+.vehicleDeleteSwipe{
+    background:none;
+    border:none;
+    color:white;
+    font-size:17px;
+    font-weight:600;
+}
+
+.vehicleSwipe .vehicleCard{
+    position:relative;
+    z-index:2;
+    background:var(--card-bg);
+    transition:transform .2s ease;
+    touch-action:pan-y;
+}
+
+.vehicleSwipe.open .vehicleCard{
+    transform:translateX(-90px);
+}
+
+.vehicleSwipe.swiping .vehicleSwipeBg{
+    opacity:1;
 }
 
 .vehicleTitle{
@@ -393,6 +443,7 @@ body:not(.dark) .menuItem{
 	font-size:14px;
 	display:flex;
 	gap:8px;
+    row-gap:6px;
 	margin-top:4px;
     margin-bottom:4px;
     flex-wrap:wrap;
@@ -554,6 +605,10 @@ body:not(.dark) .menuItem{
 
 .vehicleFuelQuick:active{
     opacity:0.7;
+}
+
+.vehicleFuelQuick:hover{
+    transform:scale(1.05);
 }
 
 /* WIDGETS */
@@ -1629,10 +1684,13 @@ select{
 }
 
 .loginWrapper{
+    position:fixed;
+    inset:0;
     display:flex;
     align-items:center;
     justify-content:center;
-    min-height:100vh;
+    padding:20px;
+    overflow:hidden;
 }
 
 .loginCard{
@@ -1724,10 +1782,10 @@ select{
 
 .vehicleDeleteBtn{
     position:absolute;
-    top:12px;
+    bottom:12px;
     right:12px;
 
-    width:32px;
+    width:90px;
     height:32px;
 
     border:none;
@@ -1736,7 +1794,7 @@ select{
     background:#ff3b30;
     color:white;
 
-    font-size:16px;
+    font-size:12px;
     cursor:pointer;
 
     display:flex;

@@ -121,50 +121,158 @@ export async function renderGarage(appDiv){
     }
 
     html += `
-      <div class="vehicleCard vehicleEnter" onclick="entraVeicolo('${id}')">
-        <button class="vehicleDeleteBtn" onclick="event.stopPropagation(); eliminaVeicolo('${id}')">
-          🗑
-        </button>
-
-        <div class="vehicleArrow">›</div>
-        <div class="vehicleTitle">
-          ${getVehicleIcon(v)} ${v.marca || ""} ${v.modello || v.nome || ""}
-          ${v.motore ? `
-          <div class="vehicleSubtitle">
-            ${v.motore}
-          </div>
-        ` : ""}
+      <div class="vehicleSwipe" data-id="${id}">
+        <div class="vehicleSwipeBg">
+          <button class="vehicleDeleteSwipe">
+              Elimina
+          </button>
         </div>
-        
-        <div class="vehicleMeta">
-          ${v.targa ? `
-            <span class="plateITA">${v.targa}</span>
+
+        <div class="vehicleCard vehicleEnter" onclick="entraVeicolo('${id}')">
+          <div class="vehicleArrow">›</div>
+          <div class="vehicleTitle">
+            ${getVehicleIcon(v)} ${v.marca || ""} ${v.modello || v.nome || ""}
+            ${v.motore ? `
+            <div class="vehicleSubtitle">
+              ${v.motore}
+            </div>
           ` : ""}
+          </div>
+          
+          <div class="vehicleMeta">
+            ${v.targa ? `
+              <span class="plateITA">${v.targa}</span>
+            ` : ""}
 
-          <span class="vehicleKm">
-            ${km.toLocaleString()} km
-          </span>
-        </div>
-
-        <div class="vehicleAlerts">
-          <div class="vehicleTagliando">
-            ${tagliandoText}
+            <span class="vehicleKm">
+              ${km.toLocaleString()} km
+            </span>
           </div>
 
-          <div class="vehicleInterventi">
-            ${interventiText}
+          <div class="vehicleAlerts">
+            <div class="vehicleTagliando">
+              ${tagliandoText}
+            </div>
+
+            <div class="vehicleInterventi">
+              ${interventiText}
+            </div>
+
+            ${additivoText}
+
+            <span class="vehicleFuelQuick" onclick="event.stopPropagation(); nav('fuelAdd')">
+              ⛽ + Rifornimento
+            </span>
           </div>
-
-          ${additivoText}
-
-          <span class="vehicleFuelQuick" onclick="event.stopPropagation(); nav('fuelAdd')">
-            ⛽ Inserisci rifornimento
-          </span>
         </div>
       </div>
     `;
   }
   document.getElementById("garageList").innerHTML = html;
+
+  let startX = 0;
+  let currentX = 0;
+  let dragging = false;
+  let activeRow = null;
+  let openedRow = null;
+
+  document.querySelectorAll(".vehicleSwipe").forEach(row=>{
+      const card = row.querySelector(".vehicleCard");
+
+      row.addEventListener("touchstart",e=>{
+          row.classList.add("swiping");
+          startX = e.touches[0].clientX;
+          dragging = true;
+          activeRow = row;
+          card.style.transition="none";
+
+          /* chiude altre card aperte */
+          if(openedRow && openedRow !== row){
+              const c = openedRow.querySelector(".vehicleCard");
+              c.style.transform="translateX(0)";
+              openedRow=null;
+          }
+      });
+
+      row.addEventListener("touchmove",e=>{
+          if(!dragging) return;
+          currentX = e.touches[0].clientX;
+          let diff = currentX - startX;
+
+          if(diff < 0){
+              /* limite swipe */
+              let maxSwipe = -120;
+
+              /* elasticità */
+              if(diff < maxSwipe){
+                  diff = maxSwipe + (diff - maxSwipe) * 0.3;
+              }
+              card.style.transform=`translateX(${diff}px)`;
+
+              /* vibrazione quando appare delete */
+              if(diff < -70 && !row.classList.contains("haptic")){
+                  row.classList.add("haptic");
+
+                  if(navigator.vibrate){
+                      navigator.vibrate(10);
+                  }
+              }
+          }
+      });
+
+      row.addEventListener("touchend",()=>{
+          row.classList.remove("swiping");
+          dragging=false;
+
+          const matrix = new WebKitCSSMatrix(
+              window.getComputedStyle(card).transform
+          );
+
+          const x = matrix.m41;
+          card.style.transition="transform .25s ease";
+
+          if(x < -70){
+              card.style.transform="translateX(-120px)";
+              openedRow=row;
+          }
+          else{
+              card.style.transform="translateX(0)";
+              row.classList.remove("haptic");
+          }
+      });
+  });
+
+  document.querySelectorAll(".vehicleDeleteSwipe")
+  .forEach(btn=>{
+      btn.addEventListener("click",async e=>{
+          const row = btn.closest(".vehicleSwipe");
+          const id = row.dataset.id;
+
+          if(!confirm("Eliminare questo veicolo?")) return;
+
+          await deleteDoc(
+              doc(db,"users",auth.currentUser.uid,"vehicles",id)
+          );
+          render();
+      });
+  });
+
+  document.querySelectorAll(".vehicleSwipe.open")
+  .forEach(el=>{
+      if(el!==row){
+          el.classList.remove("open");
+          el.querySelector(".vehicleCard").style.transform="translateX(0)";
+      }
+  });
+
+  document.addEventListener("click",e=>{
+      document.querySelectorAll(".vehicleSwipe.open")
+      .forEach(el=>{
+          if(!el.contains(e.target)){
+              el.classList.remove("open");
+          }
+      });
+  });
 
   requestAnimationFrame(()=>{
     document.querySelectorAll(".vehicleCard")
@@ -211,5 +319,7 @@ window.eliminaVeicolo = async function(id){
     doc(db,...base)
   );
 
-  location.reload();
+  setVehicleId(null);
+  setTab("garage");
+  render();
 }
