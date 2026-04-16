@@ -316,19 +316,16 @@ body:not(.dark) .menuItem{
 .vehicleSwipeBg{
     position:absolute;
     right:0;
-    top:0;
-    bottom:0;
-    width:120px;
-    inset:0;
+    top:12px;
+    bottom:12px;
+    width:0;
     background:#ff3b30;
     display:flex;
     align-items:center;
-    justify-content:flex-end;
-    padding-right:22px;
-    margin: 12px 0;
-    border-radius: 18px;
-    opacity:0;
-    transition:opacity .15s;
+    justify-content:center;
+    border-radius:16px;
+    overflow:hidden;
+    transition:width .15s ease;
 }
 
 .vehicleDeleteSwipe{
@@ -349,10 +346,6 @@ body:not(.dark) .menuItem{
 
 .vehicleSwipe.open .vehicleCard{
     transform:translateX(-90px);
-}
-
-.vehicleSwipe.swiping .vehicleSwipeBg{
-    opacity:1;
 }
 
 .vehicleTitle{
