@@ -94,6 +94,20 @@ updateDarkLabel();
 
 const splashStart = Date.now();
 
+/* fallback splash */
+setTimeout(()=>{
+    const splash = document.getElementById("splash");
+
+    if(splash){
+        splash.style.opacity="0";
+
+        setTimeout(()=>{
+            splash.remove();
+            document.body.classList.remove("loading");
+        },400);
+    }
+},4000);
+
 window.logout = async function(){
     const menu = document.getElementById("menuDrawer")
     const overlay = document.getElementById("menuOverlay")
@@ -507,3 +521,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 window.render = render;
+
+if("serviceWorker" in navigator){
+    window.addEventListener("load",()=>{
+        navigator.serviceWorker
+        .register("/service-worker.js")
+        .then(reg=>{
+            console.log("Service Worker attivo");
+
+            reg.onupdatefound = ()=>{
+                const newWorker = reg.installing;
+
+                newWorker.onstatechange = ()=>{
+                    if(newWorker.state==="installed" && navigator.serviceWorker.controller){
+                        console.log("Nuova versione disponibile");
+                        location.reload();
+                    }
+                };
+            };
+        });
+    });
+}

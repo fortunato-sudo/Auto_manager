@@ -326,6 +326,11 @@ body:not(.dark) .menuItem{
     border-radius:16px;
     overflow:hidden;
     z-index:1;
+    pointer-events:none;
+}
+
+.vehicleSwipe.open .vehicleSwipeBg{
+    pointer-events:auto;
 }
 
 .vehicleDeleteSwipe{
