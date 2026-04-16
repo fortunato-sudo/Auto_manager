@@ -280,7 +280,7 @@ body:not(.dark) .menuItem{
         box-shadow .15s ease,
         background .15s ease;
 	position:relative;
-    touch-action:manipulation;
+    touch-action:none;
     z-index: 2;
 }
 

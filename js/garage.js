@@ -8,6 +8,7 @@ let currentX = 0;
 let dragging = false;
 let moved = false;
 let blockClick = false;
+let swipeListenersInitialized = false;
 
 function getVehicleIcon(v){
   if(v.tipo === "moto") return "🏍";
@@ -194,6 +195,9 @@ export async function renderGarage(appDiv){
 }
 
 function initSwipe(){
+  if(swipeListenersInitialized) return;
+  swipeListenersInitialized = true;
+
   const rows = document.querySelectorAll(".vehicleSwipe");
   rows.forEach(row=>{
     let startX = 0;
@@ -204,6 +208,8 @@ function initSwipe(){
     const card = row.querySelector(".vehicleCard");
     const bg = row.querySelector(".vehicleSwipeBg");
     row.addEventListener("pointerdown",e=>{
+      e.preventDefault();   // blocca scroll browser
+
       startX = e.clientX;
       currentX = e.clientX;
       dragging = true;

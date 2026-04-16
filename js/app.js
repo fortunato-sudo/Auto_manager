@@ -489,6 +489,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     document.addEventListener("touchmove",function(e){
+        const garage = document.getElementById("garageList");
+
+        /* se siamo nel garage NON aprire menu */
+        if(garage) return;
+
         let currentX = e.touches[0].clientX;
         let diff = currentX - startX;
         const menu=document.getElementById("menuDrawer");
