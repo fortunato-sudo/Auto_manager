@@ -8,6 +8,7 @@ let currentX = 0;
 let dragging = false;
 let activeRow = null;
 let openedRow = null;
+let hapticTriggered = false;
 
 function getVehicleIcon(v){
   if(v.tipo === "moto") return "🏍";
@@ -227,121 +228,110 @@ window.eliminaVeicolo = async function(id){
 }
 
 document.addEventListener("touchstart", e => {
+  const row = e.target.closest(".vehicleSwipe");
+  if(!row) return;
 
-    const row = e.target.closest(".vehicleSwipe");
-    if(!row) return;
+  const card = row.querySelector(".vehicleCard");
+  startX = e.touches[0].clientX;
+  dragging = true;
+  activeRow = row;
+  card.style.transition = "none";
 
-    const card = row.querySelector(".vehicleCard");
-
-    startX = e.touches[0].clientX;
-    dragging = true;
-    activeRow = row;
-
-    card.style.transition = "none";
-
-    if(openedRow && openedRow !== row){
-        openedRow.querySelector(".vehicleCard")
-        .style.transform = "translateX(0)";
-        openedRow = null;
-    }
+  if(openedRow && openedRow !== row){
+    openedRow.querySelector(".vehicleCard")
+    .style.transform = "translateX(0)";
+    openedRow = null;
+  }
 });
 
 document.addEventListener("touchmove", e => {
+  if(!dragging || !activeRow) return;
 
-    if(!dragging || !activeRow) return;
+  const card = activeRow.querySelector(".vehicleCard");
+  currentX = e.touches[0].clientX;
 
-    const card = activeRow.querySelector(".vehicleCard");
+  let diff = currentX - startX;
+  if(diff < 0){
+    let maxSwipe = -120;
 
-    currentX = e.touches[0].clientX;
-
-    let diff = currentX - startX;
-
-    if(diff < 0){
-
-        let maxSwipe = -160;
-
-        /* elasticità */
-        if(diff < maxSwipe){
-            diff = maxSwipe + (diff - maxSwipe) * 0.3;
-        }
-
-        card.style.transform = `translateX(${diff}px)`;
-
-        /* vibrazione quando compare delete */
-        if(diff < -80 && !activeRow.classList.contains("haptic")){
-
-            activeRow.classList.add("haptic");
-
-            if(navigator.vibrate){
-                navigator.vibrate(10);
-            }
-        }
+    /* elasticità */
+    if(diff < maxSwipe){
+      diff = maxSwipe + (diff - maxSwipe) * 0.3;
     }
+
+    card.style.transform = `translateX(${diff}px)`;
+    const bg = activeRow.querySelector(".vehicleSwipeBg");
+    bg.style.width = Math.min(Math.abs(diff),120) + "px";
+
+    /* vibrazione quando compare delete */
+    if(diff < -80 && !hapticTriggered){
+      hapticTriggered = true;
+
+      if(navigator.vibrate){
+        navigator.vibrate([5,10,5]);
+      }
+    }
+  }
 });
 
 document.addEventListener("touchend", async ()=>{
+  if(!dragging || !activeRow) return;
 
-    if(!dragging || !activeRow) return;
-
-    const card = activeRow.querySelector(".vehicleCard");
-
-    const matrix = new WebKitCSSMatrix(
-        window.getComputedStyle(card).transform
-    );
-
-    const x = matrix.m41;
-
-    card.style.transition = "transform .25s ease";
-
-    /* swipe lungo = elimina diretto */
-    if(x < -140){
-
-        const id = activeRow.dataset.id;
-
-        if(confirm("Eliminare questo veicolo?")){
-
-            await deleteDoc(
-                doc(db,"users",auth.currentUser.uid,"vehicles",id)
-            );
-
-            render();
-        }
-
-        card.style.transform="translateX(0)";
-        openedRow=null;
+  const card = activeRow.querySelector(".vehicleCard");
+  const diff = currentX - startX;
+  card.style.transition = "transform .25s ease";
+  if(diff < -140 || (diff < -70 && Math.abs(diff) > 100)){
+    const id = activeRow.dataset.id;
+    if(confirm("Eliminare questo veicolo?")){
+      await deleteDoc(
+        doc(db,"users",auth.currentUser.uid,"vehicles",id)
+      );
+      render();
     }
 
-    /* swipe medio = apre delete */
-    else if(x < -70){
+    card.style.transform="translateX(0)";
+    activeRow.querySelector(".vehicleSwipeBg").style.width="0";
+  }
 
-        card.style.transform="translateX(-120px)";
-        openedRow = activeRow;
-    }
+  else if(diff < -70){
+    card.style.transform="translateX(-120px)";
+    openedRow = activeRow;
+  }
 
-    /* swipe corto = chiude */
-    else{
+  else{
+    card.style.transform="translateX(0)";
+    activeRow.querySelector(".vehicleSwipeBg").style.width="0";
+    openedRow=null;
+  }
 
-        card.style.transform="translateX(0)";
-        openedRow=null;
-    }
-
-    activeRow.classList.remove("haptic");
-
-    dragging=false;
-    activeRow=null;
+  hapticTriggered = false;
+  dragging = false;
+  activeRow = null;
 });
 
 document.querySelectorAll(".vehicleDeleteSwipe")
 .forEach(btn=>{
   btn.addEventListener("click",async e=>{
-      const row = btn.closest(".vehicleSwipe");
-      const id = row.dataset.id;
+    const row = btn.closest(".vehicleSwipe");
+    const id = row.dataset.id;
 
-      if(!confirm("Eliminare questo veicolo?")) return;
+    if(!confirm("Eliminare questo veicolo?")) return;
 
-      await deleteDoc(
-          doc(db,"users",auth.currentUser.uid,"vehicles",id)
-      );
-      render();
+    await deleteDoc(
+      doc(db,"users",auth.currentUser.uid,"vehicles",id)
+    );
+    render();
   });
+});
+
+document.addEventListener("click",e=>{
+    if(!openedRow) return;
+
+    if(!openedRow.contains(e.target)){
+      const card = openedRow.querySelector(".vehicleCard");
+      const bg = openedRow.querySelector(".vehicleSwipeBg");
+      card.style.transform="translateX(0)";
+      bg.style.width="0";
+      openedRow=null;
+    }
 });

@@ -325,7 +325,7 @@ body:not(.dark) .menuItem{
     justify-content:center;
     border-radius:16px;
     overflow:hidden;
-    transition:width .15s ease;
+    z-index:1;
 }
 
 .vehicleDeleteSwipe{
